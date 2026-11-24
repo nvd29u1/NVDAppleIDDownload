@@ -103,11 +103,18 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   keychain service `com.NVD.appleiddownload.*`, entitlements keychain group
   `com.NVD.appleiddownload`. App icons (AppIcon.appiconset + the Xcode 26
   `AppIcon.icon` layered icon) and the Avatar asset are the green pig logo.
-- Deliberate exception: the built-in local install server still uses the
-  hostname `app.localhost.qaq.wiki` and its bundled TLS certificates. That
-  hostname is a functional DNS identity (it resolves via the author's DNS);
-  renaming it would break the local installer, and the default install path
-  (NVD manifest worker) does not use it at all.
+- Local install certificates (1.2, Nov 2026): the bundled TLS
+  certificates were regenerated under NVD — CA subject
+  "O = NVD, CN = NVD Local Installation CA" (SHA256 fingerprint
+  37:BD:D2:D8:03:2E:84:F0:15:A6:0D:F3:51:D6:86:81:A4:AA:2A:8D:9B:00:BB:63:69:99:3C:05:0F:C3:65:A0,
+  valid to 21 Nov 2036), leaf re-issued for `localhost.qaq.wiki` (1 year).
+  The hostname `app.localhost.qaq.wiki` itself is unchanged — it is a
+  functional DNS identity (it resolves via the author's DNS); renaming it
+  would break the local installer. The CA private key is NOT in the repo
+  (only rootCA.pem + leaf cert/key are bundled, same as upstream). The
+  default install path (NVD manifest worker) does not use these
+  certificates at all — they are only needed when the manifest server URL
+  is left empty (local install).
 - The Digger download library (SPM) still contains its own internal queue
   labels `wiki.qaq.diggerThread.*` inside the binary; they are not app
   branding and cannot be changed without forking Digger.

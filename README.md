@@ -13,7 +13,7 @@
 > **Máy chủ manifest mặc định:** https://nvd-manifest.nguyenvietdung156195.workers.dev
 > (worker Cloudflare riêng của nvd29u1 — chỉ tạo file manifest, file IPA không
 > đi qua máy chủ này). Xoá trắng ô "Cài đặt app" trong Cài đặt để về lại máy chủ
-> local trên máy (cần cài đặt và tin cậy chứng chỉ).
+> local trên máy (cần cài đặt và tin cậy chứng chỉ "NVD Local Installation CA").
 >
 > **Giới hạn cần biết:**
 > - Tải IPA từ App Store bắt buộc phải đăng nhập Apple ID sở hữu app đó.
