@@ -75,7 +75,7 @@ extension AppStore {
             logger.info("fetching Anisette headers from user server")
             anisetteHeaders = try await AnisetteService.fetchHeaders(from: serverURL)
             logger.info("fetched \(anisetteHeaders.count) Anisette headers")
-            await currentSession.anisetteHeaders = anisetteHeaders
+            await currentSession.setAnisetteHeaders(anisetteHeaders)
         } else {
             anisetteHeaders = [:]
         }
@@ -106,7 +106,7 @@ extension AppStore {
                     currentSession = try await ApplePackage.Authenticator()
                     // A fresh session loses the headers — attach them again
                     // so retries sign in with Anisette headers too.
-                    await currentSession.anisetteHeaders = anisetteHeaders
+                    await currentSession.setAnisetteHeaders(anisetteHeaders)
                 } catch {
                     // A fresh session could not even be created (bag/SAP
                     // handshake failed); keep the original error.
