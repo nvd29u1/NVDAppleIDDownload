@@ -153,7 +153,10 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   `nvd29u1/ApplePackage` (tag `nvd-anisette-1`, commit `3d320cf`) adds
   public `Authenticator.anisetteHeaders: [String: String]` (empty by
   default, old behaviour unchanged); `makeRequest()` attaches them before
-  the SAP signature, so authenticate + 2FA requests carry them. App SPM
+  the SAP signature, so authenticate + 2FA requests carry them. Fork
+  commit `2e0bb95` (24 Nov 2026) fixes two compile errors in that change
+  (`[:]` dictionary default, `await` on the actor property assignment);
+  app SPM pin updated to `2e0bb95`. App SPM
   pin moved to the fork (revision pin). Settings → "Máy chủ Anisette":
   user-typed server URL (default empty = off, stored in
   `AppStore.anisetteServerURL`), "Kiểm tra" button GETs the server and

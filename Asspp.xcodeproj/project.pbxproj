@@ -417,7 +417,7 @@
 			repositoryURL = "https://github.com/nvd29u1/ApplePackage";
 			requirement = {
 				kind = revision;
-				revision = 3d320cfe840ac98839502fe45bf245e2ef9a5d83;
+				revision = 2e0bb955d20d43d53d2a4a94983854081ab149e9;
 			};
 		};
 		50ABFE1D2F48AAE50077DE1A /* XCRemoteSwiftPackageReference "ButtonKit" */ = {
