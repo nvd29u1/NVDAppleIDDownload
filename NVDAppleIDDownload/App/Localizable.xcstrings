@@ -4669,6 +4669,50 @@
           }
         }
       }
+    },
+    "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "The selected account is for region %@, but this app is for region %@. Apple only allows adding to Purchased in the account's own region — if Apple reports an error, add an account for region %@ in the Accounts tab and select it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "所选账号属于 %@ 区，而该应用属于 %@ 区。Apple 仅允许在账号所属区域加入已购项目——如果 Apple 报错，请在“账号”页添加 %@ 区的账号并重新选择。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
+          }
+        }
+      }
+    },
+    "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple refused: this app is not in the store for the account's region %@. Add an account for region %@ in the Accounts tab, select it, then add to Purchased."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple 拒绝：该应用不在此账号所属 %@ 区商店中。请在“账号”页添加 %@ 区的账号并选中，再加入已购项目。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

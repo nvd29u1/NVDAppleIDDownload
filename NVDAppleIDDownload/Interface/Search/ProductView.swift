@@ -82,6 +82,40 @@ struct ProductView: View {
         )
     }
 
+    /// Ghi chú dưới nút "Nhập vào Đã mua" khi lệch vùng: Apple chỉ cho
+    /// nhập app vào Đã mua ở đúng vùng của tài khoản — nút vẫn bấm được
+    /// (app có ở cả hai vùng thì vẫn nhập được bằng vùng của tài khoản),
+    /// nhưng nếu Apple báo app không có trong cửa hàng thì phải thêm tài
+    /// khoản đúng vùng. Đã kiểm tra ApplePackage (fork nvd29u1, pin
+    /// 9dc423a): `Purchase.purchase(account:app:)` KHÔNG có tham số vùng
+    /// — header `X-Apple-Store-Front` lấy từ `account.store` (vùng đăng ký
+    /// của tài khoản, do Apple trả về lúc đăng nhập), không có cách nào
+    /// mua license theo vùng của gói bằng 1 tài khoản; đổi `store` của
+    /// tài khoản đã lưu cũng không được vì `withAccount` sẽ ghi đè lại
+    /// tài khoản đã lưu. Đây là giới hạn phía Apple, không phải lỗi app.
+    private func crossRegionPurchaseNote(for accountRegion: String) -> String {
+        String(
+            format: String(localized: "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."),
+            accountRegion, region, region
+        )
+    }
+
+    /// Lỗi khi Apple từ chối nhập vào Đã mua vì app không có trong cửa
+    /// hàng vùng của tài khoản: ApplePackage trả failureType 2059 ("app is
+    /// unavailable ... in this storefront") hoặc 1010 ("invalid store or
+    /// app unavailable in this storefront") — dịch sang tiếng Việt kèm
+    /// hướng dẫn thêm tài khoản đúng vùng.
+    private struct RegionPurchaseRefusal: LocalizedError {
+        let accountRegion: String
+        let packageRegion: String
+        var errorDescription: String? {
+            String(
+                format: String(localized: "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua."),
+                accountRegion, packageRegion
+            )
+        }
+    }
+
     var account: AppStore.UserAccount? {
         vm.accounts.first { $0.id == selection }
     }
@@ -174,14 +208,30 @@ struct ProductView: View {
 
     /// Rotates the password token and requests a license for the current
     /// account. Sets `licenseHint` to a success message; callers handle errors.
+    /// Lỗi vùng của Apple (failureType 2059 / 1010) được dịch sang tiếng
+    /// Việt kèm hướng dẫn thêm tài khoản đúng vùng (xem RegionPurchaseRefusal).
     private func acquireLicense() async throws {
         guard let account else { return }
-        try await vm.withAccount(id: account.id) { userAccount in
-            try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account)
-            try await ApplePackage.Purchase.purchase(
-                account: &userAccount.account,
-                app: archive.package.software,
-            )
+        do {
+            try await vm.withAccount(id: account.id) { userAccount in
+                try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account)
+                try await ApplePackage.Purchase.purchase(
+                    account: &userAccount.account,
+                    app: archive.package.software,
+                )
+            }
+        } catch {
+            let description = error.localizedDescription
+            if description.contains("failureType: 2059")
+                || description.contains("failureType: 1010")
+                || description.contains("unavailable in this storefront")
+                || description.contains("invalid store") {
+                throw RegionPurchaseRefusal(
+                    accountRegion: selectedAccountRegion ?? "?",
+                    packageRegion: region
+                )
+            }
+            throw error
         }
         licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
         hint = licenseHint
@@ -332,6 +382,11 @@ struct ProductView: View {
                     Text("Chỉ mua license app miễn phí để app vào danh sách Đã mua, không tải file IPA về máy.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)
+                    if isRegionMismatch, let accountRegion = selectedAccountRegion {
+                        Text(crossRegionPurchaseNote(for: accountRegion))
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
                 }
             }
         } header: {

@@ -256,3 +256,21 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   strings (213 total in `Localizable.xcstrings`). The download itself
   may still fail server-side for a cross-region account — the warning
   says so; the fix only stops the dead picker/buttons.
+- Cross-region "Add to Purchased" (25 Nov 2026, still 4.2.2 build 5):
+  checked ApplePackage `Purchase.purchase(account:app:)` (fork pin
+  9dc423a) — it takes NO region parameter; the buyProduct request sends
+  `X-Apple-Store-Front: <account.store>-1`, i.e. the account's own
+  registered country from login, and Apple's server validates the
+  account against that storefront (failureType 2059 "unavailable in
+  this storefront" / 1010 "invalid store"). So one account CANNOT buy a
+  license in another region — an Apple-side limit, not an app bug — and
+  the app does NOT spoof the storefront (mutating the saved account's
+  `store` would also corrupt it, since `withAccount` persists changes).
+  What build 5 does instead: the button stays enabled when mismatched
+  (it can still succeed when the app exists in both stores, e.g.
+  Facebook in the IN store for an IN account), a Vietnamese note under
+  the button explains Apple only allows Purchased in the account's own
+  region and to add an account for the app's region in the Accounts
+  tab, and a region refusal from Apple (failureType 2059/1010) is
+  translated to a Vietnamese error telling the user to add an account
+  for that region. 2 more Vietnamese strings (215 total).
