@@ -4361,6 +4361,116 @@
           }
         }
       }
+    },
+    "Không tìm thấy tài khoản đã chọn trong app. Hãy chọn lại tài khoản ở màn chi tiết app, hoặc đăng nhập lại bằng Apple ID đó rồi thử lại.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected account was not found in the app. Please pick the account again on the app detail screen, or sign in again with that Apple ID and try again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未在应用中找到所选账号。请在应用详情页重新选择账号，或使用该 Apple ID 重新登录后再试。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy tài khoản đã chọn trong app. Hãy chọn lại tài khoản ở màn chi tiết app, hoặc đăng nhập lại bằng Apple ID đó rồi thử lại."
+          }
+        }
+      }
+    },
+    "Nhập vào Đã mua": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add to Purchased"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "加入已购项目"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập vào Đã mua"
+          }
+        }
+      }
+    },
+    "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added to Purchased. The app will appear in this Apple ID's Purchased list; no IPA file was downloaded."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "已加入已购项目。该应用将出现在这个 Apple ID 的已购列表中，未下载 IPA 文件。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."
+          }
+        }
+      }
+    },
+    "Không nhập được vào mục Đã mua.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not add to Purchased."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法加入已购项目。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không nhập được vào mục Đã mua."
+          }
+        }
+      }
+    },
+    "Chỉ mua license app miễn phí để app vào danh sách Đã mua, không tải file IPA về máy.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Only obtains the license for a free app so it appears in Purchased; no IPA file is downloaded."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "仅为免费应用获取许可，使其进入已购列表，不下载 IPA 文件。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chỉ mua license app miễn phí để app vào danh sách Đã mua, không tải file IPA về máy."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

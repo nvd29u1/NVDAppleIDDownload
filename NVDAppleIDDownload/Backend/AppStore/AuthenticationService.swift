@@ -10,8 +10,17 @@ import Foundation
 import Logging
 
 extension AppStore {
-    enum AuthenticationError: Error {
+    /// Lỗi này từng hiện ra màn hình dưới dạng "AuthenticationError 0" vì
+    /// enum chỉ có 1 case và không có mô tả: đó là lỗi "không tìm thấy tài
+    /// khoản theo id đã chọn" (vd. đăng xuất rồi đăng nhập lại bằng Apple ID
+    /// khác, hoặc tài khoản đã bị xoá khỏi app, trong khi màn Lịch sử phiên
+    /// bản vẫn giữ id cũ). Giờ có mô tả tiếng Việt rõ ràng.
+    enum AuthenticationError: Error, LocalizedError {
         case accountNotFound
+
+        var errorDescription: String? {
+            String(localized: "Không tìm thấy tài khoản đã chọn trong app. Hãy chọn lại tài khoản ở màn chi tiết app, hoặc đăng nhập lại bằng Apple ID đó rồi thử lại.")
+        }
     }
 
     /// Apple sometimes answers the MZFinance authenticate endpoint with an

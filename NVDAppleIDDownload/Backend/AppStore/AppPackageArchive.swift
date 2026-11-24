@@ -89,15 +89,34 @@ class AppPackageArchive {
         versionItems = [:]
     }
 
+    /// Tài khoản đang đăng nhập dùng cho region này. Ưu tiên id tài khoản
+    /// đã chọn ở màn chi tiết app; nếu tài khoản đó không còn trong app
+    /// (đăng xuất rồi đăng nhập lại bằng Apple ID khác, hoặc tài khoản đã
+    /// bị xoá) thì dùng tài khoản đầu tiên còn đăng nhập cho region — thay
+    /// vì ném lỗi "không tìm thấy tài khoản" ngay khi mở Lịch sử phiên bản.
+    /// Dùng chung phiên đã đăng nhập (cookie + passwordToken đã lưu), không
+    /// tạo session/authenticator mới.
+    func resolvedAccountID() -> String? {
+        let accounts = AppStore.this.accounts
+        if let accountIdentifier, accounts.contains(where: { $0.id == accountIdentifier }) {
+            return accountIdentifier
+        }
+        return AppStore.this.eligibleAccounts(for: region).first?.id
+    }
+
     func populateVersionIdentifiers(_ completion: (() async -> Void)? = nil) {
-        guard let accountIdentifier, !loading else { return }
+        guard !loading else { return }
+        guard let accountID = resolvedAccountID() else {
+            error = AppStore.AuthenticationError.accountNotFound.localizedDescription
+            return
+        }
         let requestedPackage = package
         loading = true
         error = nil
 
         Task {
             do {
-                let versions = try await AppStore.this.withAccount(id: accountIdentifier) { userAccount in
+                let versions = try await AppStore.this.withAccount(id: accountID) { userAccount in
                     try await StoreDownloadService.versions(account: &userAccount.account, package: requestedPackage)
                 }
                 self.versionIdentifiers = versions.reversed()
@@ -113,7 +132,11 @@ class AppPackageArchive {
     }
 
     func populateNextVersionItems(count: Int = 3) {
-        guard let accountIdentifier, !loading, !isVersionItemsFullyLoaded else { return }
+        guard !loading, !isVersionItemsFullyLoaded else { return }
+        guard let accountID = resolvedAccountID() else {
+            error = AppStore.AuthenticationError.accountNotFound.localizedDescription
+            return
+        }
         loading = true
         error = nil
 
@@ -124,7 +147,7 @@ class AppPackageArchive {
                     let version = self.versionIdentifiers[nextIdx]
                     let requestedPackage = self.package
 
-                    let metadata = try await AppStore.this.withAccount(id: accountIdentifier) { userAccount in
+                    let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
                         try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: version)
                     }
                     self.versionItems[version] = metadata
@@ -137,14 +160,18 @@ class AppPackageArchive {
     }
 
     func populateVersionItem(for versionID: String) {
-        guard let accountIdentifier, !loading, versionIdentifiers.contains(versionID), versionItems[versionID] == nil else { return }
+        guard !loading, versionIdentifiers.contains(versionID), versionItems[versionID] == nil else { return }
+        guard let accountID = resolvedAccountID() else {
+            error = AppStore.AuthenticationError.accountNotFound.localizedDescription
+            return
+        }
         loading = true
         error = nil
 
         Task {
             do {
                 let requestedPackage = self.package
-                let metadata = try await AppStore.this.withAccount(id: accountIdentifier) { userAccount in
+                let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
                     try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: versionID)
                 }
                 self.versionItems[versionID] = metadata

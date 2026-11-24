@@ -76,6 +76,15 @@ struct ProductView: View {
         .onAppear {
             selection = eligibleAccounts.first?.id ?? .init()
         }
+        .onChange(of: vm.accounts) { _, _ in
+            // Sau khi đăng xuất / đăng nhập lại (kể cả bằng Apple ID khác),
+            // id tài khoản đã chọn có thể không còn tồn tại — chọn lại tài
+            // khoản đầu tiên còn đăng nhập cho region, thay vì giữ id cũ
+            // rồi báo lỗi xác thực khi mở Lịch sử phiên bản hay tải bản cũ.
+            if !eligibleAccounts.contains(where: { $0.id == selection }) {
+                selection = eligibleAccounts.first?.id ?? .init()
+            }
+        }
         .navigationDestination(for: PackageManifest.self) { manifest in
             PackageView(pkg: manifest)
         }
@@ -115,7 +124,8 @@ struct ProductView: View {
                 app: archive.package.software,
             )
         }
-        licenseHint = Hint(message: String(localized: "Request Succeeded"), color: .green)
+        licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
+        hint = licenseHint
     }
 
     var packageHeader: some View {
@@ -240,6 +250,28 @@ struct ProductView: View {
                 }
                 .disabledWhenLoading()
                 .disabled(account == nil)
+
+                // Nhập app miễn phí vào mục Đã mua mà không tải về: chỉ gọi
+                // purchase để lấy license (ApplePackage.Purchase.purchase,
+                // giống lệnh purchase của ipatool), không tải file IPA.
+                // App trả phí không dùng được nút này — ApplePackage từ chối.
+                if archive.price == 0 {
+                    AsyncButton {
+                        do {
+                            try await acquireLicense()
+                        } catch {
+                            hint = Hint(message: String(localized: "Không nhập được vào mục Đã mua.") + "\n" + error.localizedDescription, color: .red)
+                            throw error
+                        }
+                    } label: {
+                        Text("Nhập vào Đã mua")
+                    }
+                    .disabledWhenLoading()
+                    .disabled(account == nil)
+                    Text("Chỉ mua license app miễn phí để app vào danh sách Đã mua, không tải file IPA về máy.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
             }
         } header: {
             Text("Download")

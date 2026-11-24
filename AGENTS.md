@@ -188,3 +188,29 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   downloads. Disabled/hidden when the download is not completed or the
   file is gone; a failed Share Sheet shows a Vietnamese alert instead of
   crashing. No decryption, no bundle rename, no new download source.
+- Version-history auth fix (24 Nov 2026, 4.2.2 build 4): choosing an old
+  version in Version History showed "AuthenticationError 0" — that is the
+  app's own `AppStore.AuthenticationError.accountNotFound` (a 1-case enum
+  with no message, so NSError printed "error 0"), thrown by `withAccount`
+  when the selected account id no longer exists in the app (e.g. signed
+  out and back in with a different Apple ID while the detail screen kept
+  the old id). Fix: `AppStore.AuthenticationError` now has a Vietnamese
+  `LocalizedError` description; `AppPackageArchive.resolvedAccountID()`
+  prefers the selected id but falls back to the first still-signed-in
+  account for the region (same logged-in session: saved cookies +
+  passwordToken, no new authenticator); `ProductView` re-syncs its
+  account picker when the accounts list changes; `StoreDownloadService`
+  retries transient store errors (empty 204/403/404/5xx, invalid
+  redirect, catalog unavailable) up to 3 times with 2 s pauses, like
+  `AuthenticationService` does for sign-in. Real verdicts (invalid
+  package, license required, rejected by code) are not retried.
+- Add to Purchased (24 Nov 2026, 4.2.2 build 4): free apps now have a
+  "Nhập vào Đã mua" button on the app detail screen (Download section),
+  using the existing `ApplePackage.Purchase.purchase` (free-only, same as
+  ipatool's purchase / Asspp "Free App Purchase"): obtains the license so
+  the app lands in that Apple ID's Purchased list, downloads no IPA.
+  Success/failure is reported in Vietnamese. Paid apps cannot use it
+  (ApplePackage refuses paid apps). There is no in-app Purchased list
+  view — the list lives in Apple's own Purchased list. The older
+  "Acquire License" button in Pricing still exists and now reports the
+  same Vietnamese success message.

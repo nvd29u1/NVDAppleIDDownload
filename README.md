@@ -27,6 +27,14 @@
 >   lưu file `.ipa` vào Tệp hoặc chia sẻ qua AirDrop / app khác. Chỉ xuất
 >   đúng file đã tải (FairPlay, gắn với Apple ID đã mua), không giải mã,
 >   không đổi tên bundle. File chưa tải xong hoặc đã bị xoá thì nút mờ đi.
+> - **Nhập vào Đã mua (4.2.2 build 4):** ở màn chi tiết app miễn phí có nút
+>   "Nhập vào Đã mua" — chỉ mua license để app vào danh sách Đã mua của
+>   Apple ID đó, không tải file IPA. App trả phí không dùng được nút này.
+> - **Lịch sử phiên bản (4.2.2 build 4):** sửa lỗi chọn phiên bản cũ báo
+>   "AuthenticationError 0" — lỗi đó là "không tìm thấy tài khoản theo id
+>   đã chọn" (vd. đăng xuất rồi đăng nhập lại bằng Apple ID khác). App giờ
+>   tự dùng tài khoản đang đăng nhập cho region đó, thử lại tối đa 3 lần
+>   khi Apple trả lỗi tạm thời, và báo lỗi tiếng Việt rõ ràng nếu vẫn lỗi.
 - Đăng nhập báo `authentication failed: HTTP 204`: máy chủ Apple trả về
   trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
   Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng

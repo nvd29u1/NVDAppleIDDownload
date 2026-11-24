@@ -16,7 +16,7 @@ struct ProductHistoryView: View {
     var body: some View {
         Form {
             ForEach(vm.versionIdentifiers, id: \.self) { key in
-                if let aid = vm.accountIdentifier, let pkg = vm.package(for: key) {
+                if let aid = vm.resolvedAccountID(), let pkg = vm.package(for: key) {
                     Menu {
                         Button("Download \(pkg.software.version)") {
                             Task {

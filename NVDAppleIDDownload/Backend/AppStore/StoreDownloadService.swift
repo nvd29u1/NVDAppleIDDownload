@@ -61,27 +61,48 @@ enum StoreDownloadService {
         do {
             let region = Configuration.countryCode(for: account.store)
             var effectiveVersion = version
-            let response = try await StoreDownloadProtocol.fetchWithFallback(version: version) { endpoint, requestedVersion in
-                effectiveVersion = requestedVersion
-                return try await fetch(session: session, endpoint: endpoint, account: &account,
-                                       appID: app.id, version: requestedVersion, trace: trace)
-            } resolveVersion: {
-                // An unpinned redownload can return a tvOS build for an iOS app.
-                guard let region else { throw StoreDownloadError.catalogUnavailable }
-                let metadata: StoreDownloadProtocol.CatalogVersion
-                do {
-                    metadata = try await catalogVersion(session: session, appID: app.id, region: region, platform: platform, trace: trace)
-                } catch {
-                    try Task.checkCancellation()
-                    throw StoreDownloadError.catalogUnavailable
+            // Apple đôi khi trả về trống / lỗi tạm thời (204/403/404/5xx,
+            // redirect không hợp lệ) rồi mới xét tài khoản — cùng họ lỗi
+            // với đăng nhập. Thử lại tối đa 3 lần với phiên đã đăng nhập
+            // như AuthenticationService làm cho login, thay vì báo lỗi ngay.
+            let response: [String: Any]
+            do {
+                var lastError: Error?
+                var fetched: [String: Any]?
+                for attempt in 1 ... 3 {
+                    do {
+                        fetched = try await StoreDownloadProtocol.fetchWithFallback(version: version) { endpoint, requestedVersion in
+                            effectiveVersion = requestedVersion
+                            return try await fetch(session: session, endpoint: endpoint, account: &account,
+                                                   appID: app.id, version: requestedVersion, trace: trace)
+                        } resolveVersion: {
+                            // An unpinned redownload can return a tvOS build for an iOS app.
+                            guard let region else { throw StoreDownloadError.catalogUnavailable }
+                            let metadata: StoreDownloadProtocol.CatalogVersion
+                            do {
+                                metadata = try await catalogVersion(session: session, appID: app.id, region: region, platform: platform, trace: trace)
+                            } catch {
+                                try Task.checkCancellation()
+                                throw StoreDownloadError.catalogUnavailable
+                            }
+                            guard !metadata.externalVersionID.isEmpty,
+                                  metadata.bundleID == nil || metadata.bundleID == app.bundleID
+                            else { throw StoreDownloadError.catalogUnavailable }
+                            logger.info("Store download [\(trace)]: catalog version=\(metadata.externalVersionID)")
+                            return metadata.externalVersionID
+                        } onFallback: { reason in
+                            logger.info("Store download [\(trace)]: trying \(reason == "empty-redownload-http500" ? "update" : "redownload"), reason=\(reason)")
+                        }
+                        break
+                    } catch {
+                        lastError = error
+                        guard Self.isTransientDownloadError(error), attempt < 3 else { throw error }
+                        logger.info("Store download [\(trace)]: transient failure (attempt \(attempt)/3), retrying: \(StoreDiagnostics.errorSummary(error))")
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    }
                 }
-                guard !metadata.externalVersionID.isEmpty,
-                      metadata.bundleID == nil || metadata.bundleID == app.bundleID
-                else { throw StoreDownloadError.catalogUnavailable }
-                logger.info("Store download [\(trace)]: catalog version=\(metadata.externalVersionID)")
-                return metadata.externalVersionID
-            } onFallback: { reason in
-                logger.info("Store download [\(trace)]: trying \(reason == "empty-redownload-http500" ? "update" : "redownload"), reason=\(reason)")
+                guard let fetched else { throw lastError ?? StoreDownloadError.empty }
+                response = fetched
             }
             // Preserve the existing UI's explicit free-license acquisition flow.
             if StoreDownloadProtocol.failureCode(response) == "9610" {
@@ -97,6 +118,27 @@ enum StoreDownloadService {
             logger.error("Store download [\(trace)]: failed, \(StoreDiagnostics.errorSummary(error))")
             throw error
         }
+    }
+
+    /// Lỗi tạm thời của Apple khi gọi dịch vụ tải: trả về trống hoặc lỗi
+    /// HTTP 204/403/404/5xx, redirect không hợp lệ, hoặc catalog tạm thời
+    /// không lấy được. Các lỗi này giống họ lỗi đăng nhập (xem
+    /// AuthenticationService.isTransientAuthError) và đáng thử lại với
+    /// cùng phiên đã đăng nhập. Lỗi phán quyết thật (vd. gói không hợp lệ,
+    /// bị từ chối theo mã lỗi, hết license) thì không thử lại.
+    private static func isTransientDownloadError(_ error: Error) -> Bool {
+        if let downloadError = error as? StoreDownloadError {
+            switch downloadError {
+            case let .emptyResponse(status), let .response(status):
+                return [204, 403, 404, 500, 502, 503, 504].contains(status)
+            case .invalidRedirect, .catalogUnavailable:
+                return true
+            default:
+                return false
+            }
+        }
+        let message = error.localizedDescription
+        return ["HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504", "failed to retrieve redirect location", "redirect limit exceeded"].contains { message.contains($0) }
     }
 
     private static func catalogVersion(session: URLSession, appID: Int64, region: String, platform: EntityType, trace: String) async throws -> StoreDownloadProtocol.CatalogVersion {
