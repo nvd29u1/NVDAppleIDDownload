@@ -250,6 +250,7 @@ struct ProductView: View {
                 }
                 .disabledWhenLoading()
                 .disabled(account == nil)
+                .nvdBorderBeam(shape: .rounded(10))
 
                 // Nhập app miễn phí vào mục Đã mua mà không tải về: chỉ gọi
                 // purchase để lấy license (ApplePackage.Purchase.purchase,
@@ -268,6 +269,7 @@ struct ProductView: View {
                     }
                     .disabledWhenLoading()
                     .disabled(account == nil)
+                    .nvdBorderBeam(shape: .rounded(10))
                     Text("Chỉ mua license app miễn phí để app vào danh sách Đã mua, không tải file IPA về máy.")
                         .font(.footnote)
                         .foregroundStyle(.secondary)

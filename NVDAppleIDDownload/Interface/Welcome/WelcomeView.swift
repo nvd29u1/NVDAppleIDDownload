@@ -30,6 +30,7 @@ struct WelcomeView: View {
                     .frame(width: 120, height: 120)
                     .clipShape(RoundedRectangle(cornerRadius: 28))
                     .shadow(radius: 12)
+                    .nvdBorderBeam(shape: .rounded(28))
 
                 Text("Welcome to NVDAppleIDDownload")
                     .font(.system(.headline, design: .rounded))

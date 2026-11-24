@@ -24,6 +24,7 @@ struct ExportIPAButton: View {
             Label(String(localized: "Tải IPA về máy"), systemImage: "square.and.arrow.down")
         }
         .disabled(!IPAExport.isAvailable(for: manifest))
+        .nvdBorderBeam(shape: .rounded(10))
         .alert(
             String(localized: "Không thể xuất file IPA"),
             isPresented: $showError,

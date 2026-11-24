@@ -214,3 +214,25 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   view — the list lives in Apple's own Purchased list. The older
   "Acquire License" button in Pricing still exists and now reports the
   same Vietnamese success message.
+- Direct Download name search (24 Nov 2026, 4.2.2 build 4): `AddDownloadView`
+  has a "Tìm theo tên app" section above the Bundle ID field — type an app
+  name (or Bundle ID), tap "Tìm" to search via `ApplePackage.Searcher.search`
+  (+ `Lookup` fallback, exact Bundle ID first, limit 20) using the selected
+  account's store countryCode; tap a result (icon, name, version, developer,
+  bundle ID) to auto-fill the Bundle ID below. Search runs only on tap/submit,
+  never per keystroke. Manual Bundle ID entry is unchanged for apps that left
+  the App Store. 4 new Vietnamese strings (208 total in `Localizable.xcstrings`).
+- BorderBeam glow (24 Nov 2026, 4.2.2 build 4): BorderBeam (ismnoiet,
+  MIT, iOS 17+/macOS 14+) is VENDORED into the app target — same 4 files as
+  NVDsign (`Extension/BorderBeam/`: `BorderBeam.swift`, `BorderBeamModifier.swift`,
+  `BeamConfiguration.swift`, `BorderBeam.metal`, MIT headers kept, `Bundle.main`
+  for the Metal library) — NOT an SPM dependency, so no package resolution in
+  CI. `nvdBorderBeam(shape:)` (plum palette #7A2048 + pale highlight) wraps
+  `.borderBeam` inside `#available(iOS 17, *)` / `#available(macOS 14, *)`
+  per platform; deployment target is iOS 17.0 / macOS 15.0 so the guard is
+  belt-and-braces. Applied (overlay only, no layout change, one cheap GPU pass
+  per beam, timeline pauses when idle / under Reduce Motion) to: the "Tải IPA
+  về máy" button (shared `ExportIPAButton` — Downloads rows + package detail),
+  the "Request Download" and "Nhập vào Đã mua" buttons on the app detail
+  screen, the "Tìm" and "Request Download" buttons on Direct Download, and
+  the pig logo card on the Home tab. The Home tab has no other main button.

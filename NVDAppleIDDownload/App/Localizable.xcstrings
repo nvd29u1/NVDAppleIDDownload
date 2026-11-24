@@ -4471,6 +4471,94 @@
           }
         }
       }
+    },
+    "Tên app hoặc Bundle ID" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "App name or Bundle ID"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "应用名称或 Bundle ID"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tên app hoặc Bundle ID"
+          }
+        }
+      }
+    },
+    "Đang tìm…" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Searching…"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "正在搜索…"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đang tìm…"
+          }
+        }
+      }
+    },
+    "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No apps found. Try a different name, or enter the Bundle ID manually below."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未找到应用。请尝试其他名称，或在下方手动输入 Bundle ID。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới."
+          }
+        }
+      }
+    },
+    "Hãy chọn tài khoản trước." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please select an account first."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请先选择账号。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hãy chọn tài khoản trước."
+          }
+        }
+      }
     }
   },
   "version": "1.1"
