@@ -21,6 +21,9 @@ struct SettingView: View {
     @State private var deviceIdDraft = ""
     @State private var showResetConfirmation = false
 
+    @State private var isCheckingAnisette = false
+    @State private var anisetteCheckResult: String?
+
     var body: some View {
         NavigationStack {
             formContent
@@ -67,6 +70,39 @@ struct SettingView: View {
                 Text("Install App")
             } footer: {
                 Text("Use this manifest server to install downloaded apps directly. Leave empty to use the built-in local server (requires installing and trusting the certificate).")
+            }
+
+            Section {
+                TextField("Ví dụ: http://192.168.1.10:6969", text: $vm.anisetteServerURL)
+                    .font(.system(.body, design: .monospaced))
+                    .autocorrectionDisabled()
+                    #if canImport(UIKit)
+                        .textInputAutocapitalization(.never)
+                        .keyboardType(.URL)
+                    #endif
+                Button("Kiểm tra") {
+                    isCheckingAnisette = true
+                    anisetteCheckResult = nil
+                    Task {
+                        let result = await AnisetteService.check(urlString: vm.anisetteServerURL)
+                        anisetteCheckResult = result
+                        isCheckingAnisette = false
+                    }
+                }
+                .disabled(vm.anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isCheckingAnisette)
+                if isCheckingAnisette {
+                    Text("Đang kiểm tra máy chủ…")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                } else if let anisetteCheckResult {
+                    Text(anisetteCheckResult)
+                        .font(.footnote)
+                        .textSelection(.enabled)
+                }
+            } header: {
+                Text("Máy chủ Anisette")
+            } footer: {
+                Text("Từ tháng 11/2026 Apple yêu cầu đăng nhập App Store phải kèm header xác minh thiết bị (Anisette). Điền địa chỉ máy chủ Anisette của riêng bạn (máy tính trong mạng nhà, ví dụ http://192.168.1.10:6969) — app sẽ lấy header từ máy chủ đó trước mỗi lần đăng nhập. Để trống là tắt, đăng nhập như trước. Chỉ có địa chỉ máy chủ được lưu ở đây; mật khẩu Apple ID KHÔNG BAO GIỜ được gửi tới máy chủ này — máy chủ chỉ trả về header, không nhận mật khẩu.")
             }
 
             Section {

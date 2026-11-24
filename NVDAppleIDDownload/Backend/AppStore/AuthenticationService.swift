@@ -36,6 +36,15 @@ extension AppStore {
     /// with a failureType. The legacy endpoint is supposed to 302 to a pod
     /// URL (see ipatool #513); when the edge drops the client it answers
     /// with an empty 204 or a destination-less redirect instead.
+    ///
+    /// Anisette (24 Nov 2026): when the user has set an Anisette server URL
+    /// in Settings, the app fetches fresh Anisette/ADI headers from that
+    /// server first and attaches them to the authenticator
+    /// (`Authenticator.anisetteHeaders`, fork nvd29u1/ApplePackage), so
+    /// every sign-in and 2FA request carries them. If the server cannot be
+    /// reached, sign-in stops here with a plain Vietnamese explanation —
+    /// signing in without the headers just reproduces the 204/404 above.
+    /// With the URL empty, the flow is unchanged.
     enum AuthenticationGateError: LocalizedError {
         case appleEmptyResponse
         case appleRedirectRefused
@@ -55,6 +64,21 @@ extension AppStore {
         logger.info("starting authentication for user")
         var currentSession = session
         var lastError: Error?
+        // Anisette: when a server URL is set, fetch fresh headers first and
+        // attach them to the session (and to every fresh retry session).
+        // A failed fetch stops sign-in here with a plain explanation.
+        let anisetteHeaders: [String: String]
+        if !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+            guard let serverURL = AnisetteService.normalizedServerURL(anisetteServerURL) else {
+                throw AnisetteService.AnisetteError.invalidURL
+            }
+            logger.info("fetching Anisette headers from user server")
+            anisetteHeaders = try await AnisetteService.fetchHeaders(from: serverURL)
+            logger.info("fetched \(anisetteHeaders.count) Anisette headers")
+            await currentSession.anisetteHeaders = anisetteHeaders
+        } else {
+            anisetteHeaders = [:]
+        }
         // Up to 3 attempts: the first with the session the UI created (so a
         // 2FA code flow keeps its authenticator), retries with a fresh
         // Authenticator (fresh bag endpoint + fresh SAP handshake).
@@ -80,6 +104,9 @@ extension AppStore {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 do {
                     currentSession = try await ApplePackage.Authenticator()
+                    // A fresh session loses the headers — attach them again
+                    // so retries sign in with Anisette headers too.
+                    await currentSession.anisetteHeaders = anisetteHeaders
                 } catch {
                     // A fresh session could not even be created (bag/SAP
                     // handshake failed); keep the original error.
@@ -127,11 +154,21 @@ extension AppStore {
             throw AuthenticationError.accountNotFound
         }
         do {
+            // Token rotation signs in again, so it needs the Anisette
+            // headers too when a server URL is set.
+            var anisetteHeaders: [String: String] = [:]
+            if !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
+                guard let serverURL = AnisetteService.normalizedServerURL(anisetteServerURL) else {
+                    throw AnisetteService.AnisetteError.invalidURL
+                }
+                anisetteHeaders = try await AnisetteService.fetchHeaders(from: serverURL)
+            }
             let newAppleAccount = try await ApplePackage.Authenticator.authenticate(
                 email: account.account.email,
                 password: account.account.password,
                 code: "",
                 cookies: account.account.cookie,
+                anisetteHeaders: anisetteHeaders,
             )
             let updatedAccount = try save(email: account.account.email, account: newAppleAccount)
             logger.info("account rotation successful for user id: \(id)")

@@ -348,6 +348,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NVDAppleIDDownload;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "NVDAppleIDDownload requires this permission to communicate with install service on your device.";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -369,6 +370,7 @@
 				INFOPLIST_KEY_CFBundleDisplayName = NVDAppleIDDownload;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.developer-tools";
 				INFOPLIST_KEY_NSLocalNetworkUsageDescription = "NVDAppleIDDownload requires this permission to communicate with install service on your device.";
+				INFOPLIST_KEY_NSAppTransportSecurity_NSAllowsLocalNetworking = YES;
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
@@ -412,10 +414,10 @@
 		};
 		50ABFB102F48A6D60077DE1A /* XCRemoteSwiftPackageReference "ApplePackage" */ = {
 			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Lakr233/ApplePackage";
+			repositoryURL = "https://github.com/nvd29u1/ApplePackage";
 			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 2.0.3;
+				kind = revision;
+				revision = 3d320cfe840ac98839502fe45bf245e2ef9a5d83;
 			};
 		};
 		50ABFE1D2F48AAE50077DE1A /* XCRemoteSwiftPackageReference "ButtonKit" */ = {

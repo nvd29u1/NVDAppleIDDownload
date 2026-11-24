@@ -139,3 +139,31 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   retries this like the 204 and shows a Vietnamese explanation. Separate
   from the server refusal, always check the typed email first — the
   account that worked on PC is kithuatscn@gmail.com, not "gamil.com".
+- Anisette research (24 Nov 2026, full write-up in
+  `docs/ANISETTE-RESEARCH.md`): porting ipatool 2.8.0's
+  local Anisette to this iOS app is NOT feasible in scope — ipatool
+  downloads an 11 GB macOS 27 IPSW, extracts 7 pinned Apple binaries, and
+  runs 4 emulated machines (Unicorn) to do ADI provisioning + OTP; iOS has
+  no JIT, ApplePackage 2.0.3 has no header-injection point, and the Apple
+  binaries can't be redistributed in the IPA. AnisetteKit (Swift, AGPLv3,
+  7 stars, no releases) needs Apple .so files the user must supply and is
+  unproven against Apple's Nov 2026 otp/1.5 gate. Working alternative
+  today: ipatool 2.8.1 on PC.
+- Anisette, app side (24 Nov 2026, 4.2.2 build 3): fork
+  `nvd29u1/ApplePackage` (tag `nvd-anisette-1`, commit `3d320cf`) adds
+  public `Authenticator.anisetteHeaders: [String: String]` (empty by
+  default, old behaviour unchanged); `makeRequest()` attaches them before
+  the SAP signature, so authenticate + 2FA requests carry them. App SPM
+  pin moved to the fork (revision pin). Settings → "Máy chủ Anisette":
+  user-typed server URL (default empty = off, stored in
+  `AppStore.anisetteServerURL`), "Kiểm tra" button GETs the server and
+  reports OK/error in Vietnamese. Before sign-in
+  (`AuthenticationService.authenticate`, retry 3 kept), the app GETs
+  header JSON from the server (10 s timeout, any header keys accepted)
+  and sets `authenticator.anisetteHeaders`; a failed fetch stops sign-in
+  with a Vietnamese explanation instead of signing in header-less.
+  `NSAppTransportSecurity_NSAllowsLocalNetworking = YES` (iOS configs)
+  so cleartext HTTP to the LAN server is allowed; the Apple ID password
+  is never sent to the Anisette server. Real sign-in through a server is
+  NOT yet verified on a real iPhone — needs the user's own test with a
+  secondary Apple ID.

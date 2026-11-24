@@ -88,6 +88,30 @@ class AppStore {
         }
     }
 
+    /// URL of the user's own Anisette server (e.g. http://192.168.1.10:6969)
+    /// that serves device-verification (Anisette/ADI) headers as JSON.
+    /// Empty = off: sign-in works exactly as before. When set, the app
+    /// fetches the headers from this server before signing in and attaches
+    /// them to the Apple sign-in requests. Only the server URL is stored
+    /// here — no Apple ID or password is ever sent to this server.
+    @ObservationIgnored
+    private var _anisetteServerURL = Persist<String>(
+        key: "AnisetteServerURL",
+        defaultValue: "",
+    )
+
+    var anisetteServerURL: String {
+        get {
+            access(keyPath: \.anisetteServerURL)
+            return _anisetteServerURL.wrappedValue
+        }
+        set {
+            withMutation(keyPath: \.anisetteServerURL) {
+                _anisetteServerURL.wrappedValue = newValue
+            }
+        }
+    }
+
     static let this = AppStore()
 
     static func normalizedDeviceIdentifier(_ value: String) -> String? {
