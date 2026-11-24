@@ -26,7 +26,11 @@
   trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
   Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng
   nhập App Store, mà thư viện ApplePackage 2.0.3 chưa có; app sẽ tự thử
-  lại 3 lần với phiên mới. Nếu vẫn lỗi: kiểm tra tài khoản trong App
+  lại 3 lần với phiên mới. Lỗi "failed to retrieve redirect location"
+  cũng cùng họ này: Apple trả về chuyển hướng nhưng không có địa chỉ
+  chuyển tiếp, tức là từ chối yêu cầu trước khi xét tài khoản — không
+  phải sai mật khẩu. Kiểm tra lại email đã gõ đúng chưa (đúng là
+  ...@gmail.com, không phải ...@gamil.com) rồi thử lại. Nếu vẫn lỗi: kiểm tra tài khoản trong App
   Store chính thức, thử mạng khác, hoặc dùng ipatool 2.8.1 trên máy tính.
 
 ---

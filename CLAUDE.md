@@ -126,3 +126,14 @@ SwiftUI views organized by feature: Account, Search, Download, Installed (macOS 
   Authenticator and otherwise shows a plain Vietnamese explanation instead
   of the bare error. Implementing Anisette provisioning would be a large
   lift with licence problems (GPL Unicorn + Apple binaries) and is not done.
+- Login "failed to retrieve redirect location" (24 Nov 2026): same family
+  as the 204 — ApplePackage `Authenticate.swift` `parseResponse` returns
+  this when Apple answers the authenticate endpoint with a redirect status
+  (301/302/303/307/308) but no usable `Location` header (or the resolve
+  step cannot resolve it). The legacy endpoint is supposed to 302 to a pod
+  URL (ipatool #513); a destination-less redirect means Apple refused the
+  request before judging the account. Not a wrong-password verdict: a bad
+  password or unknown account comes back as HTTP 200 + plist. The app now
+  retries this like the 204 and shows a Vietnamese explanation. Separate
+  from the server refusal, always check the typed email first — the
+  account that worked on PC is kithuatscn@gmail.com, not "gamil.com".

@@ -24,11 +24,29 @@ extension AppStore {
     /// upstream Asspp is archived, so the app retries a few times with a fresh
     /// SAP session (fresh bag + fresh handshake) and otherwise explains the
     /// failure plainly instead of showing a bare "HTTP 204".
+    ///
+    /// Same family, second shape (24 Nov 2026): Apple answers with a redirect
+    /// status (301/302/303/307/308) but no usable `Location` header, so
+    /// ApplePackage `Authenticate.swift` `parseResponse` fails with
+    /// "failed to retrieve redirect location" (or the resolve step in
+    /// `authenticate()` fails the same way). A redirect with no destination
+    /// means Apple refused the request before judging the account — it is
+    /// not a wrong-password verdict and not a mistyped-email verdict either:
+    /// a bad password or an unknown account comes back as HTTP 200 + plist
+    /// with a failureType. The legacy endpoint is supposed to 302 to a pod
+    /// URL (see ipatool #513); when the edge drops the client it answers
+    /// with an empty 204 or a destination-less redirect instead.
     enum AuthenticationGateError: LocalizedError {
         case appleEmptyResponse
+        case appleRedirectRefused
 
         var errorDescription: String? {
-            String(localized: "Apple đã từ chối yêu cầu đăng nhập (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai mật khẩu: hãy kiểm tra tài khoản trong App Store chính thức, thử lại sau hoặc trên mạng khác, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            switch self {
+            case .appleEmptyResponse:
+                return String(localized: "Apple đã từ chối yêu cầu đăng nhập (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai mật khẩu: hãy kiểm tra tài khoản trong App Store chính thức, thử lại sau hoặc trên mạng khác, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            case .appleRedirectRefused:
+                return String(localized: "Apple đã từ chối yêu cầu đăng nhập (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai mật khẩu: hãy kiểm tra lại email Apple ID đã gõ đúng chưa, kiểm tra tài khoản trong App Store chính thức, thử lại sau hoặc trên mạng khác, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            }
         }
     }
 
@@ -73,6 +91,10 @@ extension AppStore {
             logger.error("authentication failed for user: \(error.localizedDescription)")
             throw AuthenticationGateError.appleEmptyResponse
         }
+        if let error = lastError, Self.isRedirectRefused(error) {
+            logger.error("authentication failed for user: \(error.localizedDescription)")
+            throw AuthenticationGateError.appleRedirectRefused
+        }
         logger.error("authentication failed for user: \(lastError?.localizedDescription ?? "?")")
         throw lastError ?? AuthenticationError.accountNotFound
     }
@@ -84,11 +106,16 @@ extension AppStore {
     /// never retried here.
     private static func isTransientAuthError(_ error: Error) -> Bool {
         let message = error.localizedDescription
-        return ["HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504"].contains { message.contains($0) }
+        return ["HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504", "failed to retrieve redirect location", "redirect limit exceeded"].contains { message.contains($0) }
     }
 
     private static func isEmptyAppleResponse(_ error: Error) -> Bool {
         error.localizedDescription.contains("HTTP 204")
+    }
+
+    private static func isRedirectRefused(_ error: Error) -> Bool {
+        let message = error.localizedDescription
+        return message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded")
     }
 
     @MainActor
