@@ -156,7 +156,13 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   the SAP signature, so authenticate + 2FA requests carry them. Fork
   commit `2e0bb95` (24 Nov 2026) fixes two compile errors in that change
   (`[:]` dictionary default, `await` on the actor property assignment);
-  app SPM pin updated to `2e0bb95`. App SPM
+  app SPM pin updated to `2e0bb95`. Fork commit `9dc423a` (24 Nov 2026)
+  fixes the remaining Swift 6 error — actor-isolated state cannot be
+  mutated from a nonisolated context even with `await`, so the fork adds
+  `setAnisetteHeaders(_:)` (called from the fork's static `authenticate`
+  and from the app's `AuthenticationService`, which had the same two
+  assignments); app SPM pin updated to `9dc423a`. CI build-ios then
+  succeeded (run 45370647254, 4.2.2 build 3). App SPM
   pin moved to the fork (revision pin). Settings → "Máy chủ Anisette":
   user-typed server URL (default empty = off, stored in
   `AppStore.anisetteServerURL`), "Kiểm tra" button GETs the server and
@@ -170,3 +176,15 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   is never sent to the Anisette server. Real sign-in through a server is
   NOT yet verified on a real iPhone — needs the user's own test with a
   secondary Apple ID.
+- IPA export (24 Nov 2026, 4.2.2 build 4): downloaded IPAs live at
+  `Documents/NVDAppleIDDownload/Packages/<bundleID>/<version>/<uuid>.ipa`
+  (`PackageManifest.targetLocation`). New "Tải IPA về máy" button
+  (`ExportIPAButton` + `IPAExport` in `Extension/IPAExport.swift`): copies
+  the file untouched to the temp dir as `<bundleID>-<version>.ipa` and opens
+  the iOS/macOS Share Sheet via the existing `AirDrop()` helper (Save to
+  Files / AirDrop / other apps). Shown on each completed row in the
+  Downloads tab and on the package detail view (iOS Control section,
+  macOS Control section), plus as a context-menu action for completed
+  downloads. Disabled/hidden when the download is not completed or the
+  file is gone; a failed Share Sheet shows a Vietnamese alert instead of
+  crashing. No decryption, no bundle rename, no new download source.

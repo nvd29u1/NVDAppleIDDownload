@@ -22,6 +22,11 @@
 >   Muốn có IPA đã giải mã phải giải mã trên thiết bị đã jailbreak hoặc bằng
 >   cách khác ngoài phạm vi app này.
 > - Nên dùng Apple ID phụ lần đầu.
+> - **Xuất file IPA (4.2.2 build 4):** app đã tải xong thì ở tab Lượt tải và
+>   màn hình chi tiết app có nút "Tải IPA về máy" — bấm để mở Share Sheet,
+>   lưu file `.ipa` vào Tệp hoặc chia sẻ qua AirDrop / app khác. Chỉ xuất
+>   đúng file đã tải (FairPlay, gắn với Apple ID đã mua), không giải mã,
+>   không đổi tên bundle. File chưa tải xong hoặc đã bị xoá thì nút mờ đi.
 - Đăng nhập báo `authentication failed: HTTP 204`: máy chủ Apple trả về
   trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
   Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng

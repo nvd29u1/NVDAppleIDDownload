@@ -68,6 +68,14 @@ struct PackageView: View {
             if pkg.completed {
                 #if os(macOS)
                     DeviceCTLInstallSection(package: pkg)
+
+                    Section {
+                        ExportIPAButton(manifest: pkg)
+                    } header: {
+                        Text("Control")
+                    } footer: {
+                        Text("File IPA vẫn mã hoá FairPlay và gắn với Apple ID đã mua — chỉ xuất đúng file đã tải, không giải mã.")
+                    }
                 #endif
                 #if os(iOS)
                     Section {
@@ -92,6 +100,11 @@ struct PackageView: View {
                             try? FileManager.default.copyItem(at: url, to: newUrl)
                             AirDrop(items: [newUrl])
                         }
+
+                        // Xuất file IPA đã tải ra khỏi app: mở Share Sheet để
+                        // lưu vào Tệp / AirDrop / chia sẻ qua app khác. File
+                        // vẫn mã hoá FairPlay, chỉ xuất đúng file đã tải.
+                        ExportIPAButton(manifest: pkg)
                     } header: {
                         Text("Control")
                     } footer: {

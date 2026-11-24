@@ -75,6 +75,15 @@ private struct PackageManifestRow: View {
                 }
                 .font(.system(.footnote, design: .rounded))
                 .foregroundStyle(.secondary)
+                if manifest.completed {
+                    HStack {
+                        ExportIPAButton(manifest: manifest)
+                            .buttonStyle(.bordered)
+                            .tint(.accentColor)
+                            .font(.system(.footnote, design: .rounded))
+                        Spacer()
+                    }
+                }
             }
         }
         .contextMenu {

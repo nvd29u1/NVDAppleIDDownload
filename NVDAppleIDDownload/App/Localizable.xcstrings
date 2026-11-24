@@ -4295,6 +4295,72 @@
           }
         }
       }
+    },
+    "Tải IPA về máy": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download IPA to Device"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "下载 IPA 到设备"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải IPA về máy"
+          }
+        }
+      }
+    },
+    "Không thể xuất file IPA": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot Export IPA File"
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "无法导出 IPA 文件"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể xuất file IPA"
+          }
+        }
+      }
+    },
+    "Không tìm thấy file IPA trên máy. File có thể đã bị xoá — hãy tải lại app.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPA file not found on this device. It may have been deleted — please download the app again."
+          }
+        },
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未在本设备上找到 IPA 文件，可能已被删除，请重新下载。"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy file IPA trên máy. File có thể đã bị xoá — hãy tải lại app."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

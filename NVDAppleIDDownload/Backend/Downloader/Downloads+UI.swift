@@ -14,6 +14,7 @@ enum DownloadAction: Hashable {
     case resume
     case restart
     case delete
+    case exportIPA
 }
 
 @MainActor
@@ -28,6 +29,10 @@ extension Downloads {
             restart(request: request)
         case .delete:
             delete(request: request)
+        case .exportIPA:
+            // Chỉ mở Share Sheet khi file IPA còn trên máy; nếu file đã mất
+            // thì nút này đã không được đưa vào danh sách hành động.
+            _ = IPAExport.share(manifest: request)
         }
     }
 
@@ -40,7 +45,9 @@ extension Downloads {
         case .failed:
             [.restart, .delete]
         case .completed:
-            [.delete]
+            // Không còn file IPA trên máy thì chỉ còn Xoá — nút xuất file
+            // mờ đi / không hiện thay vì mở Share Sheet rồi lỗi.
+            IPAExport.isAvailable(for: request) ? [.exportIPA, .delete] : [.delete]
         }
     }
 
@@ -54,6 +61,8 @@ extension Downloads {
             (String(localized: "Restart Download"), "arrow.clockwise", false)
         case .delete:
             (String(localized: "Delete"), "trash", true)
+        case .exportIPA:
+            (String(localized: "Tải IPA về máy"), "square.and.arrow.down", false)
         }
     }
 }
