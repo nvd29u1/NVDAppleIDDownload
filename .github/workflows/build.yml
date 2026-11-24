@@ -53,13 +53,13 @@ jobs:
       - name: Build
         run: |
           chmod +x Resources/Scripts/compile.release.mobile.ci.sh
-          ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/Asspp.ipa"
+          ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/NVDAppleIDDownload.ipa"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Asspp.ipa
-          path: Asspp.ipa
+          name: NVDAppleIDDownload.ipa
+          path: NVDAppleIDDownload.ipa
 
   build-osx:
     runs-on: macos-26
@@ -104,10 +104,10 @@ jobs:
       - name: Build
         run: |
           chmod +x Resources/Scripts/compile.release.osx.sh
-          ./Resources/Scripts/compile.release.osx.sh "$(pwd)" "$(pwd)/Asspp.zip"
+          ./Resources/Scripts/compile.release.osx.sh "$(pwd)" "$(pwd)/NVDAppleIDDownload.zip"
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: Asspp.zip
-          path: Asspp.zip
+          name: NVDAppleIDDownload.zip
+          path: NVDAppleIDDownload.zip

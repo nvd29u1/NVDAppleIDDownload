@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject personal build metadata and signing assets before publishing Asspp."""
+"""Reject personal build metadata and signing assets before publishing NVDAppleIDDownload."""
 
 import plistlib
 import re
@@ -28,9 +28,9 @@ def check(archive):
                         raise ValueError("archive contains a personal home directory path")
             package.extractall(root)
 
-        apps = list(root.glob("Asspp.app")) + list(root.glob("Payload/Asspp.app"))
+        apps = list(root.glob("NVDAppleIDDownload.app")) + list(root.glob("Payload/NVDAppleIDDownload.app"))
         if len(apps) != 1:
-            raise ValueError("expected one Asspp application")
+            raise ValueError("expected one NVDAppleIDDownload application")
         app = apps[0]
         info = app / "Contents/Info.plist" if (app / "Contents").exists() else app / "Info.plist"
         metadata = plistlib.loads(info.read_bytes())

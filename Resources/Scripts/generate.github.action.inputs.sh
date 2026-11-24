@@ -22,13 +22,13 @@ Optional:
 
 Example file names:
   ./Certificates/apple_distribution.p12
-  ./Certificates/Asspp_AdHoc.mobileprovision
+  ./Certificates/NVDAppleIDDownload_AdHoc.mobileprovision
 
 Example:
   ./Resources/Scripts/generate.github.action.inputs.sh \
     --p12 ./Certificates/apple_distribution.p12 \
     --p12-password 'your-p12-password' \
-    --mobileprovision ./Certificates/Asspp_AdHoc.mobileprovision \
+    --mobileprovision ./Certificates/NVDAppleIDDownload_AdHoc.mobileprovision \
     --ota-base-url https://app.example.com
 EOF
 }

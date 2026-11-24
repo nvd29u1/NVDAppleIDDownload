@@ -62,15 +62,15 @@ jobs:
       - name: Build iOS package
         run: |
           chmod +x Resources/Scripts/compile.release.mobile.ci.sh
-          ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "${RUNNER_TEMP}/Asspp.ipa"
+          ./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "${RUNNER_TEMP}/NVDAppleIDDownload.ipa"
 
       - name: Build macOS package
         run: |
           chmod +x Resources/Scripts/compile.release.osx.sh
-          ./Resources/Scripts/compile.release.osx.sh "$(pwd)" "${RUNNER_TEMP}/Asspp.zip"
+          ./Resources/Scripts/compile.release.osx.sh "$(pwd)" "${RUNNER_TEMP}/NVDAppleIDDownload.zip"
 
       - name: Check release privacy
-        run: python3 Resources/Scripts/check.release.privacy.py "${RUNNER_TEMP}/Asspp.ipa" "${RUNNER_TEMP}/Asspp.zip"
+        run: python3 Resources/Scripts/check.release.privacy.py "${RUNNER_TEMP}/NVDAppleIDDownload.ipa" "${RUNNER_TEMP}/NVDAppleIDDownload.zip"
 
       - name: Create GitHub release
         env:
@@ -88,6 +88,6 @@ jobs:
         run: |
           set -euo pipefail
           gh release upload "${GITHUB_REF_NAME}" \
-            "${RUNNER_TEMP}/Asspp.ipa" \
-            "${RUNNER_TEMP}/Asspp.zip" \
+            "${RUNNER_TEMP}/NVDAppleIDDownload.ipa" \
+            "${RUNNER_TEMP}/NVDAppleIDDownload.zip" \
             --clobber

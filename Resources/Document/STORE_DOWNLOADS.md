@@ -44,6 +44,6 @@ A response that reports a different requested version is rejected.
 
 Legacy downloads do not require the SAP action signature used by login. The
 [current ipatool implementation](https://github.com/majd/ipatool/blob/5dc4c8058db3a23e9de081ac766cc917713a65cf/pkg/appstore/appstore_download_product.go)
-also has a preferred `ent/download` path with a separate `kbsync` blob; Asspp and
+also has a preferred `ent/download` path with a separate `kbsync` blob; NVDAppleIDDownload and
 ApplePackage do not implement that path. Adding a login signature to these legacy
 requests would not supply that blob.

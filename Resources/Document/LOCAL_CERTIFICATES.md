@@ -1,6 +1,6 @@
 # Local installation certificates
 
-The bundled TLS certificates identify only Asspp and `localhost.qaq.wiki`.
+The bundled TLS certificates identify only the built-in local install server (`app.localhost.qaq.wiki`). That hostname is a functional DNS identity of the install server, not app branding — it must stay as-is for the local installer to work.
 The local HTTPS installer needs the leaf certificate and its private key.
 The CA private key is not included in the repository or release packages.
 

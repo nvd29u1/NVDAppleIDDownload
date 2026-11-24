@@ -40,10 +40,10 @@ ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor
 // MARK: - Info.plist
 
 GENERATE_INFOPLIST_FILE = YES
-INFOPLIST_FILE = Asspp/Info.plist
+INFOPLIST_FILE = NVDAppleIDDownload/Info.plist
 INFOPLIST_KEY_CFBundleDisplayName = NVDAppleIDDownload
 INFOPLIST_KEY_LSApplicationCategoryType = public.app-category.developer-tools
-INFOPLIST_KEY_NSLocalNetworkUsageDescription = Asspp requires this permission to communicate with install service on your device.
+INFOPLIST_KEY_NSLocalNetworkUsageDescription = NVDAppleIDDownload requires this permission to communicate with install service on your device.
 INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES
 INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES
 INFOPLIST_KEY_UILaunchScreen_Generation = YES
@@ -52,7 +52,7 @@ INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLand
 
 // MARK: - Entitlements & Sandbox
 
-CODE_SIGN_ENTITLEMENTS = Asspp/Asspp.entitlements
+CODE_SIGN_ENTITLEMENTS = NVDAppleIDDownload/NVDAppleIDDownload.entitlements
 ENABLE_APP_SANDBOX = YES
 ENABLE_HARDENED_RUNTIME = YES
 ENABLE_INCOMING_NETWORK_CONNECTIONS = YES

@@ -6,8 +6,8 @@ SRCROOT=$(realpath "$1")
 TARGET_IPA=$2
 
 WORKSPACE="$SRCROOT/Asspp.xcworkspace"
-SCHEME="Asspp"
-BUILD_PRODUCT="Asspp.app"
+SCHEME="NVDAppleIDDownload"
+BUILD_PRODUCT="NVDAppleIDDownload.app"
 
 cd $SRCROOT
 

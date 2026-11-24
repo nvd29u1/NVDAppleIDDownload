@@ -8,7 +8,7 @@ import sys
 import tempfile
 
 root = Path(__file__).resolve().parents[2]
-catalog = root / "Asspp/App/Localizable.xcstrings"
+catalog = root / "NVDAppleIDDownload/App/Localizable.xcstrings"
 strings = json.loads(catalog.read_text())["strings"]
 keys = set()
 for filename in sys.argv[1:]:

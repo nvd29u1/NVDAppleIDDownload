@@ -26,7 +26,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		50D44D022C3F91F700CF6A69 /* Asspp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Asspp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NVDAppleIDDownload.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DCBD772F346DFE007100D2 /* Certificates */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Certificates; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -41,13 +41,13 @@
 					ios,
 				);
 			};
-			target = 50D44D012C3F91F700CF6A69 /* Asspp */;
+			target = 50D44D012C3F91F700CF6A69 /* NVDAppleIDDownload */;
 		};
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		50DCBBB42F346C57007100D2 /* Configuration */ = {isa = PBXFileSystemSynchronizedRootGroup; explicitFileTypes = {}; explicitFolders = (); path = Configuration; sourceTree = "<group>"; };
-		50DCBBF92F346C6F007100D2 /* Asspp */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (50DCBC2D2F346C6F007100D2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = Asspp; sourceTree = "<group>"; };
+		50DCBBF92F346C6F007100D2 /* NVDAppleIDDownload */ = {isa = PBXFileSystemSynchronizedRootGroup; exceptions = (50DCBC2D2F346C6F007100D2 /* PBXFileSystemSynchronizedBuildFileExceptionSet */, ); explicitFileTypes = {}; explicitFolders = (); path = NVDAppleIDDownload; sourceTree = "<group>"; };
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -79,7 +79,7 @@
 		50D44CF92C3F91F700CF6A69 = {
 			isa = PBXGroup;
 			children = (
-				50DCBBF92F346C6F007100D2 /* Asspp */,
+				50DCBBF92F346C6F007100D2 /* NVDAppleIDDownload */,
 				50DCBD772F346DFE007100D2 /* Certificates */,
 				50DCBBB42F346C57007100D2 /* Configuration */,
 				50D44D032C3F91F700CF6A69 /* Products */,
@@ -90,7 +90,7 @@
 		50D44D032C3F91F700CF6A69 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				50D44D022C3F91F700CF6A69 /* Asspp.app */,
+				50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -105,9 +105,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		50D44D012C3F91F700CF6A69 /* Asspp */ = {
+		50D44D012C3F91F700CF6A69 /* NVDAppleIDDownload */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 50D44D102C3F91F800CF6A69 /* Build configuration list for PBXNativeTarget "Asspp" */;
+			buildConfigurationList = 50D44D102C3F91F800CF6A69 /* Build configuration list for PBXNativeTarget "NVDAppleIDDownload" */;
 			buildPhases = (
 				C0NF1G001000000000000006 /* Check Developer.xcconfig */,
 				50D44CFE2C3F91F700CF6A69 /* Sources */,
@@ -119,9 +119,9 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				50DCBBF92F346C6F007100D2 /* Asspp */,
+				50DCBBF92F346C6F007100D2 /* NVDAppleIDDownload */,
 			);
-			name = Asspp;
+			name = NVDAppleIDDownload;
 			packageProductDependencies = (
 				50D44D182C3F92A100CF6A69 /* ApplePackage */,
 				50D44D1B2C3F92BB00CF6A69 /* NIO */,
@@ -139,8 +139,8 @@
 				50ABFE1E2F48AAE50077DE1A /* ButtonKit */,
 				A57ACB25387C8C8F3E31EC36 /* LookInsideServer */,
 			);
-			productName = Asspp;
-			productReference = 50D44D022C3F91F700CF6A69 /* Asspp.app */;
+			productName = NVDAppleIDDownload;
+			productReference = 50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -158,7 +158,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 50D44CFD2C3F91F700CF6A69 /* Build configuration list for PBXProject "Asspp" */;
+			buildConfigurationList = 50D44CFD2C3F91F700CF6A69 /* Build configuration list for PBXProject "NVDAppleIDDownload" */;
 			compatibilityVersion = "Xcode 14.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -186,7 +186,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				50D44D012C3F91F700CF6A69 /* Asspp */,
+				50D44D012C3F91F700CF6A69 /* NVDAppleIDDownload */,
 			);
 		};
 /* End PBXProject section */
@@ -381,7 +381,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		50D44CFD2C3F91F700CF6A69 /* Build configuration list for PBXProject "Asspp" */ = {
+		50D44CFD2C3F91F700CF6A69 /* Build configuration list for PBXProject "NVDAppleIDDownload" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				50D44D0E2C3F91F800CF6A69 /* Debug */,
@@ -390,7 +390,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		50D44D102C3F91F800CF6A69 /* Build configuration list for PBXNativeTarget "Asspp" */ = {
+		50D44D102C3F91F800CF6A69 /* Build configuration list for PBXNativeTarget "NVDAppleIDDownload" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				50D44D112C3F91F800CF6A69 /* Debug */,

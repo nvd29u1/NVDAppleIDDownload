@@ -14,19 +14,19 @@ Bundle ID: `com.NVD.appleiddownload` (upstream Asspp used `wiki.qaq.Asspp`). Dep
 
 ```bash
 # Build for iOS (device)
-xcodebuild -workspace Asspp.xcworkspace -scheme Asspp -configuration Debug -destination 'generic/platform=iOS' build | xcbeautify
+xcodebuild -workspace Asspp.xcworkspace -scheme NVDAppleIDDownload -configuration Debug -destination 'generic/platform=iOS' build | xcbeautify
 
 # Build for macOS
-xcodebuild -workspace Asspp.xcworkspace -scheme Asspp -configuration Debug -destination 'platform=macOS' build | xcbeautify
+xcodebuild -workspace Asspp.xcworkspace -scheme NVDAppleIDDownload -configuration Debug -destination 'platform=macOS' build | xcbeautify
 
 # Build for iOS simulator
-xcodebuild -workspace Asspp.xcworkspace -scheme Asspp -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16' build | xcbeautify
+xcodebuild -workspace Asspp.xcworkspace -scheme NVDAppleIDDownload -configuration Debug -destination 'platform=iOS Simulator,name=iPhone 16' build | xcbeautify
 
 # CI release build (iOS IPA, unsigned)
-./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/Asspp.ipa"
+./Resources/Scripts/compile.release.mobile.ci.sh "$(pwd)" "$(pwd)/NVDAppleIDDownload.ipa"
 
 # CI release build (macOS zip)
-./Resources/Scripts/compile.release.osx.sh "$(pwd)" "$(pwd)/Asspp.zip"
+./Resources/Scripts/compile.release.osx.sh "$(pwd)" "$(pwd)/NVDAppleIDDownload.zip"
 ```
 
 **Important**: Always use `Asspp.xcworkspace` (not `.xcodeproj`) because the workspace manages SPM package resolution. Always pipe xcodebuild output through `xcbeautify` to reduce output verbosity and save tokens.
@@ -51,9 +51,9 @@ xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → 
 
 ### App Entry Point
 
-`Asspp/App/main.swift` — initializes logging (`LogManagerHandler`), configures `ApplePackage` device identifier, sets up `Digger` download manager (max 3 concurrent), and starts the OTA installer on iOS. On iOS 26+, the main view switches to `NewMainView` (new `Tab` API); otherwise `MainView` is used.
+`NVDAppleIDDownload/App/main.swift` — initializes logging (`LogManagerHandler`), configures `ApplePackage` device identifier, sets up `Digger` download manager (max 3 concurrent), and starts the OTA installer on iOS. On iOS 26+, the main view switches to `NewMainView` (new `Tab` API); otherwise `MainView` is used.
 
-### Backend Layer (`Asspp/Backend/`)
+### Backend Layer (`NVDAppleIDDownload/Backend/`)
 
 - **AppStore/**: `AppStore` singleton manages accounts and device identifier. `AuthenticationService` handles auth using ApplePackage's SAP-signed authenticator; `AddAccountView` retains the authenticator across verification-code attempts. `AppPackage`/`AppPackageArchive`/`UserAccount` are model wrappers around ApplePackage types.
 - **Downloader/**: `Downloads` singleton manages download queue via `Digger`. `PackageManifest` tracks per-download state and IPA signature injection. Downloads persist to `Documents/NVDAppleIDDownload/Packages/`.
@@ -61,7 +61,7 @@ xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → 
 - **DeviceCTL/**: macOS-only device management via `devicectl` CLI. `DeviceManager` handles app installation to connected iOS devices.
 - **LogManager.swift**: Thread-safe log singleton feeding `Settings/LogView`.
 
-### Interface Layer (`Asspp/Interface/`)
+### Interface Layer (`NVDAppleIDDownload/Interface/`)
 
 SwiftUI views organized by feature: Account, Search, Download, Installed (macOS only), Setting, Welcome. `MainView` uses `NavigationSplitView` sidebar on macOS and `TabView` on iOS.
 
@@ -73,7 +73,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
 - **Persistence**: Custom `@PublishedPersist` / `@Persist` property wrappers (in `Extension/PublishedPersist.swift`) back properties to file storage (`Documents/Config/`) or Keychain. Accounts stored in Keychain; downloads and settings use file storage.
 - **Platform branching**: Heavy use of `#if os(macOS)` / `#if os(iOS)` / `#if canImport(UIKit)` for platform-specific code paths.
 - **Singletons**: `AppStore.this`, `Downloads.this` are `@MainActor` singletons.
-- **Localization**: Vietnamese (vi) is the primary UI language, plus English and Simplified Chinese (zh-Hans) via `.xcstrings` format in `Asspp/App/` .
+- **Localization**: Vietnamese (vi) is the primary UI language, plus English and Simplified Chinese (zh-Hans) via `.xcstrings` format in `NVDAppleIDDownload/App/` .
 
 ## Dependencies (SPM via Xcode)
 
@@ -94,3 +94,30 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
 - **Structure**: Early returns, guard statements for unwrapping, single responsibility per extension.
 - **Modern Swift**: `@Observable` macro, `async/await`, `@MainActor`, opaque `some` types.
 - **Memory**: `weak`/`unowned` references to break cycles, capture lists in closures.
+
+## NVD personalization notes (Nov 2026)
+
+- Full rename from upstream Asspp: target/product/executable are
+  `NVDAppleIDDownload`, source folder `NVDAppleIDDownload/`, bundle ID
+  `com.NVD.appleiddownload`, logger labels `com.NVD.appleiddownload*`,
+  keychain service `com.NVD.appleiddownload.*`, entitlements keychain group
+  `com.NVD.appleiddownload`. App icons (AppIcon.appiconset + the Xcode 26
+  `AppIcon.icon` layered icon) and the Avatar asset are the green pig logo.
+- Deliberate exception: the built-in local install server still uses the
+  hostname `app.localhost.qaq.wiki` and its bundled TLS certificates. That
+  hostname is a functional DNS identity (it resolves via the author's DNS);
+  renaming it would break the local installer, and the default install path
+  (NVD manifest worker) does not use it at all.
+- The Digger download library (SPM) still contains its own internal queue
+  labels `wiki.qaq.diggerThread.*` inside the binary; they are not app
+  branding and cannot be changed without forking Digger.
+- Login `HTTP 204`: Apple returns an empty response from the MZFinance
+  authenticate endpoint before judging credentials (ApplePackage
+  `Authenticate.swift:276`, `guard response.status == .ok`). Since 6 Nov
+  2026 Apple gates sign-in on Anisette/ADI device verification, which
+  ApplePackage 2.0.3 does not do; there is no newer ApplePackage and
+  upstream Asspp was archived 18 Nov 2026. `AuthenticationService`
+  retries transient HTTP 204/403/404/5xx up to 3 times with a fresh
+  Authenticator and otherwise shows a plain Vietnamese explanation instead
+  of the bare error. Implementing Anisette provisioning would be a large
+  lift with licence problems (GPL Unicorn + Apple binaries) and is not done.

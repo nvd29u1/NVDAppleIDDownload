@@ -67,7 +67,7 @@ _To get Base64 on macOS:_ `base64 -i certificate.p12 | pbcopy`
 
 | Name                | Value            | Description                                                                                                               |
 | :------------------ | :--------------- | :------------------------------------------------------------------------------------------------------------------------ |
-| `IOS_BUNDLE_ID`     | `wiki.qaq.Asspp` | **Important**: Must match the App ID in your Provisioning Profile.                                                        |
+| `IOS_BUNDLE_ID`     | `com.NVD.appleiddownload` | **Important**: Must match the App ID in your Provisioning Profile.                                                        |
 | `IOS_EXPORT_METHOD` | `ad-hoc`         | Usually `ad-hoc`.                                                                                                         |
 | `IOS_OTA_BASE_URL`  | _(Optional)_     | If you use a custom domain for GitHub Pages, enter it here (e.g., `https://apps.example.com`). Otherwise, leave it empty. |
 

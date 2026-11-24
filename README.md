@@ -22,25 +22,31 @@
 >   Muốn có IPA đã giải mã phải giải mã trên thiết bị đã jailbreak hoặc bằng
 >   cách khác ngoài phạm vi app này.
 > - Nên dùng Apple ID phụ lần đầu.
+- Đăng nhập báo `authentication failed: HTTP 204`: máy chủ Apple trả về
+  trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
+  Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng
+  nhập App Store, mà thư viện ApplePackage 2.0.3 chưa có; app sẽ tự thử
+  lại 3 lần với phiên mới. Nếu vẫn lỗi: kiểm tra tài khoản trong App
+  Store chính thức, thử mạng khác, hoặc dùng ipatool 2.8.1 trên máy tính.
 
 ---
 
-# Asspp
+# NVDAppleIDDownload
 
 **The Ultimate Multi-Region App Store Manager.**
 
-Asspp is a powerful client designed for users who need to manage **multiple Apple IDs** across **different countries and regions**. Switch stores instantly, download apps from anywhere, and manage your IPA library—all without logging out of your device.
+NVDAppleIDDownload is a powerful client designed for users who need to manage **multiple Apple IDs** across **different countries and regions**. Switch stores instantly, download apps from anywhere, and manage your IPA library—all without logging out of your device.
 
 [简体中文 🇨🇳](./Resources/i18n/zh-Hans/README.md)
 
 ![Preview](./Resources/Screenshots/Apptisan_Asspp.png)
 
-## ✨ Why Asspp?
+## ✨ Why NVDAppleIDDownload?
 
 - **🌍 Multi-Region Access**: Browse and search the US, Japan, China, or any other App Store region seamlessly. No more switching system accounts just to check an app.
-- **👥 Multi-Account Support**: Add unlimited Apple IDs. Asspp automatically uses the correct account for the store you are browsing.
+- **👥 Multi-Account Support**: Add unlimited Apple IDs. NVDAppleIDDownload automatically uses the correct account for the store you are browsing.
 - **📦 IPA Management**: Download official, signed IPAs directly from Apple's servers for backup or sideloading.
-- **⏪ History Versions**: Need an older version of an app? Asspp makes it easy to find and download previous releases.
+- **⏪ History Versions**: Need an older version of an app? NVDAppleIDDownload makes it easy to find and download previous releases.
 - **📱 Cross-Platform**: Native experience on both **iOS** and **macOS**.
 
 ## 📥 Installation
@@ -55,16 +61,16 @@ Fork this repository to automatically build and sign the app with your own devel
 
 #### Option 2: Manual Install
 
-1.  Download the latest `.ipa` from [Releases](https://github.com/Lakr233/Asspp/releases).
+1.  Download the latest `.ipa` from [Releases](https://github.com/nvd29u1/NVDAppleIDDownload/releases).
 2.  Sign and install using your preferred tool (e.g., SideStore, AltStore, TrollStore, or other signing service).
 
 ### macOS
 
-1.  Download the latest `.zip` from [Releases](https://github.com/Lakr233/Asspp/releases).
-2.  Unzip and move `Asspp.app` to your Applications folder.
+1.  Download the latest `.zip` from [Releases](https://github.com/nvd29u1/NVDAppleIDDownload/releases).
+2.  Unzip and move `NVDAppleIDDownload.app` to your Applications folder.
 3.  **First Run and Trusting the App (Recommended)**:
     1.  Try double-clicking to open the app. If you see "App can’t be opened because the developer cannot be verified" or a similar message:
-        - In Finder, locate `Asspp.app`, **Control-click** (or right-click) the app and choose **Open**, then click **Open** again in the dialog. This will create a one-time trust exception for the app.
+        - In Finder, locate `NVDAppleIDDownload.app`, **Control-click** (or right-click) the app and choose **Open**, then click **Open** again in the dialog. This will create a one-time trust exception for the app.
     2.  If Control-clicking does not work or the app is still blocked:
         - Open **System Settings** -> **Privacy & Security** (or System Preferences -> Security & Privacy on older macOS). In the General/Security section, look for the blocked app and click **Open Anyway** or **Allow**. You may need to enter an administrator password.
     3.  Recommendation: Download from this repository's Releases and verify the release details to ensure the source is trusted before trusting and opening the app.
@@ -79,7 +85,7 @@ Fork this repository to automatically build and sign the app with your own devel
 
 ## 🚨 Special Notice
 
-Asspp utilizes the same underlying communication protocol as `ipatool`. According to community speculation (unverified), previous outages of this protocol were likely caused by:
+NVDAppleIDDownload utilizes the same underlying communication protocol as `ipatool`. According to community speculation (unverified), previous outages of this protocol were likely caused by:
 1. Widespread usage triggering Apple's risk control mechanisms.
 2. Protocol modifications following the patching of an iCloud security vulnerability.
 3. Adjustments to Apple's front-end gateways, which now enforce stricter traffic allocation and request validation.

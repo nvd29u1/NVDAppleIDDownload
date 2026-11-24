@@ -23,4 +23,4 @@ CODE_SIGN_IDENTITY[sdk=macosx*] = Apple Development
 // Uncomment and modify as needed
 
 // Override bundle identifier for personal builds
-// PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.Asspp
+// PRODUCT_BUNDLE_IDENTIFIER = com.yourcompany.NVDAppleIDDownload
