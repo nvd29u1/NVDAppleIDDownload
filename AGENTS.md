@@ -45,7 +45,7 @@ A build phase script errors if this file is missing. The CI scripts generate a n
 
 ## Build Configuration
 
-xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers are in `Configuration/Version.xcconfig` (single source of truth).
+xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers live in `Configuration/Version.xcconfig` — BUT `MARKETING_VERSION` is also pinned in `Asspp.xcodeproj/project.pbxproj` (target Debug + Release build settings), and the pbxproj value overrides the xcconfig, so a version bump must change BOTH places or the built app keeps the old version. `CURRENT_PROJECT_VERSION` (build number) lives only in `Version.xcconfig`. From build 5 the app uses its own version **2.0** (build stays 5, no reset — the CI scripts never touch version numbers) instead of upstream Asspp 4.2.2; the welcome screen shows "`<MARKETING_VERSION> <build>`" (e.g. "2.0 5") from `Bundle.main` info dictionary (`main.swift`, `WelcomeView`).
 
 ## Architecture
 
@@ -236,7 +236,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   the "Request Download" and "Nhập vào Đã mua" buttons on the app detail
   screen, the "Tìm" and "Request Download" buttons on Direct Download, and
   the pig logo card on the Home tab. The Home tab has no other main button.
-- Region fallback (24 Nov 2026, 4.2.2 build 5): the detail screen
+- Region fallback (25 Nov 2026, 2.0 build 5): the detail screen
   (`ProductView`) used to list only accounts whose store region matched
   the package region (`eligibleAccounts`), so with a VN package and only
   an IN account signed in the Account picker was empty and "Request
@@ -256,7 +256,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   strings (213 total in `Localizable.xcstrings`). The download itself
   may still fail server-side for a cross-region account — the warning
   says so; the fix only stops the dead picker/buttons.
-- Cross-region "Add to Purchased" (25 Nov 2026, still 4.2.2 build 5):
+- Cross-region "Add to Purchased" (25 Nov 2026, still 2.0 build 5):
   checked ApplePackage `Purchase.purchase(account:app:)` (fork pin
   9dc423a) — it takes NO region parameter; the buyProduct request sends
   `X-Apple-Store-Front: <account.store>-1`, i.e. the account's own
@@ -274,3 +274,12 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   tab, and a region refusal from Apple (failureType 2059/1010) is
   translated to a Vietnamese error telling the user to add an account
   for that region. 2 more Vietnamese strings (215 total).
+- Own version 2.0 (25 Nov 2026, 2.0 build 5): `MARKETING_VERSION`
+  4.2.2 → 2.0, build stays 5 (no reset — nothing in the repo's build
+  process forces a reset; `compile.release.mobile.ci.sh` never touches
+  version numbers). Changed in both `Configuration/Version.xcconfig`
+  AND `Asspp.xcodeproj/project.pbxproj` (target Debug + Release): the
+  pbxproj pins `MARKETING_VERSION` and overrides the xcconfig, so
+  changing the xcconfig alone would have shipped 4.2.2 again. Welcome
+  screen / startup log show the version automatically from the bundle
+  (`main.swift` `version` = short version + build, e.g. "2.0 5").

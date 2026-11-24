@@ -8,6 +8,13 @@
 > Copyright (c) 2025 Lakr Aream. Mọi quyền và ghi công của tác giả gốc được giữ
 > nguyên trong file `LICENSE`.
 >
+> **Phiên bản riêng 2.0 (từ build 5):** từ build 5 trở đi app dùng version
+> riêng **2.0** thay vì version gốc Asspp 4.2.2 (màn chào mừng hiện "2.0 5");
+> số build giữ nguyên là **5**, không reset về 1 — quy trình build của repo
+> không bắt reset build (script CI không đụng tới version, `MARKETING_VERSION`
+> nằm ở `Configuration/Version.xcconfig` và cả 2 cấu hình Debug/Release của
+> target trong `Asspp.xcodeproj/project.pbxproj`).
+>
 > **Giao diện NVD:** nền mận đậm, logo lợn xanh, tiếng Việt.
 >
 > **Máy chủ manifest mặc định:** https://nvd-manifest.nguyenvietdung156195.workers.dev
@@ -35,6 +42,17 @@
 >   đã chọn" (vd. đăng xuất rồi đăng nhập lại bằng Apple ID khác). App giờ
 >   tự dùng tài khoản đang đăng nhập cho region đó, thử lại tối đa 3 lần
 >   khi Apple trả lỗi tạm thời, và báo lỗi tiếng Việt rõ ràng nếu vẫn lỗi.
+> - **Vùng tài khoản (2.0 build 5):** màn chi tiết app liệt kê mọi tài khoản
+>   đã đăng nhập (đúng vùng trước, khác vùng sau, có ghi mã vùng và chữ
+>   "khác vùng"); không có tài khoản đúng vùng thì tự chọn tài khoản đang
+>   đăng nhập và hiện cảnh báo vùng màu cam. Nút "Yêu cầu tải" và "Nhập vào
+>   Đã mua" chỉ mờ khi chưa đăng nhập tài khoản nào.
+> - **Nhập vào Đã mua khác vùng (2.0 build 5):** 1 tài khoản không mua được
+>   license ở vùng khác — Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài
+>   khoản (giới hạn phía Apple, lệnh purchase của ApplePackage không có tham
+>   số vùng). Nút vẫn bấm được khi lệch vùng (app có ở cả hai vùng thì vẫn
+>   nhập được); nếu Apple từ chối vì app không có trong cửa hàng vùng đó thì
+>   app báo rõ bằng tiếng Việt và gợi ý thêm tài khoản đúng vùng ở tab Tài khoản.
 - Đăng nhập báo `authentication failed: HTTP 204`: máy chủ Apple trả về
   trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
   Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng
