@@ -94,6 +94,10 @@ class AppPackageArchive {
     /// (đăng xuất rồi đăng nhập lại bằng Apple ID khác, hoặc tài khoản đã
     /// bị xoá) thì dùng tài khoản đầu tiên còn đăng nhập cho region — thay
     /// vì ném lỗi "không tìm thấy tài khoản" ngay khi mở Lịch sử phiên bản.
+    /// Nếu không có tài khoản nào đúng vùng (vd gói vùng VN mà chỉ có tài
+    /// khoản vùng IN), fallback sang tài khoản đã đăng nhập đầu tiên dù
+    /// khác vùng, giống picker ở màn chi tiết app (build 5) — để Lịch sử
+    /// phiên bản vẫn mở được thay vì báo lỗi ngay.
     /// Dùng chung phiên đã đăng nhập (cookie + passwordToken đã lưu), không
     /// tạo session/authenticator mới.
     func resolvedAccountID() -> String? {
@@ -102,6 +106,7 @@ class AppPackageArchive {
             return accountIdentifier
         }
         return AppStore.this.eligibleAccounts(for: region).first?.id
+            ?? accounts.first?.id
     }
 
     func populateVersionIdentifiers(_ completion: (() async -> Void)? = nil) {

@@ -236,3 +236,23 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   the "Request Download" and "Nhập vào Đã mua" buttons on the app detail
   screen, the "Tìm" and "Request Download" buttons on Direct Download, and
   the pig logo card on the Home tab. The Home tab has no other main button.
+- Region fallback (24 Nov 2026, 4.2.2 build 5): the detail screen
+  (`ProductView`) used to list only accounts whose store region matched
+  the package region (`eligibleAccounts`), so with a VN package and only
+  an IN account signed in the Account picker was empty and "Request
+  Download" / "Nhập vào Đã mua" were disabled — confirmed on a real
+  iPhone 24 Nov 2026 (Facebook, VN region, only kumit.95bt@gmail.com /
+  IN signed in). Fix: the picker now lists every signed-in account
+  (matching region first, others after, each labelled with its region
+  code, other-region rows marked "khác vùng"); with no matching-region
+  account it auto-selects the first signed-in account and shows an
+  orange Vietnamese warning "Tài khoản này vùng %@, gói đang xem vùng
+  %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng
+  tìm kiếm."; the two buttons are disabled only when no account at all
+  is signed in (the red "no account" error now shows only then, in
+  Vietnamese). `AppPackageArchive.resolvedAccountID()` falls back the
+  same way (matching region first, then any signed-in account) so
+  Version History also opens instead of erroring. 5 new Vietnamese
+  strings (213 total in `Localizable.xcstrings`). The download itself
+  may still fail server-side for a cross-region account — the warning
+  says so; the fix only stops the dead picker/buttons.

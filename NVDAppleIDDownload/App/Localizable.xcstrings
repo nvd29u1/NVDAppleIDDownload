@@ -4559,6 +4559,116 @@
           }
         }
       }
+    },
+    "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "This account is for region %@, but this package is for region %@ — the download may fail. Add an account for region %@ or change the search region."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "此账号属于 %@ 区，而该应用属于 %@ 区——可能无法下载。请添加 %@ 区的账号或更改搜索区域。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm."
+          }
+        }
+      }
+    },
+    "khác vùng" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "different region"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "不同区域"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "khác vùng"
+          }
+        }
+      }
+    },
+    "Cảnh báo vùng" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region warning"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "区域提醒"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Cảnh báo vùng"
+          }
+        }
+      }
+    },
+    "Không có tài khoản nào đăng nhập." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No account is signed in."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未登录任何账号。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Không có tài khoản nào đăng nhập."
+          }
+        }
+      }
+    },
+    "Hãy thêm tài khoản trong trang Tài khoản." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Please add an account in the Accounts page."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "请在“账号”页面添加账号。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Hãy thêm tài khoản trong trang Tài khoản."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

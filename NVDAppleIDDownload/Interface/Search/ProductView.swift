@@ -30,6 +30,58 @@ struct ProductView: View {
         vm.eligibleAccounts(for: region)
     }
 
+    /// Mọi tài khoản đã đăng nhập, tài khoản đúng vùng đứng trước, tài
+    /// khoản khác vùng đứng sau (vẫn chọn được, có ghi chú vùng) — không
+    /// ẩn hẳn như trước. Trước build 5, picker chỉ liệt kê tài khoản đúng
+    /// vùng nên với gói vùng VN + chỉ tài khoản vùng IN đăng nhập, picker
+    /// rỗng và nút "Yêu cầu tải" / "Nhập vào Đã mua" chết hẳn.
+    var pickerAccounts: [AppStore.UserAccount] {
+        let eligible = eligibleAccounts
+        let others = vm.accounts.filter { account in
+            !eligible.contains(where: { $0.id == account.id })
+        }
+        return eligible + others
+    }
+
+    /// Vùng (mã quốc gia, vd "IN", "VN") của tài khoản đang chọn.
+    var selectedAccountRegion: String? {
+        guard let account else { return nil }
+        return ApplePackage.Configuration.countryCode(for: account.account.store)
+    }
+
+    /// Tài khoản đang chọn khác vùng với gói đang xem.
+    var isRegionMismatch: Bool {
+        guard let code = selectedAccountRegion else { return false }
+        return code != region
+    }
+
+    /// Chọn tài khoản: giữ lựa chọn hiện tại nếu vẫn còn trong danh sách;
+    /// nếu không, ưu tiên tài khoản đúng vùng, nếu không có thì fallback
+    /// sang tài khoản đã đăng nhập đầu tiên (dù khác vùng) thay vì để
+    /// picker rỗng.
+    private func selectFallbackAccount() {
+        if pickerAccounts.contains(where: { $0.id == selection }) { return }
+        selection = pickerAccounts.first?.id ?? .init()
+    }
+
+    /// Nhãn trong picker: email + mã vùng, tài khoản khác vùng ghi rõ
+    /// "khác vùng" để người dùng biết trước là có thể tải không được.
+    private func pickerLabel(for account: AppStore.UserAccount) -> String {
+        let code = ApplePackage.Configuration.countryCode(for: account.account.store) ?? "?"
+        if code == region {
+            return "\(account.account.email) (\(code))"
+        }
+        return "\(account.account.email) (\(code)) — \(String(localized: "khác vùng"))"
+    }
+
+    /// Cảnh báo khi tài khoản đang chọn khác vùng với gói đang xem.
+    private func regionMismatchWarning(for accountRegion: String) -> String {
+        String(
+            format: String(localized: "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm."),
+            accountRegion, region, region
+        )
+    }
+
     var account: AppStore.UserAccount? {
         vm.accounts.first { $0.id == selection }
     }
@@ -56,34 +108,41 @@ struct ProductView: View {
     var body: some View {
         Form {
             accountSelector
+            if let accountRegion = selectedAccountRegion, isRegionMismatch {
+                Section {
+                    Text(regionMismatchWarning(for: accountRegion))
+                        .foregroundStyle(.orange)
+                } header: {
+                    Text("Cảnh báo vùng")
+                }
+            }
             buttons
             packageHeader
             packageDetails
             packageDescription
-            if account == nil {
+            if vm.accounts.isEmpty {
                 Section {
-                    Text("No account available for this region.")
+                    Text("Không có tài khoản nào đăng nhập.")
                         .foregroundStyle(.red)
                 } header: {
                     Text("Error")
                 } footer: {
-                    Text("Please add an account in the Accounts page.")
+                    Text("Hãy thêm tài khoản trong trang Tài khoản.")
                 }
             }
             pricing
         }
         .formStyle(.grouped)
         .onAppear {
-            selection = eligibleAccounts.first?.id ?? .init()
+            selectFallbackAccount()
         }
         .onChange(of: vm.accounts) { _, _ in
             // Sau khi đăng xuất / đăng nhập lại (kể cả bằng Apple ID khác),
             // id tài khoản đã chọn có thể không còn tồn tại — chọn lại tài
-            // khoản đầu tiên còn đăng nhập cho region, thay vì giữ id cũ
-            // rồi báo lỗi xác thực khi mở Lịch sử phiên bản hay tải bản cũ.
-            if !eligibleAccounts.contains(where: { $0.id == selection }) {
-                selection = eligibleAccounts.first?.id ?? .init()
-            }
+            // khoản đầu tiên còn đăng nhập (ưu tiên đúng vùng, fallback
+            // sang tài khoản khác vùng) thay vì giữ id cũ rồi báo lỗi xác
+            // thực khi mở Lịch sử phiên bản hay tải bản cũ.
+            selectFallbackAccount()
         }
         .navigationDestination(for: PackageManifest.self) { manifest in
             PackageView(pkg: manifest)
@@ -208,8 +267,8 @@ struct ProductView: View {
     var accountSelector: some View {
         Section {
             Picker("Account", selection: $selection) {
-                ForEach(eligibleAccounts) { account in
-                    Text(account.account.email)
+                ForEach(pickerAccounts) { account in
+                    Text(pickerLabel(for: account))
                         .id(account.id)
                 }
             }
