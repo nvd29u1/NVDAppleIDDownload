@@ -5,22 +5,35 @@
 //  Created by 秋星桥 on 2024/7/11.
 //
 
-import ColorfulX
 import SwiftUI
 
 struct WelcomeView: View {
     @State var openInstruction: Bool = false
 
+    // NVD theme: dark plum background, green pig logo.
+    private static let plumTop = Color(red: 0.48, green: 0.13, blue: 0.28)
+    private static let plumBottom = Color(red: 0.23, green: 0.07, blue: 0.16)
+
     var body: some View {
         ZStack {
+            LinearGradient(
+                colors: [Self.plumTop, Self.plumBottom],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .ignoresSafeArea()
+
             VStack(spacing: 32) {
-                Image(.avatar)
+                Image(.pigLogo)
                     .resizable()
                     .aspectRatio(contentMode: .fit)
-                    .frame(width: 80, height: 80)
+                    .frame(width: 120, height: 120)
+                    .clipShape(RoundedRectangle(cornerRadius: 28))
+                    .shadow(radius: 12)
 
                 Text("Welcome to Asspp")
                     .font(.system(.headline, design: .rounded))
+                    .foregroundStyle(.white)
 
                 Spacer().frame(height: 0)
             }
@@ -43,15 +56,10 @@ struct WelcomeView: View {
                 Text("The App Store API can be unstable. Retry if an error occurs.")
             }
             .font(.footnote)
-            .foregroundStyle(.secondary)
+            .foregroundStyle(.white.opacity(0.75))
             .padding()
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            ColorfulView(color: .constant(.winter))
-                .opacity(0.25)
-                .ignoresSafeArea(),
-        )
         #if os(macOS)
         .toolbarBackgroundVisibility(.hidden, for: .windowToolbar)
         #endif

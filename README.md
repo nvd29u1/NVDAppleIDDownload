@@ -8,6 +8,8 @@
 > Copyright (c) 2025 Lakr Aream. Mọi quyền và ghi công của tác giả gốc được giữ
 > nguyên trong file `LICENSE`.
 >
+> **Giao diện NVD:** nền mận đậm, logo lợn xanh, tiếng Việt.
+>
 > **Máy chủ manifest mặc định:** https://nvd-manifest.nguyenvietdung156195.workers.dev
 > (worker Cloudflare riêng của nvd29u1 — chỉ tạo file manifest, file IPA không
 > đi qua máy chủ này). Xoá trắng ô "Cài đặt app" trong Cài đặt để về lại máy chủ

@@ -65,6 +65,8 @@ xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → 
 
 SwiftUI views organized by feature: Account, Search, Download, Installed (macOS only), Setting, Welcome. `MainView` uses `NavigationSplitView` sidebar on macOS and `TabView` on iOS.
 
+NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with the green NVD pig logo (`PigLogo` image set). Forms keep the system background for readability.
+
 ### Key Patterns
 
 - **Observation**: `AppStore`, `Downloads`, `Installer`, `DeviceManager`, `PackageManifest` all use `@Observable` (not legacy `ObservableObject`).
