@@ -14,15 +14,18 @@ enum StoreDownloadService {
         }
     }
 
-    static func download(account: inout Account, package: AppStore.AppPackage) async throws -> DownloadOutput {
+    /// `region` là mã vùng của gói đang xem (vd "VN"), khi caller biết
+    /// (màn chi tiết app / Lịch sử phiên bản). Chỉ dùng để tự sửa lỗi
+    /// -128 CountryMismatch: xem `product`.
+    static func download(account: inout Account, package: AppStore.AppPackage, region: String? = nil) async throws -> DownloadOutput {
         let email = account.email
-        return try await product(account: &account, package: package, version: package.externalVersionID, operation: "download") { item in
+        return try await product(account: &account, package: package, version: package.externalVersionID, operation: "download", region: region) { item in
             try output(item: item, email: email)
         }
     }
 
-    static func versions(account: inout Account, package: AppStore.AppPackage) async throws -> [String] {
-        try await product(account: &account, package: package, version: nil, operation: "versions") { item in
+    static func versions(account: inout Account, package: AppStore.AppPackage, region: String? = nil) async throws -> [String] {
+        try await product(account: &account, package: package, version: nil, operation: "versions", region: region) { item in
             guard let metadata = item["metadata"] as? [String: Any],
                   let identifiers = metadata["softwareVersionExternalIdentifiers"] as? [Any]
             else { throw StoreDownloadError.noVersions }
@@ -32,8 +35,8 @@ enum StoreDownloadService {
         }
     }
 
-    static func versionMetadata(account: inout Account, package: AppStore.AppPackage, versionID: String) async throws -> VersionMetadata {
-        try await product(account: &account, package: package, version: versionID, operation: "version-metadata") { item in
+    static func versionMetadata(account: inout Account, package: AppStore.AppPackage, versionID: String, region: String? = nil) async throws -> VersionMetadata {
+        try await product(account: &account, package: package, version: versionID, operation: "version-metadata", region: region) { item in
             guard let metadata = item["metadata"] as? [String: Any],
                   let version = metadata["bundleShortVersionString"] as? String,
                   let dateString = metadata["releaseDate"] as? String,
@@ -43,7 +46,7 @@ enum StoreDownloadService {
         }
     }
 
-    private static func product<Result>(account: inout Account, package: AppStore.AppPackage, version: String?, operation: String, parse: ([String: Any]) throws -> Result) async throws -> Result {
+    private static func product<Result>(account: inout Account, package: AppStore.AppPackage, version: String?, operation: String, region: String? = nil, parse: ([String: Any]) throws -> Result) async throws -> Result {
         let trace = String(UUID().uuidString.prefix(8))
         let app = package.software
         let version = version.flatMap { $0.isEmpty ? nil : $0 }
@@ -59,59 +62,95 @@ enum StoreDownloadService {
         let session = URLSession(configuration: configuration, delegate: NoRedirect(), delegateQueue: nil)
         defer { session.invalidateAndCancel() }
         do {
-            let region = Configuration.countryCode(for: account.store)
             var effectiveVersion = version
             // Apple đôi khi trả về trống / lỗi tạm thời (204/403/404/5xx,
             // redirect không hợp lệ) rồi mới xét tài khoản — cùng họ lỗi
             // với đăng nhập. Thử lại tối đa 3 lần với phiên đã đăng nhập
             // như AuthenticationService làm cho login, thay vì báo lỗi ngay.
-            let response: [String: Any]
-            do {
-                var lastError: Error?
-                var fetched: [String: Any]?
-                for attempt in 1 ... 3 {
-                    do {
-                        fetched = try await StoreDownloadProtocol.fetchWithFallback(version: version) { endpoint, requestedVersion in
-                            effectiveVersion = requestedVersion
-                            return try await fetch(session: session, endpoint: endpoint, account: &account,
-                                                   appID: app.id, version: requestedVersion, trace: trace)
-                        } resolveVersion: {
-                            // An unpinned redownload can return a tvOS build for an iOS app.
-                            guard let region else { throw StoreDownloadError.catalogUnavailable }
-                            let metadata: StoreDownloadProtocol.CatalogVersion
-                            do {
-                                metadata = try await catalogVersion(session: session, appID: app.id, region: region, platform: platform, trace: trace)
-                            } catch {
-                                try Task.checkCancellation()
-                                throw StoreDownloadError.catalogUnavailable
+            // Một lần lấy metadata (fetch + kiểm tra failure + parse) được
+            // gói lại để lỗi -128 bên dưới thử lại được với bản sao tài
+            // khoản đã chỉnh vùng.
+            func fetchAndParse(using requestAccount: inout Account) async throws -> Result {
+                let region = Configuration.countryCode(for: requestAccount.store)
+                let response: [String: Any]
+                do {
+                    var lastError: Error?
+                    var fetched: [String: Any]?
+                    for attempt in 1 ... 3 {
+                        do {
+                            fetched = try await StoreDownloadProtocol.fetchWithFallback(version: version) { endpoint, requestedVersion in
+                                effectiveVersion = requestedVersion
+                                return try await fetch(session: session, endpoint: endpoint, account: &requestAccount,
+                                                       appID: app.id, version: requestedVersion, trace: trace)
+                            } resolveVersion: {
+                                // An unpinned redownload can return a tvOS build for an iOS app.
+                                guard let region else { throw StoreDownloadError.catalogUnavailable }
+                                let metadata: StoreDownloadProtocol.CatalogVersion
+                                do {
+                                    metadata = try await catalogVersion(session: session, appID: app.id, region: region, platform: platform, trace: trace)
+                                } catch {
+                                    try Task.checkCancellation()
+                                    throw StoreDownloadError.catalogUnavailable
+                                }
+                                guard !metadata.externalVersionID.isEmpty,
+                                      metadata.bundleID == nil || metadata.bundleID == app.bundleID
+                                else { throw StoreDownloadError.catalogUnavailable }
+                                logger.info("Store download [\(trace)]: catalog version=\(metadata.externalVersionID)")
+                                return metadata.externalVersionID
+                            } onFallback: { reason in
+                                logger.info("Store download [\(trace)]: trying \(reason == "empty-redownload-http500" ? "update" : "redownload"), reason=\(reason)")
                             }
-                            guard !metadata.externalVersionID.isEmpty,
-                                  metadata.bundleID == nil || metadata.bundleID == app.bundleID
-                            else { throw StoreDownloadError.catalogUnavailable }
-                            logger.info("Store download [\(trace)]: catalog version=\(metadata.externalVersionID)")
-                            return metadata.externalVersionID
-                        } onFallback: { reason in
-                            logger.info("Store download [\(trace)]: trying \(reason == "empty-redownload-http500" ? "update" : "redownload"), reason=\(reason)")
+                            break
+                        } catch {
+                            lastError = error
+                            guard Self.isTransientDownloadError(error), attempt < 3 else { throw error }
+                            logger.info("Store download [\(trace)]: transient failure (attempt \(attempt)/3), retrying: \(StoreDiagnostics.errorSummary(error))")
+                            try? await Task.sleep(nanoseconds: 2_000_000_000)
                         }
-                        break
-                    } catch {
-                        lastError = error
-                        guard Self.isTransientDownloadError(error), attempt < 3 else { throw error }
-                        logger.info("Store download [\(trace)]: transient failure (attempt \(attempt)/3), retrying: \(StoreDiagnostics.errorSummary(error))")
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
                     }
+                    guard let fetched else { throw lastError ?? StoreDownloadError.empty }
+                    response = fetched
                 }
-                guard let fetched else { throw lastError ?? StoreDownloadError.empty }
-                response = fetched
+                // Preserve the existing UI's explicit free-license acquisition flow.
+                if StoreDownloadProtocol.failureCode(response) == "9610" {
+                    throw ApplePackageError.licenseRequired
+                }
+                let item = try StoreDownloadProtocol.packageItem(response, bundleID: app.bundleID, version: effectiveVersion)
+                return try parse(item)
             }
-            // Preserve the existing UI's explicit free-license acquisition flow.
-            if StoreDownloadProtocol.failureCode(response) == "9610" {
-                throw ApplePackageError.licenseRequired
+            do {
+                let result = try await fetchAndParse(using: &account)
+                logger.info("Store download [\(trace)]: product metadata ready")
+                return result
+            } catch {
+                // -128 CountryMismatch (ý tưởng iPadn v2.3.3 tự sửa):
+                // vùng của tài khoản không khớp vùng của gói. Thử lại
+                // đúng 1 lần với BẢN SAO của tài khoản đã chỉnh `store`
+                // sang vùng của gói — bản sao chỉ sống trong lần thử lại,
+                // không ghi về `account`, nên tài khoản đã lưu (mà
+                // `withAccount` sẽ ghi đè lại sau khi body trả về) không
+                // bị đổi vùng. Cookie mới gộp vào bản sao cũng bị bỏ,
+                // chấp nhận được cho 1 lần thử. Nếu thử lại cũng lỗi thì
+                // ném lỗi -128 gốc để UI chẩn đoán lệch vùng.
+                let originalError = error
+                guard let downloadError = error as? StoreDownloadError,
+                      case let .rejected(code, _) = downloadError, code == "-128",
+                      let region,
+                      Configuration.countryCode(for: account.store) != region,
+                      let adjustedStore = Configuration.storeId(for: region)
+                else { throw originalError }
+                logger.info("Store download [\(trace)]: CountryMismatch (-128), retrying once with request-local store for region=\(region)")
+                var adjustedAccount = account
+                adjustedAccount.store = adjustedStore
+                do {
+                    let result = try await fetchAndParse(using: &adjustedAccount)
+                    logger.info("Store download [\(trace)]: product metadata ready (after -128 region fix)")
+                    return result
+                } catch {
+                    logger.info("Store download [\(trace)]: -128 region-fix retry failed, reporting original error")
+                    throw originalError
+                }
             }
-            let item = try StoreDownloadProtocol.packageItem(response, bundleID: app.bundleID, version: effectiveVersion)
-            let result = try parse(item)
-            logger.info("Store download [\(trace)]: product metadata ready")
-            return result
         } catch {
             // localizedDescription and NSError.userInfo can contain Apple messages
             // or a credential-bearing URL. Log only the error type and numeric code.

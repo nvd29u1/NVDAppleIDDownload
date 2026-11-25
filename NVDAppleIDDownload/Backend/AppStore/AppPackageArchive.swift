@@ -122,7 +122,7 @@ class AppPackageArchive {
         Task {
             do {
                 let versions = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                    try await StoreDownloadService.versions(account: &userAccount.account, package: requestedPackage)
+                    try await StoreDownloadService.versions(account: &userAccount.account, package: requestedPackage, region: region)
                 }
                 self.versionIdentifiers = versions.reversed()
             } catch {
@@ -153,7 +153,7 @@ class AppPackageArchive {
                     let requestedPackage = self.package
 
                     let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                        try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: version)
+                        try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: version, region: region)
                     }
                     self.versionItems[version] = metadata
                 }
@@ -177,7 +177,7 @@ class AppPackageArchive {
             do {
                 let requestedPackage = self.package
                 let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                    try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: versionID)
+                    try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: versionID, region: region)
                 }
                 self.versionItems[versionID] = metadata
             } catch {

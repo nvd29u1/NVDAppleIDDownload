@@ -283,3 +283,57 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   changing the xcconfig alone would have shipped 4.2.2 again. Welcome
   screen / startup log show the version automatically from the bundle
   (`main.swift` `version` = short version + build, e.g. "2.0 5").
+- Đợt 1 build 6 (25 Nov 2026, 2.0 build 6): 2 mục dễ nhất từ
+  `docs/IPADN-SO-SANH.md` (mục 2 + 5) + fix lỗi mua thật gặp sáng
+  25/11. Học ý tưởng iPadn rồi viết lại sạch, KHÔNG copy code iPadn
+  (GPL-2.0), giữ MIT.
+  - Chẩn đoán lệch vùng + nút "Đổi tài khoản rồi thử lại" (mục 2):
+    `ProductView` chỉ chẩn đoán SAU khi lỗi thật — tải hoặc nhập vào Đã
+    mua thất bại với failureType 2059/1010/-128 thì hiện popup tiếng
+    Việt nêu đúng vùng tài khoản / vùng gói + 2 nút: [Đổi sang tài khoản
+    vùng Y và thử lại] (có tài khoản đúng vùng đã đăng nhập thì tự đổi
+    picker sang nó rồi chạy lại đúng thao tác 1 lần, không mở popup nữa;
+    chưa có thì hiện hướng dẫn thêm tài khoản vùng Y ở tab Tài khoản —
+    màn này không có đường chuyển tab bằng code nên nút "mở màn chọn tài
+    khoản" thực chất là quay lại picker ngay trên màn chi tiết) và [Đổi
+    tài khoản] (đóng popup, tự chọn bằng picker). Không chặn trước khi
+    tải — cảnh báo cam build 5 vẫn hiện trước, popup chỉ sau lỗi thật.
+    Lỗi -128 (`StoreDownloadService`, có `region` của gói luồn từ
+    `ProductView`/`AppPackageArchive`/`Downloads.startDownload` xuống):
+    tự chỉnh `store` sang vùng của gói trong BẢN SAO của tài khoản rồi
+    retry 1 lần, KHÔNG ghi về tài khoản đã lưu (`withAccount` sẽ ghi đè
+    lại tài khoản sau khi body trả về nên chỉnh thẳng là hỏng tài khoản).
+    Lần thử lại thất bại thì báo lỗi -128 gốc để UI chẩn đoán. Mua
+    license thì KHÔNG tự chỉnh store (purchase chạy trong `withAccount`
+    nên bản sao không tách được) — -128 khi mua đi qua popup đổi tài
+    khoản như 2059/1010. `StoreDownloadError.rejected` mã 2059/1010/-128
+    cũng dịch sang tiếng Việt (màn Lịch sử phiên bản hiện qua alert
+    "Oops"). 8 chuỗi mới (223 tổng).
+  - Lấy license xong tự refresh + retry lịch sử phiên bản (mục 5):
+    sau "Nhập vào Đã mua" thành công, `ProductView` xoá cache phiên bản
+    của gói (`AppPackageArchive.clearVersionItems`, chung kho Persist
+    theo gói + vùng) rồi tự gọi lại `versions()` 1 lần sau ~1,5 giây —
+    mở Lịch sử phiên bản là thấy danh sách mới, không phải tự mở lại /
+    bấm Refresh. Lỗi khi làm mới thì lặng lẽ bỏ qua.
+  - Fix lỗi redirect khi mua (sáng 25/11: tài khoản kumit.95bt@gmail.com
+    vùng IN, gói Muse from Meta vùng US, bấm "Nhập vào Đã mua" thất bại
+    "authentication failed: failed to retrieve redirect location"):
+    nguyên nhân là `Purchase.purchase` và `Authenticator.rotatePasswordToken`
+    trong fork KHÔNG hề gắn Anisette headers — request mua + rotate token
+    đều gọi Apple thiếu header, trong khi đăng nhập thì có. Fork
+    `nvd29u1/ApplePackage` commit `541c43a` (từ pin `9dc423a`) thêm tham
+    số tuỳ chọn `anisetteHeaders: [String: String] = [:]` cho
+    `Purchase.purchase` / `purchaseWithParams` / `makeRequest` (gắn vào
+    header buyProduct) và `rotatePasswordToken(for:anisetteHeaders:)`
+    (chuyền vào `authenticate`); mặc định rỗng nên hành vi cũ không đổi.
+    App: `AppStore.anisetteHeadersForStoreCall()` lấy header mới từ máy
+    chủ Anisette trong Cài đặt trước khi mua (lấy không được thì dừng,
+    không mua thiếu header — cùng chính sách như đăng nhập);
+    `acquireLicense` thử lại lỗi tạm thời (204/403/404/5xx, redirect
+    không địa chỉ, body trống) tối đa 3 lần, lỗi vùng 2059/1010/-128
+    thì KHÔNG retry mà dịch sang tiếng Việt + mở popup; lỗi cửa Apple
+    cuối cùng dịch sang tiếng Việt rõ ràng (`PurchaseGateError`).
+    Chưa kiểm chứng trên iPhone thật — cần test với tài khoản phụ + máy
+    chủ Anisette (xem báo cáo giao bản).
+  - Version: 2.0 build 6 (`CURRENT_PROJECT_VERSION` 5 → 6, chỉ trong
+    `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0).

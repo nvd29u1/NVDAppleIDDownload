@@ -21,7 +21,7 @@ struct ProductHistoryView: View {
                         Button("Download \(pkg.software.version)") {
                             Task {
                                 do {
-                                    try await Downloads.this.startDownload(for: pkg, accountID: aid)
+                        try await Downloads.this.startDownload(for: pkg, accountID: aid, region: vm.region)
                                 } catch {
                                     vm.error = error.localizedDescription
                                 }

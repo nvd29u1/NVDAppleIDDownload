@@ -68,9 +68,12 @@ extension Downloads {
 }
 
 extension Downloads {
-    func startDownload(for package: AppStore.AppPackage, accountID: String) async throws {
+    /// `region` là mã vùng của gói đang tải (vd "VN"), khi caller biết —
+    /// để StoreDownloadService tự sửa lỗi -128 CountryMismatch bằng bản
+    /// sao tài khoản đã chỉnh vùng (không đổi tài khoản đã lưu).
+    func startDownload(for package: AppStore.AppPackage, accountID: String, region: String? = nil) async throws {
         try await AppStore.this.withAccount(id: accountID) { account in
-            let downloadOutput = try await StoreDownloadService.download(account: &account.account, package: package)
+            let downloadOutput = try await StoreDownloadService.download(account: &account.account, package: package, region: region)
             let request = try Downloads.this.add(request: .init(
                 account: account,
                 package: package,

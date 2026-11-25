@@ -126,7 +126,7 @@ struct AddDownloadView: View {
                         guard let countryCode = ApplePackage.Configuration.countryCode(for: account.account.store) else { return }
                         let software = try await ApplePackage.Lookup.lookup(bundleID: bundleID, countryCode: countryCode)
                         let appPackage = AppStore.AppPackage(software: software)
-                        try await dvm.startDownload(for: appPackage, accountID: account.id)
+                        try await dvm.startDownload(for: appPackage, accountID: account.id, region: countryCode)
                         hint = String(localized: "Download Requested")
                         hintIsError = false
                     } catch {

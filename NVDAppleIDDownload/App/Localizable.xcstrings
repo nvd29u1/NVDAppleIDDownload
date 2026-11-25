@@ -4713,6 +4713,182 @@
           }
         }
       }
+    },
+    "Lỗi do lệch vùng" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region mismatch"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "区域不匹配"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lỗi do lệch vùng"
+          }
+        }
+      }
+    },
+    "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Region mismatch: the account is in region %@, this package is in region %@ — Apple only allows downloads and Add to Purchased in the account's own region. Switch to an account in region %@ and try again, or add an account for region %@ in the Accounts tab."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "区域不匹配：账号在 %@ 区，该安装包在 %@ 区——Apple 只允许在账号所属区域下载和加入已购项目。请切换到 %@ 区的账号后重试，或在“账号”页添加 %@ 区的账号。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản."
+          }
+        }
+      }
+    },
+    "Đổi sang tài khoản vùng %@ và thử lại" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch to a %@ account and try again"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换到 %@ 区账号后重试"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đổi sang tài khoản vùng %@ và thử lại"
+          }
+        }
+      }
+    },
+    "Đổi tài khoản" : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Switch account"
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "切换账号"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Đổi tài khoản"
+          }
+        }
+      }
+    },
+    "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "No account for region %@ is signed in. Add an account for region %@ in the Accounts tab, then select it."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "尚未登录 %@ 区的账号。请在“账号”页添加 %@ 区的账号，然后重新选择。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
+          }
+        }
+      }
+    },
+    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple refused the Add to Purchased request (the server returned an empty response — HTTP 204). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple 拒绝了加入已购项目的请求（服务器返回了空响应——HTTP 204）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
+          }
+        }
+      }
+    },
+    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple refused the Add to Purchased request (the server returned a redirect with no destination). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple 拒绝了加入已购项目的请求（服务器返回了重定向，但没有目标地址）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
+          }
+        }
+      }
+    },
+    "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại." : {
+      "localizations" : {
+        "en" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple refused because of a region mismatch (code %@). The app is not in the store for the account's region — switch to an account in the right region and try again."
+          }
+        },
+        "zh-Hans" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple 因区域不匹配而拒绝（代码 %@）。该应用不在此账号所属区域的商店中——请切换到对应区域的账号后重试。"
+          }
+        },
+        "vi" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

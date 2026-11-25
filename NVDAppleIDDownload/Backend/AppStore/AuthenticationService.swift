@@ -154,6 +154,24 @@ extension AppStore {
         return message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded")
     }
 
+    /// Anisette headers cho một lệnh store (mua license / rotate token).
+    /// Cùng chính sách như đăng nhập: nếu đã đặt URL máy chủ Anisette thì
+    /// lấy header mới trước; lấy không được thì dừng lại với giải thích
+    /// tiếng Việt thay vì gọi Apple thiếu header (Apple sẽ từ chối ngay
+    /// bằng 204 / redirect không địa chỉ). URL trống nghĩa là không dùng
+    /// header — hành vi cũ giữ nguyên.
+    @MainActor
+    func anisetteHeadersForStoreCall() async throws -> [String: String] {
+        guard !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return [:] }
+        guard let serverURL = AnisetteService.normalizedServerURL(anisetteServerURL) else {
+            throw AnisetteService.AnisetteError.invalidURL
+        }
+        logger.info("fetching Anisette headers from user server for store call")
+        let headers = try await AnisetteService.fetchHeaders(from: serverURL)
+        logger.info("fetched \(headers.count) Anisette headers for store call")
+        return headers
+    }
+
     @MainActor
     @discardableResult
     func rotate(id: UserAccount.ID) async throws -> UserAccount? {

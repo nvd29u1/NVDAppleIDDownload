@@ -28,7 +28,14 @@ enum StoreDownloadError: LocalizedError {
         case .noVersions:
             String(localized: "Apple returned no version history for this app and platform.")
         case let .rejected(code, message):
-            message.isEmpty ? String(localized: "Apple rejected the download (code: \(code)).") : message
+            // Lỗi vùng của Apple (2059/1010/-128 CountryMismatch): app
+            // không có trong cửa hàng vùng của tài khoản. Dịch sang tiếng
+            // Việt kèm hướng dẫn đổi tài khoản thay vì để nguyên mã số —
+            // màn Lịch sử phiên bản hiện lỗi này qua alert "Oops".
+            if ["2059", "1010", "-128"].contains(code) {
+                return String(localized: "Apple từ chối vì lệch vùng (mã \(code)). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại.")
+            }
+            return message.isEmpty ? String(localized: "Apple rejected the download (code: \(code)).") : message
         }
     }
 }

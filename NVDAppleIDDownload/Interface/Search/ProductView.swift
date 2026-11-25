@@ -87,7 +87,7 @@ struct ProductView: View {
     /// (app có ở cả hai vùng thì vẫn nhập được bằng vùng của tài khoản),
     /// nhưng nếu Apple báo app không có trong cửa hàng thì phải thêm tài
     /// khoản đúng vùng. Đã kiểm tra ApplePackage (fork nvd29u1, pin
-    /// 9dc423a): `Purchase.purchase(account:app:)` KHÔNG có tham số vùng
+    /// 541c43a): `Purchase.purchase(account:app:anisetteHeaders:)` KHÔNG có tham số vùng
     /// — header `X-Apple-Store-Front` lấy từ `account.store` (vùng đăng ký
     /// của tài khoản, do Apple trả về lúc đăng nhập), không có cách nào
     /// mua license theo vùng của gói bằng 1 tài khoản; đổi `store` của
@@ -102,10 +102,13 @@ struct ProductView: View {
 
     /// Lỗi khi Apple từ chối nhập vào Đã mua vì app không có trong cửa
     /// hàng vùng của tài khoản: ApplePackage trả failureType 2059 ("app is
-    /// unavailable ... in this storefront") hoặc 1010 ("invalid store or
-    /// app unavailable in this storefront") — dịch sang tiếng Việt kèm
-    /// hướng dẫn thêm tài khoản đúng vùng.
+    /// unavailable ... in this storefront"), 1010 ("invalid store or app
+    /// unavailable in this storefront") hoặc -128 (CountryMismatch) — dịch
+    /// sang tiếng Việt kèm hướng dẫn thêm tài khoản đúng vùng. `code` giữ
+    /// lại mã gốc để màn hình biết đây là lỗi vùng và mở popup chẩn đoán
+    /// (thay vì chỉ hiện chữ lỗi).
     private struct RegionPurchaseRefusal: LocalizedError {
+        let code: String
         let accountRegion: String
         let packageRegion: String
         var errorDescription: String? {
@@ -116,6 +119,90 @@ struct ProductView: View {
         }
     }
 
+    /// Lỗi khi Apple từ chối yêu cầu nhập vào Đã mua trước khi xét tài
+    /// khoản — cùng họ lỗi cửa Apple như lúc đăng nhập (trả về trống 204
+    /// / chuyển hướng không có địa chỉ), không phải lỗi sai tài khoản.
+    private enum PurchaseGateError: LocalizedError {
+        case appleEmptyResponse
+        case appleRedirectRefused
+
+        var errorDescription: String? {
+            switch self {
+            case .appleEmptyResponse:
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            case .appleRedirectRefused:
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            }
+        }
+    }
+
+    /// Thao tác vừa thất bại vì lệch vùng — để popup biết bấm "thử lại"
+    /// thì chạy lại thao tác nào.
+    private enum RegionFailedOperation {
+        case download
+        case purchase
+    }
+
+    /// Chẩn đoán lệch vùng sau một lỗi thật (ý tưởng iPadn v2.3.1): không
+    /// chặn trước khi tải/mua, chỉ khi Apple đã trả 2059/1010/-128 mới
+    /// hiện popup nêu đúng vùng tài khoản / vùng gói + nút đổi tài khoản
+    /// rồi thử lại.
+    private struct RegionDiagnosis: Identifiable {
+        let id = UUID()
+        let code: String
+        let accountRegion: String
+        let packageRegion: String
+        let operation: RegionFailedOperation
+    }
+
+    /// Mã lỗi vùng trong một lỗi bất kỳ: failureType 2059/1010/-128 từ
+    /// ApplePackage (mua license), hoặc `StoreDownloadError.rejected`
+    /// cùng mã (tải / lịch sử phiên bản). Trả nil nếu không phải lỗi vùng.
+    private static func regionFailureCode(in error: Error) -> String? {
+        if let refusal = error as? RegionPurchaseRefusal { return refusal.code }
+        if let downloadError = error as? StoreDownloadError,
+           case let .rejected(code, _) = downloadError,
+           ["2059", "1010", "-128"].contains(code) {
+            return code
+        }
+        let description = error.localizedDescription
+        if description.contains("failureType: 2059") || description.contains("code: 2059") { return "2059" }
+        if description.contains("failureType: 1010") || description.contains("code: 1010") { return "1010" }
+        if description.contains("failureType: -128") || description.contains("code: -128") { return "-128" }
+        // Thông điệp của fork cho 2059/1010 không phải lúc nào cũng kèm
+        // failureType (vd. "app is unavailable ... in this storefront").
+        if description.contains("unavailable in this storefront") { return "2059" }
+        if description.contains("invalid store") { return "1010" }
+        return nil
+    }
+
+    /// Lỗi tạm thời của Apple khi mua license: máy chủ trả về trống hoặc
+    /// lỗi HTTP 204/403/404/5xx, redirect không có địa chỉ — cùng họ lỗi
+    /// với đăng nhập, đáng thử lại. Lỗi phán quyết thật (lệch vùng
+    /// 2059/1010/-128, app trả phí, bắt chấp nhận điều khoản, token hết
+    /// hạn) thì không thử lại.
+    private static func isTransientPurchaseError(_ error: Error) -> Bool {
+        let message = error.localizedDescription
+        return ["request failed with status 204", "request failed with status 403", "request failed with status 404",
+                "request failed with status 500", "request failed with status 502", "request failed with status 503", "request failed with status 504",
+                "HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504",
+                "failed to retrieve redirect location", "redirect limit exceeded",
+                "response body is empty"].contains { message.contains($0) }
+    }
+
+    /// Dịch lỗi cửa Apple khi mua license sang tiếng Việt rõ ràng (như
+    /// AuthenticationService làm cho đăng nhập). Lỗi khác giữ nguyên.
+    private static func translatePurchaseGateError(_ error: Error) -> Error {
+        let message = error.localizedDescription
+        if message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded") {
+            return PurchaseGateError.appleRedirectRefused
+        }
+        if message.contains("request failed with status 204") || message.contains("HTTP 204") {
+            return PurchaseGateError.appleEmptyResponse
+        }
+        return error
+    }
+
     var account: AppStore.UserAccount? {
         vm.accounts.first { $0.id == selection }
     }
@@ -124,6 +211,7 @@ struct ProductView: View {
     @State private var licenseHint: Hint?
     @State private var showLicenseAlert = false
     @State private var hint: Hint?
+    @State private var regionDiagnosis: RegionDiagnosis?
 
     let sizeFormatter: ByteCountFormatter = {
         let formatter = ByteCountFormatter()
@@ -182,6 +270,24 @@ struct ProductView: View {
             PackageView(pkg: manifest)
         }
         .navigationTitle("Select Account")
+        .alert(item: $regionDiagnosis) { diagnosis in
+            Alert(
+                title: Text("Lỗi do lệch vùng"),
+                message: Text(String(
+                    format: String(localized: "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản."),
+                    diagnosis.accountRegion, diagnosis.packageRegion, diagnosis.packageRegion, diagnosis.packageRegion
+                )),
+                primaryButton: .default(Text(String(
+                    format: String(localized: "Đổi sang tài khoản vùng %@ và thử lại"),
+                    diagnosis.packageRegion
+                ))) {
+                    Task {
+                        await retryAfterRegionSwitch(diagnosis)
+                    }
+                },
+                secondaryButton: .cancel(Text("Đổi tài khoản")) {}
+            )
+        }
         .alert("License Required", isPresented: $showLicenseAlert) {
             var confirmRole: ButtonRole?
             #if compiler(>=6.2)
@@ -196,7 +302,16 @@ struct ProductView: View {
                         do {
                             try await acquireLicense()
                         } catch {
-                            licenseHint = Hint(message: error.localizedDescription, color: .red)
+                            if let refusal = error as? RegionPurchaseRefusal {
+                                regionDiagnosis = RegionDiagnosis(
+                                    code: refusal.code,
+                                    accountRegion: refusal.accountRegion,
+                                    packageRegion: refusal.packageRegion,
+                                    operation: .purchase
+                                )
+                            } else {
+                                licenseHint = Hint(message: error.localizedDescription, color: .red)
+                            }
                         }
                     }
                 }
@@ -206,35 +321,115 @@ struct ProductView: View {
         } message: {}
     }
 
-    /// Rotates the password token and requests a license for the current
-    /// account. Sets `licenseHint` to a success message; callers handle errors.
-    /// Lỗi vùng của Apple (failureType 2059 / 1010) được dịch sang tiếng
-    /// Việt kèm hướng dẫn thêm tài khoản đúng vùng (xem RegionPurchaseRefusal).
-    private func acquireLicense() async throws {
-        guard let account else { return }
+    /// Nút "Đổi sang tài khoản vùng Y và thử lại" trong popup lệch vùng:
+    /// nếu đã có tài khoản đúng vùng đăng nhập thì tự đổi picker sang nó
+    /// rồi chạy lại đúng thao tác vừa lỗi 1 lần; chưa có tài khoản đúng
+    /// vùng thì chỉ hiện hướng dẫn thêm tài khoản ở tab Tài khoản (picker
+    /// chọn tài khoản vẫn nằm ngay trên màn này để người dùng tự đổi).
+    /// Lần thử lại này không mở popup nữa — lỗi thì hiện hint đỏ.
+    private func retryAfterRegionSwitch(_ diagnosis: RegionDiagnosis) async {
+        guard let matching = vm.eligibleAccounts(for: diagnosis.packageRegion).first else {
+            hint = Hint(message: String(
+                format: String(localized: "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."),
+                diagnosis.packageRegion, diagnosis.packageRegion
+            ), color: .red)
+            return
+        }
+        selection = matching.id
         do {
-            try await vm.withAccount(id: account.id) { userAccount in
-                try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account)
-                try await ApplePackage.Purchase.purchase(
-                    account: &userAccount.account,
-                    app: archive.package.software,
-                )
+            switch diagnosis.operation {
+            case .download:
+                try await requestDownload()
+            case .purchase:
+                try await acquireLicense()
             }
         } catch {
-            let description = error.localizedDescription
-            if description.contains("failureType: 2059")
-                || description.contains("failureType: 1010")
-                || description.contains("unavailable in this storefront")
-                || description.contains("invalid store") {
-                throw RegionPurchaseRefusal(
-                    accountRegion: selectedAccountRegion ?? "?",
-                    packageRegion: region
-                )
+            hint = Hint(message: error.localizedDescription, color: .red)
+        }
+    }
+
+    /// Yêu cầu tải gói đang xem bằng tài khoản đã chọn. Tách riêng để nút
+    /// "thử lại" trong popup lệch vùng dùng lại được sau khi đã đổi tài
+    /// khoản. Lỗi vùng (2059/1010/-128) thì caller mở popup chẩn đoán;
+    /// lỗi khác thì hiện hint đỏ như trước.
+    private func requestDownload() async throws {
+        guard let account else { return }
+        try await dvm.startDownload(for: archive.package, accountID: account.id, region: region)
+        hint = Hint(message: String(localized: "Download Requested"), color: nil)
+        if let req = dvm.downloadRequest(forArchive: archive.package) {
+            navigationPath.append(req)
+        }
+    }
+
+    /// Rotates the password token and requests a license for the current
+    /// account. Sets `licenseHint` to a success message; callers handle errors.
+    ///
+    /// Mua license có gắn Anisette headers (build 6): rotate token và
+    /// buyProduct đều nhận header lấy từ máy chủ Anisette trong Cài đặt
+    /// (fork nvd29u1/ApplePackage 541c43a) — trước đây cả hai đều gọi
+    /// Apple thiếu header nên Apple có thể từ chối ngay bằng 204 /
+    /// redirect không địa chỉ ("failed to retrieve redirect location"),
+    /// đúng lỗi gặp sáng 25/11/2026. Lỗi tạm thời kiểu đó thì thử lại tối
+    /// đa 3 lần như đăng nhập; lỗi vùng (2059/1010/-128) thì dịch sang
+    /// tiếng Việt kèm hướng dẫn thêm tài khoản đúng vùng (xem
+    /// RegionPurchaseRefusal) và KHÔNG thử lại vô ích.
+    private func acquireLicense() async throws {
+        guard let account else { return }
+        // Lấy header Anisette trước (cùng chính sách như đăng nhập: máy
+        // chủ đã đặt mà lấy không được thì dừng, không mua thiếu header).
+        let anisetteHeaders = try await vm.anisetteHeadersForStoreCall()
+        var lastError: Error?
+        for attempt in 1 ... 3 {
+            do {
+                try await vm.withAccount(id: account.id) { userAccount in
+                    try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account, anisetteHeaders: anisetteHeaders)
+                    try await ApplePackage.Purchase.purchase(
+                        account: &userAccount.account,
+                        app: archive.package.software,
+                        anisetteHeaders: anisetteHeaders,
+                    )
+                }
+                lastError = nil
+                break
+            } catch {
+                lastError = error
+                if let code = Self.regionFailureCode(in: error) {
+                    throw RegionPurchaseRefusal(
+                        code: code,
+                        accountRegion: selectedAccountRegion ?? "?",
+                        packageRegion: region
+                    )
+                }
+                guard Self.isTransientPurchaseError(error), attempt < 3 else { break }
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
             }
-            throw error
+        }
+        if let lastError {
+            throw Self.translatePurchaseGateError(lastError)
         }
         licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
         hint = licenseHint
+        refreshVersionHistoryAfterLicense()
+    }
+
+    /// Lấy license xong thì tự làm mới Lịch sử phiên bản (ý tưởng iPadn
+    /// v2.3.5): xoá cache phiên bản cũ rồi tự gọi lại versions() 1 lần
+    /// sau ~1,5 giây, để người dùng mở Lịch sử phiên bản là thấy danh
+    /// sách mới thay vì phải tự mở lại / bấm Refresh. Cache dùng chung
+    /// kho Persist theo gói + vùng nên màn Lịch sử (tạo archive riêng
+    /// nhưng cùng khoá) cũng đọc được danh sách mới. Lỗi khi làm mới thì
+    /// lặng lẽ bỏ qua — người dùng vẫn mở lại Lịch sử như trước được.
+    private func refreshVersionHistoryAfterLicense() {
+        guard let account else { return }
+        let refreshArchive = AppPackageArchive(accountID: account.id, region: region, package: archive.package)
+        guard !refreshArchive.loading else { return }
+        refreshArchive.clearVersionItems()
+        Task {
+            try? await Task.sleep(nanoseconds: 1_500_000_000)
+            await MainActor.run {
+                refreshArchive.populateVersionIdentifiers()
+            }
+        }
     }
 
     var packageHeader: some View {
@@ -295,7 +490,21 @@ struct ProductView: View {
             Text("\(archive.formattedPrice ?? "N/A")")
             if archive.price == 0 {
                 AsyncButton {
-                    try await acquireLicense()
+                    do {
+                        try await acquireLicense()
+                    } catch {
+                        if let refusal = error as? RegionPurchaseRefusal {
+                            regionDiagnosis = RegionDiagnosis(
+                                code: refusal.code,
+                                accountRegion: refusal.accountRegion,
+                                packageRegion: refusal.packageRegion,
+                                operation: .purchase
+                            )
+                        } else {
+                            licenseHint = Hint(message: error.localizedDescription, color: .red)
+                        }
+                        throw error
+                    }
                 } label: {
                     Text("Acquire License")
                 }
@@ -339,15 +548,17 @@ struct ProductView: View {
                 }
             } else {
                 AsyncButton {
-                    guard let account else { return }
                     do {
-                        try await dvm.startDownload(for: archive.package, accountID: account.id)
-                        hint = Hint(message: String(localized: "Download Requested"), color: nil)
-                        if let req = dvm.downloadRequest(forArchive: archive.package) {
-                            navigationPath.append(req)
-                        }
+                        try await requestDownload()
                     } catch {
-                        if case ApplePackageError.licenseRequired = error, archive.package.software.price == 0 {
+                        if let code = Self.regionFailureCode(in: error) {
+                            regionDiagnosis = RegionDiagnosis(
+                                code: code,
+                                accountRegion: selectedAccountRegion ?? "?",
+                                packageRegion: region,
+                                operation: .download
+                            )
+                        } else if case ApplePackageError.licenseRequired = error, archive.package.software.price == 0 {
                             showLicenseAlert = true
                         } else {
                             hint = Hint(message: String(localized: "Unable to retrieve download URL. Please try again later.") + "\n" + error.localizedDescription, color: .red)
@@ -370,7 +581,16 @@ struct ProductView: View {
                         do {
                             try await acquireLicense()
                         } catch {
-                            hint = Hint(message: String(localized: "Không nhập được vào mục Đã mua.") + "\n" + error.localizedDescription, color: .red)
+                            if let refusal = error as? RegionPurchaseRefusal {
+                                regionDiagnosis = RegionDiagnosis(
+                                    code: refusal.code,
+                                    accountRegion: refusal.accountRegion,
+                                    packageRegion: refusal.packageRegion,
+                                    operation: .purchase
+                                )
+                            } else {
+                                hint = Hint(message: String(localized: "Không nhập được vào mục Đã mua.") + "\n" + error.localizedDescription, color: .red)
+                            }
                             throw error
                         }
                     } label: {
