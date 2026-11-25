@@ -403,7 +403,7 @@ final class IPadnLoopbackServer: @unchecked Sendable {
             if method != "HEAD" { response.append(resource.0) }
             connection.send(content: response, completion: .contentProcessed { _ in connection.cancel() })
         } else if parts.count == 2, parts[0] == "runtime", !parts[1].contains(".."),
-           let root = Bundle.main.url(forResource: "SAPRuntime", withExtension: nil),
+           let root = Bundle.main.url(forResource: "SAPRuntime", withExtension: nil) ?? Bundle.main.resourceURL,
            ["index.html", "sap-signer.js", "wasm_exec.js", "unicorn_x86.js", "sap.wasm", "libCoreADI.so", "libstoreservicescore.so"].contains(parts[1]) {
             sendFile(connection, url: root.appendingPathComponent(parts[1]), range: headers["range"], head: method == "HEAD")
         } else if parts.count == 3, parts[0] == "files" {

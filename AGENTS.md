@@ -1698,7 +1698,30 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     part). Backup bản 19:
     `deliver/NVDAppleIDDownload-2.0-build19-backup.ipa` (SHA256
     `e06314da…` khớp bản đã giao).
-  - CI "Build App" run 45655927457 (đang chạy — điền kết quả sau):
+  - CI "Build App" run 45655927457: FAIL — build-ios lỗi 7 chỗ
+    `logger.info("..." + var)` (Logger.Message không nhận String nối
+    bằng `+`, chỉ nhận literal/nội suy); build-osx bị cancelled do hết
+    runner (lỗi hạ tầng). Sửa: đổi cả 10 chỗ nối chuỗi trong
+    logger.info sang nội suy (IPadnSAPSigner 3 chỗ, IPadnLoopbackServer
+    7 chỗ) → commit local `24e6f2b`, đẩy → remote `566a7d91`.
+    CI "Build App" run 45661890911: SUCCESS cả 2 job (build-ios +
+    build-osx). Artifact iOS 77.746.580 byte; IPA trong 78.200.768 byte.
+  - Kiểm chứng IPA (ký ad-hoc zsign -a -z 9, 78.294.812 byte, SHA256
+    `7a19ea8c…`): bundle com.NVD.appleiddownload, version 2.1 build 20,
+    minOS 16.0, Configurator/2.21 có 1 hit, "No Downloads"/"No Accounts"
+    0 hit, Twemoji 0 hit, IPadnLoginService 131 hit, sap.wasm trong
+    bundle SHA256 `b7150bb4…` KHỚP manifest.
+  - **LỖI PHÁT HIỆN KHI KIỂM CHỨNG (chưa có trong bản CI này):** project
+    dùng synchronized group nên Xcode copy file của SAPRuntime PHẲNG ra
+    root bundle (không có thư mục SAPRuntime/), nhưng
+    IPadnLoopbackServer.swift:406 tìm
+    `Bundle.main.url(forResource: "SAPRuntime", …)` → nil → mọi request
+    /runtime/* trả 404 → WKWebView không tải được index.html/sap.wasm →
+    đăng nhập sẽ lỗi ngay trên máy thật. Sửa (chưa build): fallback
+    `?? Bundle.main.resourceURL` ở dòng 406; CI script dời
+    sap.wasm.part* ra khỏi source tree trước xcodebuild để khỏi chui
+    vào bundle (~50 MB thừa). Đẩy lại + build lại rồi kiểm chứng lại
+    layout bundle trước khi giao.
   - Chưa kiểm chứng trên iPhone thật — cần anh test: đăng nhập bằng
     tài khoản phụ (kumit.95bt@gmail.com) xem vào được không; nếu vẫn lỗi
     thì chụp Nhật ký quanh dòng "ipadn login: ..." (stage + mã HTTP, không

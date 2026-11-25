@@ -59,6 +59,14 @@ if [ "$(shasum -a 256 "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm" | awk '{
 fi
 echo "[+] sap.wasm reassembled and verified"
 
+# The .part files are only needed for the reassembly above. The project
+# uses a synchronized group, so Xcode would copy them flat into the app
+# bundle as well (~50 MB wasted in the IPA). Move them out of the source
+# tree before xcodebuild; the runner is ephemeral, no restore needed.
+mkdir -p /tmp/sap-parts-build20
+mv "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm.part"* /tmp/sap-parts-build20/
+echo "[+] sap.wasm.part* moved out of the bundle"
+
 xcodebuild -workspace "$WORKSPACE" \
     -scheme "$SCHEME" \
     -configuration Release \
