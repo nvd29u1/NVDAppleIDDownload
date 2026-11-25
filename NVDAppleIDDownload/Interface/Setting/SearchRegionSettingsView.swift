@@ -17,7 +17,9 @@ struct SearchRegionSettingsView: View {
     @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
     @State private var vm = AppStore.this
     @State private var query = ""
+#if os(iOS)
     @State private var editMode: EditMode = .inactive
+#endif
 
     /// Vùng ưa thích theo thứ tự người dùng đã sắp xếp.
     var favoriteRegions: [StoreRegion] {
@@ -79,7 +81,11 @@ struct SearchRegionSettingsView: View {
             } header: {
                 Text("Vùng ưa thích")
             } footer: {
+#if os(iOS)
                 Text("Bấm Sửa để kéo sắp xếp hoặc xoá. Vùng ưa thích hiện đầu tiên trong menu chọn vùng ở tab Tìm kiếm.")
+#else
+                Text("Kéo để sắp xếp lại thứ tự. Vùng ưa thích hiện đầu tiên trong menu chọn vùng ở tab Tìm kiếm.")
+#endif
             }
 
             Section {
@@ -96,10 +102,12 @@ struct SearchRegionSettingsView: View {
         }
         .searchable(text: $query, prompt: "Tìm theo tên hoặc mã vùng (vd VN, US, Nhật Bản)")
         .navigationTitle("Vùng tìm kiếm")
+#if os(iOS)
         .toolbar {
             EditButton()
         }
         .environment(\.editMode, $editMode)
+#endif
     }
 
     /// Hàng trong mục ưa thích: bấm vào thì chọn làm vùng đang tìm.
