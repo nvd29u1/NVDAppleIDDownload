@@ -1364,9 +1364,30 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     45627727410 success cả 2 job NHƯNG build nhầm fork cũ (xem bài
     học pin ở mục 1 — chỉ sửa Package.resolved); IPA ký từ run đó
     (SHA256 `2e74c013…`, 25.644.058 byte) KHÔNG có fix trailing-slash
-    nên KHÔNG giao, đã bỏ. Lần đẩy 2 (sửa pbxproj): (điền sau khi push
-    — remote head + run "Build App" + size/SHA256 + kết quả kiểm
-    chứng, kèm xác nhận log CI checkout ApplePackage @ 78eb66f7).
+    nên KHÔNG giao, đã bỏ (file /tmp cũng đã mất khi runtime restart
+    — không sao, bản đó vốn đã bỏ). Lần đẩy 2 (sửa pbxproj, remote
+    `dbdecd29`): CI "Build App" run 45631814761 — attempt 1 cả 2 job
+    bị cancelled sau ~28 phút chờ runner macos-26 (không có step nào
+    chạy, không có concurrency/timeout trong workflow — kẹt capacity
+    thoáng qua); bấm rerun-failed-jobs thì attempt 2 chạy ngay và
+    success cả build-ios (job 139277804753) + build-osx (job
+    139277804062). Log build-ios xác nhận checkout ApplePackage @
+    `78eb66f7` (2 hit, 0 hit pin cũ 541c43a) — pin fix đã vào build
+    thật. Artifact `NVDAppleIDDownload.ipa` chưa ký (25.110.342
+    byte, SHA256 `3b156379…`) tải về qua redirect-capture, ký ad-hoc
+    bằng zsign `-a -z 9`. IPA `deliver/NVDAppleIDDownload.ipa`
+    (25.644.174 byte, SHA256
+    `3802c1ff088ea40f4108e073d8e4f5b89bed1becd670030a7649c1ee31305522`):
+    kiểm chứng 2.0 build 18, bundle `com.NVD.appleiddownload`, min
+    iOS 16.0, iPhone+iPad, superblob hợp lệ (magic 0xfade0cc0, slot
+    0+2), framework CydiaSubstrate đã embed, binary có chuỗi mới
+    ("Khôi phục mặc định" 1, "Tùy chỉnh" 1, "LiveContainer
+    detection" 1, "Đã kiểm chứng tới iOS" 1, "jkcoxson (Mac)" 2),
+    Twemoji 0 hit ("Được làm với" 0); thứ tự tab không đổi (MainView
+    không động — Ký IPA, Tìm kiếm, Lượt tải, Tài khoản rồi Đã mua,
+    Đang theo dõi, Cài đặt). Build 17 giữ lại ở
+    `deliver/NVDAppleIDDownload-2.0-build17-backup.ipa` (SHA256
+    `13308ad7…` khớp bản đã giao).
   - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) đăng nhập lại
     bằng tài khoản phụ (kumit.95bt@gmail.com) xem còn lỗi 204 không;
     nếu vẫn lỗi thì chụp Nhật ký quanh dòng `>>> POST` + `<<<` để soi
