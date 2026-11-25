@@ -123,9 +123,15 @@ struct ProductView: View {
     /// Lỗi khi Apple từ chối yêu cầu nhập vào Đã mua trước khi xét tài
     /// khoản — cùng họ lỗi cửa Apple như lúc đăng nhập (trả về trống 204
     /// / chuyển hướng không có địa chỉ), không phải lỗi sai tài khoản.
+    /// Hai case *NoServer (build 15): cùng lỗi cửa đó nhưng máy chưa
+    /// cấu hình máy chủ Anisette nên app không gửi được bằng chứng xác
+    /// minh thiết bị — nói rõ để người dùng biết phải cấu hình máy chủ
+    /// chứ không phải tài khoản sai.
     private enum PurchaseGateError: LocalizedError {
         case appleEmptyResponse
         case appleRedirectRefused
+        case appleEmptyResponseNoServer
+        case appleRedirectRefusedNoServer
 
         var errorDescription: String? {
             switch self {
@@ -133,6 +139,10 @@ struct ProductView: View {
                 return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .appleRedirectRefused:
                 return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            case .appleEmptyResponseNoServer:
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            case .appleRedirectRefusedNoServer:
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
             }
         }
     }
@@ -181,10 +191,14 @@ struct ProductView: View {
     /// lỗi HTTP 204/403/404/5xx, redirect không có địa chỉ — cùng họ lỗi
     /// với đăng nhập, đáng thử lại. Lỗi phán quyết thật (lệch vùng
     /// 2059/1010/-128, app trả phí, bắt chấp nhận điều khoản, token hết
-    /// hạn) thì không thử lại.
+    /// hạn) thì không thử lại. Build 15: thêm 301/302/303/307/308 —
+    /// buyProduct dùng redirectConfiguration .disallow nên Apple chuyển
+    /// hướng (vd sang pod của vùng khác) sẽ trả về đúng mã 3xx thay vì
+    /// theo chuyển hướng; trước đây mã này rơi ra ngoài danh sách nên
+    /// không retry và không dịch ra tiếng Việt.
     private static func isTransientPurchaseError(_ error: Error) -> Bool {
         let message = error.localizedDescription
-        return ["request failed with status 204", "request failed with status 403", "request failed with status 404",
+        return ["request failed with status 204", "request failed with status 301", "request failed with status 302", "request failed with status 303", "request failed with status 307", "request failed with status 308", "request failed with status 403", "request failed with status 404",
                 "request failed with status 500", "request failed with status 502", "request failed with status 503", "request failed with status 504",
                 "HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504",
                 "failed to retrieve redirect location", "redirect limit exceeded",
@@ -193,13 +207,20 @@ struct ProductView: View {
 
     /// Dịch lỗi cửa Apple khi mua license sang tiếng Việt rõ ràng (như
     /// AuthenticationService làm cho đăng nhập). Lỗi khác giữ nguyên.
-    private static func translatePurchaseGateError(_ error: Error) -> Error {
+    /// `anisetteConfigured` (build 15): đã cấu hình máy chủ Anisette
+    /// trong Cài đặt hay chưa — chưa cấu hình mà gặp lỗi cửa thì nói
+    /// rõ nguyên nhân có thể là thiếu header xác minh thiết bị.
+    private static func translatePurchaseGateError(_ error: Error, anisetteConfigured: Bool) -> Error {
         let message = error.localizedDescription
-        if message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded") {
-            return PurchaseGateError.appleRedirectRefused
+        if message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded")
+            || message.contains("request failed with status 301") || message.contains("request failed with status 302")
+            || message.contains("request failed with status 303") || message.contains("request failed with status 307")
+            || message.contains("request failed with status 308")
+        {
+            return anisetteConfigured ? PurchaseGateError.appleRedirectRefused : PurchaseGateError.appleRedirectRefusedNoServer
         }
         if message.contains("request failed with status 204") || message.contains("HTTP 204") {
-            return PurchaseGateError.appleEmptyResponse
+            return anisetteConfigured ? PurchaseGateError.appleEmptyResponse : PurchaseGateError.appleEmptyResponseNoServer
         }
         return error
     }
@@ -376,16 +397,49 @@ struct ProductView: View {
     /// đa 3 lần như đăng nhập; lỗi vùng (2059/1010/-128) thì dịch sang
     /// tiếng Việt kèm hướng dẫn thêm tài khoản đúng vùng (xem
     /// RegionPurchaseRefusal) và KHÔNG thử lại vô ích.
+    ///
+    /// Build 15 — rotate chỉ là best-effort: lỗi "failed to retrieve
+    /// redirect location" mà anh gặp 17:55 25/11 chỉ ném được ở
+    /// `Authenticator.parseResponse` trong fork, tức là ở bước rotate
+    /// (đăng nhập lại), TRƯỚC CẢ khi buyProduct chạy — và request
+    /// authenticate không hề chứa vùng của app nên đây KHÔNG phải lỗi
+    /// chặn theo vùng (vùng chỉ được xét ở buyProduct, chưa chạy tới).
+    /// Phiên đã lưu đã chứng minh còn sống (đồng bộ DMAP ra 368 app +
+    /// tải chạy được cùng tài khoản) nên lỗi cửa ở rotate thì giữ phiên
+    /// cũ rồi thử mua tiếp; chỉ lỗi phán quyết thật (đòi mã 2FA, sai
+    /// mật khẩu, token hết hạn) mới dừng ngay. Nếu token cũ thật sự
+    /// chết thì buyProduct sẽ báo đúng lỗi hết hạn, không bị nhầm
+    /// thành lỗi cửa nữa.
     private func acquireLicense() async throws {
         guard let account else { return }
         // Lấy header Anisette trước (cùng chính sách như đăng nhập: máy
         // chủ đã đặt mà lấy không được thì dừng, không mua thiếu header).
         let anisetteHeaders = try await vm.anisetteHeadersForStoreCall()
+        // AppStore là @MainActor nên đọc URL máy chủ cần await; ghi lại
+        // từ đầu để cuối hàm báo lỗi chính xác (đã cấu hình máy chủ hay
+        // chưa) mà không phải đọc lại từ ngữ cảnh không phải MainActor.
+        let serverURL = await vm.anisetteServerURL
+        let anisetteConfigured = !serverURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         var lastError: Error?
         for attempt in 1 ... 3 {
             do {
                 try await vm.withAccount(id: account.id) { userAccount in
-                    try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account, anisetteHeaders: anisetteHeaders)
+                    do {
+                        try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account, anisetteHeaders: anisetteHeaders)
+                    } catch {
+                        if Self.isTransientPurchaseError(error) {
+                            // Lỗi cửa Apple ở bước làm mới phiên: phiên đã
+                            // lưu vẫn còn sống nên thử mua tiếp bằng phiên
+                            // đó thay vì bỏ cả lần mua (xem ghi chú trên).
+                            // withAccount chỉ ghi lại tài khoản khi closure
+                            // chạy xong không lỗi, và rotate chỉ gán tài
+                            // khoản mới khi authenticate thành công, nên
+                            // rotate hỏng không làm bẩn tài khoản đã lưu.
+                            logger.info("acquireLicense: token rotation hit Apple gate, continuing with saved session: \(StoreDiagnostics.errorSummary(error))")
+                        } else {
+                            throw error
+                        }
+                    }
                     try await ApplePackage.Purchase.purchase(
                         account: &userAccount.account,
                         app: archive.package.software,
@@ -408,7 +462,7 @@ struct ProductView: View {
             }
         }
         if let lastError {
-            throw Self.translatePurchaseGateError(lastError)
+            throw Self.translatePurchaseGateError(lastError, anisetteConfigured: anisetteConfigured)
         }
         licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
         hint = licenseHint

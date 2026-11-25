@@ -173,15 +173,33 @@ final class PurchasedStore {
 
         // 1. Bước Commerce: 1 lượt phân trang tuần tự (không song song
         // để khỏi bị Apple gắn cờ). Thất bại thì ghi chú, không dừng.
+        // Lỗi tạm thời (vd Apple trả 500) thì thử lại tối đa 3 lần như
+        // bước DMAP. Header Anisette lấy chung 1 lần như DMAP (build
+        // 14/15); lấy không được thì bước này lỗi với đúng lỗi đó —
+        // bước DMAP phía sau cũng sẽ báo lỗi đó (cùng chính sách).
         var commerceApps: [PurchasedApp] = []
         var commerceError: Error?
         do {
-            commerceApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                try await PurchasedCommerceService.fetchAllPurchasedApps(account: userAccount.account)
+            let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
+            for attempt in 1 ... 3 {
+                do {
+                    commerceApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                        try await PurchasedCommerceService.fetchAllPurchasedApps(account: userAccount.account, anisetteHeaders: anisetteHeaders)
+                    }
+                    commerceError = nil
+                    break
+                } catch {
+                    commerceError = error
+                    guard Self.isTransientSyncError(error), attempt < 3 else { break }
+                    logger.info("Purchased full sync: commerce transient failure (attempt \(attempt)/3), retrying")
+                    try? await Task.sleep(nanoseconds: 2_000_000_000)
+                }
             }
         } catch {
             commerceError = error
-            logger.error("Purchased full sync: commerce step failed: \(StoreDiagnostics.errorSummary(error))")
+        }
+        if let commerceError {
+            logger.error("Purchased full sync: commerce step failed: \(StoreDiagnostics.errorSummary(commerceError))")
         }
 
         // 2. Bước DMAP (như sync thường, retry tối đa 3 lần, gặp 401/403

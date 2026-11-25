@@ -21,9 +21,12 @@
 //  - Endpoint: https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/commerce/account/purchases
 //    (cùng họ MZFinance với các lệnh mua/tải — xem StoreDownloadService).
 //  - Xác thực bằng phiên đã đăng nhập: X-Token, X-DSID,
-//    X-Apple-Store-Front, GUID máy; body GET nên ký SAP trên body rỗng
-//    (như DMAP ký body) nếu ký được, ký không được thì vẫn gửi (token
-//    có thể đã đủ) — không dừng cả lần đồng bộ chỉ vì thiếu chữ ký.
+//    X-Apple-Store-Front, GUID máy, kèm cookie phiên + header
+//    Anisette như DMAP (build 15; trước đây thiếu cả hai — nghi
+//    phạm số 1 của lỗi HTTP 500 ngày 25/11/2026); body GET nên ký
+//    SAP trên body rỗng (như DMAP ký body) nếu ký được, ký không
+//    được thì vẫn gửi (token có thể đã đủ) — không dừng cả lần
+//    đồng bộ chỉ vì thiếu chữ ký.
 //  - Phân trang: theo `links.next` của JSON:API, tối đa 10 trang, gọi
 //    tuần tự (không gọi song song để khỏi bị Apple gắn cờ).
 //  - Gộp: khử trùng nội bộ theo order-id (id của mục data) rồi theo
@@ -67,14 +70,16 @@ enum PurchasedCommerceService {
 
     /// Lấy toàn bộ lịch sử mua mà endpoint trả về (phân trang tuần tự
     /// qua links.next, tối đa 10 trang). `account` chỉ đọc — hàm không
-    /// đổi gì trong tài khoản đã lưu.
-    static func fetchAllPurchasedApps(account: ApplePackage.Account) async throws -> [PurchasedApp] {
+    /// đổi gì trong tài khoản đã lưu. `anisetteHeaders` (build 15):
+    /// header xác minh thiết bị lấy từ máy chủ Anisette trong Cài đặt —
+    /// cùng chính sách như DMAP (build 14); rỗng khi chưa cấu hình.
+    static func fetchAllPurchasedApps(account: ApplePackage.Account, anisetteHeaders: [String: String] = [:]) async throws -> [PurchasedApp] {
         var all: [PurchasedApp] = []
         var nextURL: URL? = URL(string: baseURL)
         var pages = 0
         while let url = nextURL, pages < 10 {
             pages += 1
-            let (data, next) = try await fetchPage(account: account, url: url)
+            let (data, next) = try await fetchPage(account: account, url: url, anisetteHeaders: anisetteHeaders)
             all.append(contentsOf: data)
             nextURL = next
         }
@@ -83,14 +88,14 @@ enum PurchasedCommerceService {
 
     /// Một trang: GET JSON:API, theo links.next nếu có. Trả về (app
     /// trong trang, URL trang sau hoặc nil).
-    private static func fetchPage(account: ApplePackage.Account, url: URL) async throws -> ([PurchasedApp], URL?) {
+    private static func fetchPage(account: ApplePackage.Account, url: URL, anisetteHeaders: [String: String] = [:]) async throws -> ([PurchasedApp], URL?) {
         let session = URLSession(configuration: ephemeralConfiguration(), delegate: nil, delegateQueue: nil)
         defer { session.invalidateAndCancel() }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
         request.setValue("application/vnd.api+json", forHTTPHeaderField: "Accept")
-        applyHeaders(&request, account: account)
+        applyHeaders(&request, account: account, anisetteHeaders: anisetteHeaders)
         // Ký SAP trên body rỗng (GET không có body): ký được thì gắn,
         // ký không được thì vẫn gửi — token có thể đã đủ, xem ghi chú
         // đầu file.
@@ -291,8 +296,13 @@ enum PurchasedCommerceService {
 
     /// Header xác thực cho Commerce: token + DSID của tài khoản,
     /// storefront của tài khoản, GUID máy — cùng họ header với DMAP
-    /// (PurchasedDMAPService.applyHeaders), không gửi cookie.
-    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account) {
+    /// (PurchasedDMAPService.applyHeaders). Build 15: gửi kèm cookie
+    /// phiên đã đăng nhập + header Anisette như DMAP — trước đây bước
+    /// này là lệnh store duy nhất không gửi cả hai (nghi phạm số 1
+    /// của lỗi HTTP 500 ngày 25/11/2026: Apple trả 500 chứ không
+    /// phải 401/403, tức đã qua cửa xác thực rồi lỗi ở bước tra cứu
+    /// phía máy chủ).
+    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, anisetteHeaders: [String: String] = [:]) {
         let now = Date()
         // Không đặt lại Accept ở đây: fetchPage đã đặt
         // "application/vnd.api+json" cho JSON:API.
@@ -306,6 +316,14 @@ enum PurchasedCommerceService {
         request.setValue(ApplePackage.Configuration.deviceIdentifier, forHTTPHeaderField: "X-GUID")
         request.setValue(account.passwordToken, forHTTPHeaderField: "X-Token")
         request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
+        if let url = request.url {
+            for (name, value) in account.cookie.buildCookieHeader(url) {
+                request.setValue(value, forHTTPHeaderField: name)
+            }
+        }
+        for (name, value) in anisetteHeaders {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
     }
 
     private static func iso8601(_ date: Date) -> String {
