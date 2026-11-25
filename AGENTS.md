@@ -1711,17 +1711,36 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     minOS 16.0, Configurator/2.21 có 1 hit, "No Downloads"/"No Accounts"
     0 hit, Twemoji 0 hit, IPadnLoginService 131 hit, sap.wasm trong
     bundle SHA256 `b7150bb4…` KHỚP manifest.
-  - **LỖI PHÁT HIỆN KHI KIỂM CHỨNG (chưa có trong bản CI này):** project
-    dùng synchronized group nên Xcode copy file của SAPRuntime PHẲNG ra
-    root bundle (không có thư mục SAPRuntime/), nhưng
-    IPadnLoopbackServer.swift:406 tìm
+  - **LỖI PHÁT HIỆN KHI KIỂM CHỨNG:** project dùng synchronized group
+    nên Xcode copy file của SAPRuntime PHẲNG ra root bundle (không có
+    thư mục SAPRuntime/), nhưng IPadnLoopbackServer.swift:406 tìm
     `Bundle.main.url(forResource: "SAPRuntime", …)` → nil → mọi request
     /runtime/* trả 404 → WKWebView không tải được index.html/sap.wasm →
-    đăng nhập sẽ lỗi ngay trên máy thật. Sửa (chưa build): fallback
+    đăng nhập sẽ lỗi ngay trên máy thật. Sửa: fallback
     `?? Bundle.main.resourceURL` ở dòng 406; CI script dời
     sap.wasm.part* ra khỏi source tree trước xcodebuild để khỏi chui
-    vào bundle (~50 MB thừa). Đẩy lại + build lại rồi kiểm chứng lại
-    layout bundle trước khi giao.
+    vào bundle. Commit local `4ab53a8`, đẩy → remote `22db4bd4`.
+  - CI "Build App" run 45666146347 (cho fix trên): SUCCESS cả 2 job.
+    Artifact iOS 52.675.898 byte (giảm ~25 MB nhờ dời .part ra);
+    IPA trong 52.990.976 byte. Ký ad-hoc zsign -a -z 9 (lần đầu lỗi
+    Unzip failed vì /tmp đầy 89% do các thư mục giải nén cũ — dọn
+    /tmp/ci20x, /tmp/verify20, /tmp/raw20 rồi ký lại OK):
+    `deliver/NVDAppleIDDownload.ipa` 53.213.969 byte, SHA256
+    `daa96369a3d5d94abff98f7fcad6b49ce0935a82cd647c69ccee2f5f66a5564e`.
+  - Kiểm chứng IPA cuối (độc lập): bundle com.NVD.appleiddownload,
+    version 2.1 build 20, minOS 16.0; sap.wasm ở root bundle, SHA256
+    `b7150bb4…` KHỚP manifest; KHÔNG còn file .part nào trong bundle;
+    đủ file runtime ở root (index.html, sap-signer.js, wasm_exec.js,
+    unicorn_x86.js, libCoreADI.so, libstoreservicescore.so);
+    Configurator/2.21 có 1 hit, "No Downloads"/"No Accounts" 0 hit,
+    Twemoji 0 hit, IPadnLoginService 131 hit; đủ 7 tab trong binary
+    (Ký IPA, Tìm kiếm, Lượt tải, Tài khoản, Đã mua, Đang theo dõi,
+    Cài đặt); _CodeSignature/CodeResources có (chữ ký ad-hoc zsign,
+    không có file CodeSignature — bình thường với zsign).
+  - Lưu ý: lần tải log CI qua API `/jobs/{id}/logs` bị chặn vì redirect
+    ra host ngoài cần duyệt (đã hết thời gian chờ duyệt) — đã lấy lỗi
+    build qua check-run annotations thay thế, đủ dùng; không cần tải
+    lại log đó.
   - Chưa kiểm chứng trên iPhone thật — cần anh test: đăng nhập bằng
     tài khoản phụ (kumit.95bt@gmail.com) xem vào được không; nếu vẫn lỗi
     thì chụp Nhật ký quanh dòng "ipadn login: ..." (stage + mã HTTP, không
