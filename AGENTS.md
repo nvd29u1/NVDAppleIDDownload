@@ -905,3 +905,109 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     "Đồng bộ lại" nếu cần; nếu vẫn báo hết hạn thì chụp lại câu lỗi
     (giờ có ghi bước + mã HTTP) và xem Cài đặt → Nhật ký dòng
     "Purchased DMAP: <bước> HTTP=<mã>".
+
+- Đợt 5 build 15 (25 Nov 2026, 2.0 build 15): 2 lỗi anh chốt gộp
+  chung 1 bản (Commerce HTTP 500 lúc 17:56 + nhập app khác vùng
+  vào Đã mua lúc 17:55, đều sau khi bản 14 đã chạy được DMAP 368
+  app). Chưa kiểm chứng trên iPhone thật.
+  - LỖI 1 — Commerce HTTP 500: bấm "Đồng bộ toàn bộ lịch sử mua"
+    thì Apple trả 500, banner cam (danh sách DMAP vẫn hiện). CHẨN
+    ĐOÁN (đọc code + đối chiếu đường đang chạy): request Commerce
+    là lệnh store DUY NHẤT trong app không gửi cả cookie phiên lẫn
+    header Anisette — DMAP (đã chạy sau build 14), tải, đăng nhập,
+    mua đều gửi cookie; DMAP/mua/đăng nhập đều gắn Anisette khi có
+    máy chủ. Apple trả 500 chứ không phải 401/403, tức đã qua cửa
+    xác thực rồi lỗi ở bước tra cứu phía máy chủ — khớp với thiếu
+    cookie phiên (máy chủ cần cookie để tra đơn mua). FIX
+    (`PurchasedCommerceService` + `PurchasedStore.syncFullHistory`):
+    (a) `applyHeaders` gửi kèm cookie (`account.cookie.
+    buildCookieHeader(url)`, đúng mẫu DMAP) + header Anisette;
+    (b) `syncFullHistory` lấy header Anisette chung 1 lần trước
+    bước Commerce (lấy không được thì bước này lỗi với đúng lỗi
+    đó, như DMAP); (c) bước Commerce thử lại lỗi tạm thời tối đa
+    3 lần, nghỉ 2 giây (dùng chung `isTransientSyncError` — lỗi
+    500 khớp qua chuỗi "HTTP 500" trong thông báo). KHÔNG đổi
+    method GET, SAP signature body rỗng, parser JSON:API, thứ tự
+    Commerce-trước-DMAP. Giả thuyết mở (KHÔNG làm — chưa có bằng
+    chứng): iPadn quét lịch sử theo từng năm (6 luồng song song
+    theo năm), có thể endpoint cần tham số lọc năm; dạng
+    request/response Commerce vẫn chưa xác minh bằng tài khoản thật
+    — nếu sau bản này vẫn 500 thì cần log máy thật
+    ("Purchased commerce: HTTP=<mã> bytes=<n>") rồi mới soi tiếp.
+    Đường DMAP + tải không động (chỉ thêm header cho Commerce).
+  - LỖI 2 — Nhập app khác vùng vào Đã mua vẫn lỗi redirect
+    (tài khoản IN, app vùng US, 17:55 25/11): "Apple đã từ chối
+    yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng
+    không có địa chỉ chuyển tiếp)". CHẨN ĐOÁN QUAN TRỌNG (đọc
+    fork pin 541c43a): chuỗi "failed to retrieve redirect
+    location" chỉ ném được ở `Authenticator.parseResponse` trong
+    fork, tức là ở bước `rotatePasswordToken` (đăng nhập lại) —
+    bước ĐẦU TIÊN của `acquireLicense`, TRƯỚC CẢ khi buyProduct
+    chạy; và request authenticate không hề chứa vùng của app nên
+    đây KHÔNG phải lỗi chặn theo vùng (vùng chỉ được xét ở
+    buyProduct, chưa chạy tới). Nguyên nhân là cửa xác minh thiết
+    bị của Apple: rotate gọi authenticate mà không có header
+    Anisette (máy chủ Anisette chưa từng được triển khai — cài
+    trên PC và Oracle VPS đều đã bỏ 24/11 — nên
+    `anisetteHeadersForStoreCall()` trả về rỗng). Phiên đã lưu
+    đã chứng minh còn sống (DMAP 368 app lúc 17:51 + tải chạy
+    được cùng tài khoản) nên lỗi nằm ở bước làm mới, không phải
+    ở phiên. FIX (`ProductView.acquireLicense`): (a) rotate chỉ
+    còn là best-effort — lỗi cửa (redirect/204/lỗi tạm thời,
+    đúng tập `isTransientPurchaseError`) thì giữ phiên đã lưu rồi
+    thử mua tiếp bằng phiên đó; chỉ lỗi phán quyết thật (đòi mã
+    2FA, sai mật khẩu, token hết hạn) mới dừng ngay. An toàn:
+    `rotatePasswordToken` chỉ gán tài khoản mới khi authenticate
+    thành công, và `withAccount` chỉ ghi lại tài khoản khi
+    closure chạy xong không lỗi, nên rotate hỏng không làm bẩn
+    tài khoản đã lưu; nếu token cũ thật sự chết thì buyProduct
+    sẽ báo đúng lỗi hết hạn ("password token is expired") thay
+    vì nhầm thành lỗi cửa. (b) buyProduct dùng
+    `redirectConfiguration: .disallow` nên Apple chuyển hướng
+    (vd sang pod vùng khác) sẽ trả về đúng mã 3xx — trước đây
+    301/302/303/307/308 không có trong
+    `isTransientPurchaseError` nên không retry và không dịch ra
+    tiếng Việt; đã thêm vào cả hai chỗ, map về
+    `PurchaseGateError.appleRedirectRefused`. (c) Lỗi cửa giờ
+    nói rõ trạng thái máy chủ Anisette: 2 case mới
+    `appleRedirectRefusedNoServer` /
+    `appleEmptyResponseNoServer` ("Máy chưa cấu hình máy chủ
+    Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được
+    bằng chứng xác minh thiết bị mà Apple đòi...") khi chưa cấu
+    hình máy chủ; đã cấu hình thì giữ câu cũ. Popup lệch vùng
+    build 6 (2059/1010/-128) không động — lỗi này không phải lỗi
+    vùng nên popup đó không kích hoạt. KHÔNG đụng Anisette
+    on-device (đã kết luận không khả thi) và không đề xuất
+    ipatool/PC làm giải pháp chính (câu lỗi cũ vẫn giữ
+    ipatool 2.8.1 ở cuối như đường dự phòng, như trước).
+  - Version: 2.0 build 15 (`CURRENT_PROJECT_VERSION` 14 → 15,
+    chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
+    ở cả xcconfig và pbxproj).
+  - CI + IPA: remote `e5fd260c` (commit code `23748c4`), CI "Build
+    App" run 45600838987 `success` cả build-ios + build-osx (chạy
+    ~21 phút: build-ios xong trước, build-osx xong sau; lưu ý lần
+    này script poll đầu khớp nhầm run "Store download checks"
+    45600839036 cùng head — phải lọc theo tên workflow "Build
+    App", không chỉ head SHA). Artifact
+    `NVDAppleIDDownload.ipa` (25.369.680 byte, chưa ký, SHA256
+    `f121c8ba…`) tải về qua redirect-capture, ký ad-hoc bằng
+    zsign `-a -z 9` (lưu ý như build 14: không có `-z` thì IPA
+    không nén ~67 MB). IPA
+    `deliver/NVDAppleIDDownload.ipa` (25.732.408 byte, SHA256
+    `3f1bf7d72297bbf192761b4550556ca77b736ef5290dfc84ef4fb37d7b60cdf6`):
+    kiểm chứng 2.0 build 15, bundle `com.NVD.appleiddownload`,
+    min iOS 17.0, binary có chuỗi mới ("Máy chưa cấu hình máy chủ
+    Anisette" 2 hit, "token rotation hit Apple gate" 1 hit),
+    symbol PurchasedView/SearchView/SignRootView/WatchlistView,
+    framework CydiaSubstrate đã embed, superblob hợp lệ (magic
+    0xfade0cc0); thứ tự tab không đổi so với build 13/14 (diff
+    bản này chỉ 3 file Swift + xcconfig, `MainView.swift` không
+    động). Build 14 giữ lại ở
+    `deliver/NVDAppleIDDownload-2.0-build14-backup.ipa` (SHA256
+    `daac44d5…` khớp bản đã giao). Chưa kiểm chứng trên iPhone
+    thật — cần anh test: (1) bấm "Đồng bộ toàn bộ lịch sử mua"
+    xem còn banner HTTP 500 không, có gộp thêm app mua gần đây
+    không; (2) mở app vùng US rồi bấm "Nhập vào Đã mua" bằng tài
+    khoản IN xem còn lỗi redirect không, và app có vào được mục
+    Đã mua không; nếu vẫn lỗi thì chụp lại câu lỗi mới (giờ có
+    ghi rõ đã cấu hình máy chủ Anisette hay chưa).
