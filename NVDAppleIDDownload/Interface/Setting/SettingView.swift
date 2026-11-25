@@ -14,7 +14,7 @@ import SwiftUI
 
 struct SettingView: View {
     @Environment(\.openURL) private var openURL
-    @State private var vm = AppStore.this
+    @StateObject private var vm = AppStore.this
     @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
 
     @State private var showDeviceIdWarning = false
@@ -312,12 +312,44 @@ struct SettingView: View {
                 Link(destination: URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!) {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
                 }
+                // Đợt 5, build 17: bổ sung link SayoSign còn thiếu sau
+                // khi bản 16 chuyển credit sang đây (chỉ chuyển chữ,
+                // chưa chuyển link).
+                Link(destination: URL(string: "https://github.com/nvd29u1/SayoSign")!) {
+                    Label("SayoSign", systemImage: "signature")
+                }
                 Text("Được làm với 🎀 bởi tác giả gốc. Giấy phép GPL-3.0. Icon dùng Twemoji (CC-BY 4.0).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 Link(destination: URL(string: "https://github.com/ismnoiet/border-beam-ios")!) {
                     Label("BorderBeam", systemImage: "sun.max")
                 }
+                // Đợt 5, build 17: khoảng iOS hỗ trợ + tích xanh. Đầu
+                // dưới lấy từ MinimumOSVersion của binary (đổi min ở
+                // Base.xcconfig thì tự cập nhật); đầu trên là hằng số
+                // maxSupportedIOSVersion cạnh version trong main.swift
+                // (mốc ổn định anh chốt 19/11: 27.2). Dòng ghi chú giữ
+                // trung thực mốc đã kiểm chứng thật (27.0).
+                #if os(iOS)
+                if isCurrentIOSSupported {
+                    Label("Hỗ trợ iOS \(minSupportedIOSVersion) – \(maxSupportedIOSVersion)", systemImage: "checkmark.circle.fill")
+                        .foregroundStyle(.green)
+                } else {
+                    Text("Hỗ trợ iOS \(minSupportedIOSVersion) – \(maxSupportedIOSVersion)")
+                        .foregroundStyle(.secondary)
+                }
+                #else
+                Text("Hỗ trợ iOS \(minSupportedIOSVersion) – \(maxSupportedIOSVersion)")
+                    .foregroundStyle(.secondary)
+                #endif
+                Text("Đã kiểm chứng tới iOS \(testedIOSVersion).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                #if os(iOS)
+                Text("Đang chạy trong LiveContainer thì nhập file và cài đặt không hoạt động — cài app thật qua SideStore hoặc AltStore để dùng các tính năng này.")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                #endif
             } header: {
                 Text("Giới thiệu")
             }

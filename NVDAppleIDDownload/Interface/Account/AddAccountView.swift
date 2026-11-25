@@ -10,7 +10,7 @@ import ButtonKit
 import SwiftUI
 
 struct AddAccountView: View {
-    @State private var vm = AppStore.this
+    @StateObject private var vm = AppStore.this
     @Environment(\.dismiss) private var dismiss
 
     @State private var email: String = ""

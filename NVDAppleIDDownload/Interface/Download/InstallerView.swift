@@ -10,7 +10,7 @@
     import UIKit
 
     struct InstallerView: View {
-        @State var installer: Installer
+        @ObservedObject var installer: Installer
 
         var icon: String {
             switch installer.status {

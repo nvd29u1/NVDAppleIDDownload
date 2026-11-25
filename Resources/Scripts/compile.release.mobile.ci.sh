@@ -38,7 +38,7 @@ fi
 if command -v rustup >/dev/null 2>&1; then
     rustup target add aarch64-apple-ios
 fi
-IPHONEOS_DEPLOYMENT_TARGET=17.0 cargo build --release --target aarch64-apple-ios --manifest-path "$SRCROOT/rust/sayoidev/Cargo.toml"
+IPHONEOS_DEPLOYMENT_TARGET=16.0 cargo build --release --target aarch64-apple-ios --manifest-path "$SRCROOT/rust/sayoidev/Cargo.toml"
 if [ ! -f "$SRCROOT/rust/sayoidev/target/aarch64-apple-ios/release/libsayoidev.a" ]; then
     echo "[-] libsayoidev.a was not built (rust/sayoidev/target/aarch64-apple-ios/release/)"
     exit 1

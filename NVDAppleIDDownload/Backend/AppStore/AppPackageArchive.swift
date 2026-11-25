@@ -10,43 +10,34 @@ import Foundation
 import OrderedCollections
 
 @MainActor
-@Observable
-class AppPackageArchive {
-    @ObservationIgnored
+class AppPackageArchive: ObservableObject {
     let accountIdentifier: String?
-    @ObservationIgnored
     let region: String
 
-    var package: AppStore.AppPackage
+    @Published var package: AppStore.AppPackage
 
     typealias VersionIdentifier = String
-    @ObservationIgnored
     private var _versionIdentifiers: Persist<[VersionIdentifier]>
 
     var versionIdentifiers: [VersionIdentifier] {
         get {
-            access(keyPath: \.versionIdentifiers)
             return _versionIdentifiers.wrappedValue
         }
         set {
-            withMutation(keyPath: \.versionIdentifiers) {
-                _versionIdentifiers.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _versionIdentifiers.wrappedValue = newValue
         }
     }
 
-    @ObservationIgnored
     private var _versionItems: Persist<OrderedDictionary<VersionIdentifier, VersionMetadata>>
 
     var versionItems: OrderedDictionary<VersionIdentifier, VersionMetadata> {
         get {
-            access(keyPath: \.versionItems)
             return _versionItems.wrappedValue
         }
         set {
-            withMutation(keyPath: \.versionItems) {
-                _versionItems.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _versionItems.wrappedValue = newValue
         }
     }
 
@@ -54,18 +45,15 @@ class AppPackageArchive {
     /// build 8 — ý tưởng iPadn mục 6). Lưu riêng với VersionMetadata
     /// của ApplePackage (chỉ có số version + ngày) để không đụng tới
     /// thư viện ngoài.
-    @ObservationIgnored
     private var _versionExtras: Persist<[VersionIdentifier: VersionExtra]>
 
     var versionExtras: [VersionIdentifier: VersionExtra] {
         get {
-            access(keyPath: \.versionExtras)
             return _versionExtras.wrappedValue
         }
         set {
-            withMutation(keyPath: \.versionExtras) {
-                _versionExtras.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _versionExtras.wrappedValue = newValue
         }
     }
 
@@ -78,9 +66,9 @@ class AppPackageArchive {
         return versionItems.count == versionIdentifiers.count
     }
 
-    var error: String?
-    var loading = false
-    var shouldDismiss = false
+    @Published var error: String?
+    @Published var loading = false
+    @Published var shouldDismiss = false
 
     init(accountID: String?, region: String, package: AppStore.AppPackage) {
         accountIdentifier = accountID

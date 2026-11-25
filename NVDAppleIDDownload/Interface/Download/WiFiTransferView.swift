@@ -16,9 +16,9 @@
 import SwiftUI
 
 struct WiFiTransferView: View {
-    @State private var server = WiFiTransferServer()
-    @State private var store = AppStore.this
-    @State private var downloads = Downloads.this
+    @StateObject private var server = WiFiTransferServer()
+    @StateObject private var store = AppStore.this
+    @StateObject private var downloads = Downloads.this
     @State private var errorMessage: String?
 
     private var completedManifests: [PackageManifest] {

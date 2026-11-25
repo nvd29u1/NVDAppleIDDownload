@@ -539,6 +539,14 @@ enum SignInstaller {
         return false
     }
 
+    /// true khi máy đã cài TrollStore (mở được scheme apple-magnifier,
+    /// đã khai trong LSApplicationQueriesSchemes). Chỉ hiện nút "Cài
+    /// bằng TrollStore" khi thật sự cài được.
+    static var trollStoreAvailable: Bool {
+        guard let u = URL(string: "apple-magnifier://") else { return false }
+        return UIApplication.shared.canOpenURL(u)
+    }
+
     static func openTrollStore(_ ipa: URL) -> Bool {
         guard let u = URL(string: "apple-magnifier://install?url=" + (ipa.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")),
               UIApplication.shared.canOpenURL(u) else { return false }

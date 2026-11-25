@@ -69,7 +69,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
 
 ### Key Patterns
 
-- **Observation**: `AppStore`, `Downloads`, `Installer`, `DeviceManager`, `PackageManifest` all use `@Observable` (not legacy `ObservableObject`).
+- **Observation**: từ build 17, các class dùng `ObservableObject` + `@Published` (đã bỏ `@Observable` để chạy được iOS 16.0 — xem notes build 17). Ngoại lệ duy nhất: `DeviceManager` (chỉ macOS, min 15.0) vẫn giữ `@Observable`.
 - **Persistence**: Custom `@PublishedPersist` / `@Persist` property wrappers (in `Extension/PublishedPersist.swift`) back properties to file storage (`Documents/Config/`) or Keychain. Accounts stored in Keychain; downloads and settings use file storage.
 - **Platform branching**: Heavy use of `#if os(macOS)` / `#if os(iOS)` / `#if canImport(UIKit)` for platform-specific code paths.
 - **Singletons**: `AppStore.this`, `Downloads.this` are `@MainActor` singletons.
@@ -81,7 +81,8 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
 - **Vapor** — HTTPS server for iOS OTA installation
 - **Digger** — Download manager with progress/speed tracking
 - **Kingfisher** — Async image loading
-- **ColorfulX** — Gradient animations (welcome screen)
+- **ColorfulX** — Gradient animations (welcome screen). ĐÃ GỠ ở build 17 (dead dep, 0 usage từ khi tab Welcome bị xoá ở build 10).
+- **LookInsideServer** — ĐÃ GỠ ở build 17 (dead dep, 0 usage; binary target, min OS chưa xác minh).
 - **KeychainAccess** — Keychain storage for accounts
 - **AnyCodable** — Type-erased Codable values
 - **ButtonKit** — Async button actions
@@ -92,7 +93,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
 - **Indentation**: 4 spaces. Opening brace on same line.
 - **Naming**: PascalCase for types, camelCase for properties/methods. PascalCase filenames for types, `+` prefix for extension files.
 - **Structure**: Early returns, guard statements for unwrapping, single responsibility per extension.
-- **Modern Swift**: `@Observable` macro, `async/await`, `@MainActor`, opaque `some` types.
+- **Modern Swift**: `ObservableObject` + `@Published` (từ build 17; trước đó dùng `@Observable` macro), `async/await`, `@MainActor`, opaque `some` types.
 - **Memory**: `weak`/`unowned` references to break cycles, capture lists in closures.
 
 ## NVD personalization notes (Nov 2026)
@@ -1024,3 +1025,115 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Mục Giới thiệu ở Cài đặt Ký IPA: bỏ theo lệnh anh 18:56 25/11 (ảnh DAA7D340). Đã kiểm chứng TRƯỚC khi xoá: Cài đặt chính (SettingView About) đã có đủ bằng chữ: Asspp của Lakr233 (MIT), SayoSign của murk-sus (GPL-3.0), BorderBeam của ismnoiet (MIT); THIẾU 3 thứ nên đã CHUYỂN sang Cài đặt chính thay vì xoá mất: link GitHub, dòng Twemoji (CC-BY 4.0), link BorderBeam. Lưu ý: link GitHub trong Sign About trỏ về https://github.com/nvd29u1/NVDAppleIDDownload (repo app gộp) — giữ nguyên URL này khi chuyển, không dùng nvd29u1/SayoSign (URL đó là của thời NVDsign). Chỉ động đúng mục Giới thiệu đó: tiêu đề "Cài đặt" + mọi dòng cài đặt khác trong SignSettingsView giữ nguyên; Cài đặt chính chỉ thêm 3 dòng credit, không động gì khác.
   - Version: 2.0 build 16 (CURRENT_PROJECT_VERSION 15 → 16, chỉ trong Version.xcconfig; MARKETING_VERSION giữ 2.0 ở cả xcconfig và pbxproj).
   - CI + IPA: remote 3020d89c (commit code 2b185bc + d95fe97), CI "Build App" run 45609924263 success cả build-ios + build-osx (~20 phút). Artifact NVDAppleIDDownload.ipa (25.384.888 byte, chưa ký) tải về qua redirect-capture, ký ad-hoc bằng zsign -a -z 9. LƯU Ý: lần ký đầu THẤT BẠI vì /tmp đầy (tmpfs 512M, còn 70M — đọng /tmp/build13 112M + /tmp/nvdad12 + /tmp/entcheck + /tmp/b13check + /tmp/nvd14* từ các bản trước); đã xoá các thư mục check cũ trong /tmp (giữ /tmp/ipadn-fresh 100M làm bằng chứng iPadn + /tmp/applepackage-fork) rồi ký lại thành công — lần sau ký mà lỗi thì kiểm tra df /tmp trước. IPA deliver/NVDAppleIDDownload.ipa (25.746.919 byte, SHA256 edb02e4e39e30ff6a1fd97e064cf536344c8718cb201ea281a978d78b959874d): kiểm chứng 2.0 build 16, bundle com.NVD.appleiddownload, min iOS 17.0, framework CydiaSubstrate đã embed, superblob hợp lệ (magic 0xfade0cc0, slot 0 + 2), binary có chuỗi mới ("Phiên đăng nhập của tài khoản này đã hết hạn" 1 hit, "token rotation failed earlier" 1 hit, NoFollowRedirectDelegate 3 hit, "Purchased commerce:" 1 hit, "links.next" 0 hit — parser cũ đã hết; "isJsonApiFormat"/"isDeepLink" 0 hit là ĐÚNG — chuỗi ngắn ≤15 byte Swift lưu dạng immediate, không có trong binary dạng literal, như bài học ".staging" ở build 13), credit đã chuyển còn đủ (GitHub 1 hit, Twemoji 1 hit, BorderBeam 1 hit); diff từ build 15 chỉ 5 file (xcconfig + PurchasedCommerceService + ProductView + SettingView + SignSettingsView) — MainView.swift không động (thứ tự tab giữ nguyên), PurchasedDMAPService + BackgroundDownloadService không động (đường DMAP + tải giữ nguyên). Build 15 giữ lại ở deliver/NVDAppleIDDownload-2.0-build15-backup.ipa (SHA256 3f1bf7d7… khớp bản đã giao). Chưa kiểm chứng trên iPhone thật — cần anh test: (1) bấm "Đồng bộ toàn bộ lịch sử mua" xem còn banner HTTP 500 không, có gộp thêm app mua gần đây không; nếu vẫn 500 thì chụp màn Nhật ký quanh dòng "Purchased commerce: HTTP=..." (giờ đã log body nguyên văn) để biết Apple chê cái gì; (2) mở app vùng US rồi bấm "Nhập vào Đã mua" bằng tài khoản IN — nếu vẫn lỗi thì câu lỗi mới phải là tiếng Việt rõ ràng (không còn câu thô "password token is expired (failureType: 2034)"), chụp lại câu lỗi + dòng log "acquireLicense: token rotation..." quanh đó.
+
+- Đợt 5 build 17 (25 Nov 2026, 2.0 build 17): hạ min iOS 17.0 → 16.0 +
+  LiveContainer guest + nút TrollStore + khoảng iOS ở Giới thiệu.
+  Làm song song với bản 16 trên worktree riêng `b17` (base d95fe97),
+  rebase lên main sau khi bản 16 giao xong (remote 9d04416b).
+  1. Hạ min iOS: `IPHONEOS_DEPLOYMENT_TARGET` 17.0 → 16.0 ở
+     `Configuration/Base.xcconfig:13` và cầu Rust
+     `Resources/Scripts/compile.release.mobile.ci.sh:41` (libsayoidev.a).
+     macOS target 15.0 không đụng; hook CydiaSubstrate đã 12.0.
+  2. `@Observable` (iOS 17+) → `ObservableObject` + `@Published` (hoặc
+     `objectWillChange.send()` ở setter Persist): 13 khai báo trong 12
+     file — AppStore (9 cặp access/withMutation), AppPackageArchive (3),
+     FollowStore, Downloads, PurchasedStore (11 `@Published`),
+     PackageManifest, AppLockService, PriceComparisonService
+     (UpdateCheckStore), Installer (`@MainActor @Published status`),
+     WiFiTransferServer, SearchView (SearchFieldFocus), MainView
+     (MainTabSelection). 29 điểm access/withMutation (4 file) đã bỏ;
+     view đổi `@State var vm = …` → `@StateObject` (singleton sở hữu)
+     hoặc `@ObservedObject` (truyền vào) — 31 điểm, 18 file, kể cả
+     ExportIPAButton/PackageManifestRow (đọc `manifest.completed` nên
+     `let` thường sẽ stale). `PublishedPersist.swift` đã có sẵn
+     subscript `EnclosingSelf: ObservableObject` gửi objectWillChange
+     nên không sửa. `DeviceManager.swift` (chỉ macOS, min 15.0) CỐ
+     TÌNH giữ `@Observable` (2 khai báo: class + nested InstalledApp).
+     `withObservationTracking` ở AppDelegate iOS/macOS → giữ
+     `AnyCancellable` trên `Downloads.this.objectWillChange`, sink
+     đọc lại trong `Task { @MainActor in }` (objectWillChange bắn
+     TRƯỚC khi giá trị đổi).
+  3. `ContentUnavailableView` ×5 → helper chung
+     `NVDContentUnavailableView` trong `Interface/Utils/ViewBackports.swift`
+     (dùng system view trên iOS 17+/macOS 14+, VStack fallback dưới đó):
+     AccountView ×2, DownloadView, PurchasedView, WatchlistView.
+  4. onChange 2 tham số ×8 → 1 tham số (không chỗ nào dùng giá trị cũ):
+     AppLockService:94, ProductHistoryView:206, ProductView:296,
+     SearchView:73,111,165, PurchasedView:95,101.
+  5. Symbol effect ×3: `PackageView.swift:176` → modifier
+     `symbolEffectReplaceIfAvailable()` (ViewBackports, gate iOS 17+);
+     2 chỗ trong `DeviceCTLInstallSection.swift` (chỉ macOS) giữ nguyên.
+  6. Gỡ dependency chết khỏi pbxproj + Package.resolved: ColorfulX
+     (0 usage từ khi tab Welcome bị xoá ở build 10) và LookInsideServer
+     (0 usage; binary, min OS chưa xác minh). pbxproj: đúng 12 object
+     bị gỡ (2 PBXBuildFile, 2 Frameworks refs, 2 product dep + 2 target
+     refs, 2 remote package refs + 2 project refs); Package.resolved:
+     43 → 41 pin, JSON hợp lệ, diff gọn 18 dòng. Bài học: script gỡ
+     pin đầu tiên parse sai chỉ số — `' : "colorfulx",'.split('"')[2]`
+     là `','`, phải lấy `[1]` (đã sửa sang regex
+     `"identity"\s*:\s*"([^"]+)"`).
+  7. Chứng chỉ cá nhân / SideStore / AltStore: KHÔNG đổi gì. IPA CI
+     thực tế không mang entitlement nào (superblob chỉ slot 0+2; CI
+     ghi đè CODE_SIGN_ENTITLEMENTS=""), keychain group mặc định và
+     ngoại lệ /private/tmp/ đều không phải rào cản — app đã chạy qua
+     SideStore tài khoản free (build 11–15). AltStore cùng cơ chế cert
+     free (chưa test trực tiếp trên máy anh).
+  8. LiveContainer: helper mới `Interface/Sign/LiveContainerGuest.swift`
+     — phát hiện guest bằng `Bundle.main.bundleIdentifier !=
+     "com.NVD.appleiddownload"` (guest dlopen trong process host nên
+     Bundle.main là của LiveContainer). Khi guest: banner cam đầu tab
+     Ký IPA (SignRootView) + mờ nút nhập file (SignLibraryView "Import
+     from Files", SignCertificatesView "Import .p12" + 2 nút chọn
+     .p12/.mobileprovision) và nút cài (SignView "Install now",
+     SignedRow "Install", context menu "Install without re-signing");
+     Tải từ URL không cần nhập file nên giữ nguyên. Dòng hướng dẫn
+     tĩnh trong mục Giới thiệu (Cài đặt chính). Tìm kiếm/xem/tải IPA
+     foreground vẫn chạy được ở guest. Chưa kiểm chứng phát hiện guest
+     trên máy thật — cần anh cài bản 17 vào LiveContainer thử nhập file
+     để xác nhận banner hiện.
+  9. TrollStore: không cần .tipa, chỉ cần .ipa chuẩn + min 16.0.
+     Nối nút "Cài bằng TrollStore" vào `SignInstaller.openTrollStore`
+     (trước đây dead code, 0 caller) ở màn chi tiết sau khi ký xong
+     (SignView, cạnh "Install now"); chỉ hiện khi
+     `trollStoreAvailable` (canOpenURL apple-magnifier://, scheme đã
+     có trong LSApplicationQueriesSchemes). Máy anh iOS 27.0 KHÔNG dùng
+     được TrollStore (vá từ 17.0.1) — tính năng này cho máy khác ở
+     iOS 14.0–16.6.1/17.0, chưa test được trên máy anh.
+  10. Giới thiệu (Cài đặt chính): thêm hàng "Hỗ trợ iOS 16.0 – 27.2"
+      + tích xanh `checkmark.circle.fill` màu xanh khi iOS máy trong
+      [16.0, 27.2] (so major.minor, bỏ patch), không tích + màu
+      secondary khi ngoài khoảng; macOS chỉ hiện chữ, không check.
+      Đầu dưới đọc từ `Bundle.main["MinimumOSVersion"]` (đổi min thì
+      About tự cập nhật); đầu trên là hằng số duy nhất
+      `maxSupportedIOSVersion = "27.2"` cạnh `version` trong
+      `App/main.swift` (mốc ổn định anh chốt 19/11 — KHÔNG phải 27.0
+      như báo cáo rà soát đề xuất); dòng ghi chú nhỏ giữ trung thực
+      "Đã kiểm chứng tới iOS 27.0" (`testedIOSVersion`). Bổ sung link
+      SayoSign còn thiếu sau khi bản 16 chuyển credit (chỉ chuyển chữ,
+      chưa chuyển link). Logic check dùng
+      `ProcessInfo.processInfo.operatingSystemVersion` (không cần
+      UIKit) trong `isCurrentIOSSupported`.
+  11. Chuỗi mới thêm vào `App/Localizable.xcstrings` (en + vi, 559 →
+      562 key): "Install with TrollStore" / "Cài bằng TrollStore",
+      "TrollStore is not installed" / "Chưa cài TrollStore", banner
+      LiveContainer (en + vi).
+  - Version: 2.0 build 17 (`CURRENT_PROJECT_VERSION` 16 → 17, chỉ
+    trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả xcconfig
+    và pbxproj).
+  - Kiểm chứng code-level (chưa có CI): `swiftc -parse` pass trên các
+    file Swift đã sửa (parse only, không type-check); grep sweep: không
+    còn `@Observable`/`access(keyPath`/`withMutation(keyPath`/
+    `withObservationTracking` ngoài `DeviceManager.swift` (macOS) và
+    comment giải thích; không còn onChange 2 tham số hay
+    `ContentUnavailableView(` trần ngoài helper; không còn
+    `.symbolEffect` không gate ngoài file macOS-only. CI build với
+    target 16.0 là cửa kiểm chứng cuối cho Digger source,
+    KeychainAccess min, LookInside (đã gỡ), NIO.
+  - CI + IPA: (bổ sung sau khi push main và chạy CI).
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) cài bản 17
+    qua SideStore như mọi khi, mở app, kiểm tra tab Ký IPA/Tìm kiếm/
+    Lượt tải/Tài khoản còn đúng thứ tự, Đã mua đồng bộ được (đường
+    DMAP + Commerce của bản 16 không động); (2) mục Giới thiệu ở Cài
+    đặt chính hiện "Hỗ trợ iOS 16.0 – 27.2" kèm tích xanh; (3) cài bản
+    17 vào LiveContainer, mở tab Ký IPA xem banner cam có hiện và các
+    nút nhập/cài có mờ đi không.

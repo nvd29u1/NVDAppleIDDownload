@@ -76,14 +76,13 @@ enum PriceComparisonService {
 /// Kết quả kiểm tra bản mới cho các app đã tải xong (tab Lượt tải).
 /// Chỉ giữ trong bộ nhớ (không lưu file): mỗi lần mở tab thì tra lại.
 @MainActor
-@Observable
-final class UpdateCheckStore {
+final class UpdateCheckStore: ObservableObject {
     static let shared = UpdateCheckStore()
 
     /// Phiên bản mới nhất tra được, theo Bundle ID.
-    private(set) var latestVersions: [String: String] = [:]
-    private(set) var isChecking = false
-    private(set) var lastChecked: Date?
+    @Published private(set) var latestVersions: [String: String] = [:]
+    @Published private(set) var isChecking = false
+    @Published private(set) var lastChecked: Date?
 
     private init() {}
 

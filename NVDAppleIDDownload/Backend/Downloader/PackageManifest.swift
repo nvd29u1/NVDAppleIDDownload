@@ -14,27 +14,26 @@ private let packagesDir = {
     return ret
 }()
 
-@Observable
-class PackageManifest: Identifiable, Codable, Hashable, Equatable {
-    @ObservationIgnored private(set) var id: UUID = .init()
+class PackageManifest: Identifiable, Codable, Hashable, Equatable, ObservableObject {
+    private(set) var id: UUID = .init()
 
-    @ObservationIgnored private(set) var account: AppStore.UserAccount
-    @ObservationIgnored private(set) var package: AppStore.AppPackage
+    private(set) var account: AppStore.UserAccount
+    private(set) var package: AppStore.AppPackage
 
-    @ObservationIgnored private(set) var url: URL
-    @ObservationIgnored private(set) var signatures: [ApplePackage.Sinf]
-    @ObservationIgnored private(set) var iTunesMetadata: Data
+    private(set) var url: URL
+    private(set) var signatures: [ApplePackage.Sinf]
+    private(set) var iTunesMetadata: Data
 
-    @ObservationIgnored private(set) var creation: Date
+    private(set) var creation: Date
 
-    var state: PackageState = .init()
+    @Published var state: PackageState = .init()
 
     /// "Giữ phiên bản này" (đợt 3, build 8 — ý tưởng iPadn mục 6): app
     /// đã tải xong mà người dùng giữ phiên bản này thì tab Lượt tải
     /// không nhắc "Có bản mới" nữa, kể cả khi Store đã có bản mới hơn.
     /// Bật/tắt ở màn chi tiết gói đã tải và ở từng dòng trong tab Lượt
     /// tải; lưu cùng manifest nên thoát app vẫn nhớ.
-    var pinned: Bool = false
+    @Published var pinned: Bool = false
 
     /// Dữ liệu nối tiếp tải nền (đợt 4, build 9 — URLSession background):
     /// tạm dừng bằng cancel(byProducingResumeData:) thì hệ thống trả
@@ -42,7 +41,7 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
     /// downloadTask(withResumeData:). Nil = chưa từng tạm dừng / đã tải
     /// xong / resumeData hỏng đã bị xoá. Manifest cũ không có trường
     /// này thì mặc định nil.
-    var resumeData: Data? = nil
+    @Published var resumeData: Data? = nil
 
     var targetLocation: URL {
         packagesDir

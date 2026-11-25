@@ -16,8 +16,8 @@ import Kingfisher
 import SwiftUI
 
 struct PurchasedView: View {
-    @State private var store = PurchasedStore.shared
-    @State private var vm = AppStore.this
+    @StateObject private var store = PurchasedStore.shared
+    @StateObject private var vm = AppStore.this
     @AppStorage("searchRegion") private var searchRegion = "US"
 
     @State private var searchText = ""
@@ -92,13 +92,13 @@ struct PurchasedView: View {
                         Task { await store.sync() }
                     }
                 }
-                .onChange(of: accountID) { _, newValue in
+                .onChange(of: accountID) { newValue in
                     store.switchAccount(to: newValue)
                     if store.items.isEmpty, account != nil {
                         Task { await store.sync() }
                     }
                 }
-                .onChange(of: vm.accounts) { _, _ in
+                .onChange(of: vm.accounts) { _ in
                     selectFallbackAccount()
                     store.switchAccount(to: accountID)
                 }
@@ -113,10 +113,10 @@ struct PurchasedView: View {
     @ViewBuilder
     private var content: some View {
         if vm.accounts.isEmpty {
-            ContentUnavailableView(
+            NVDContentUnavailableView(
                 "Chưa có tài khoản nào đăng nhập",
                 systemImage: "person.crop.circle.badge.exclamationmark",
-                description: Text("Hãy thêm tài khoản ở tab Tài khoản rồi quay lại đây để xem mục Đã mua.")
+                description: "Hãy thêm tài khoản ở tab Tài khoản rồi quay lại đây để xem mục Đã mua."
             )
         } else {
             List {

@@ -24,6 +24,9 @@ struct CertificatesView: View {
                         .buttonStyle(.plain)
                         .glassy()
                         .nvdBorderBeam(shape: .rounded(20))
+                        // Đợt 5, build 17: guest trong LiveContainer
+                        // không nhập file được — nút mờ đi.
+                        .disabled(LiveContainerGuest.isGuest)
                         Button { appleID = true } label: {
                             VStack(spacing: 8) {
                                 Image(systemName: "applelogo").font(.title2)
@@ -203,6 +206,7 @@ struct ImportCertificateView: View {
                         }
                     }
                     .nvdBorderBeam(shape: .rounded(10))
+                    .disabled(LiveContainerGuest.isGuest)
                     Button { pickFiles() } label: {
                         HStack {
                             Label(L("Profile (.mobileprovision)"), systemImage: "doc.text.fill")
@@ -211,6 +215,7 @@ struct ImportCertificateView: View {
                         }
                     }
                     .nvdBorderBeam(shape: .rounded(10))
+                    .disabled(LiveContainerGuest.isGuest)
                 }
                 Section(header: Text(L("Details"))) {
                     SecureField(L("Password"), text: $password)

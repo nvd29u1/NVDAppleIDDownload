@@ -9,33 +9,31 @@ import ApplePackage
 import Foundation
 
 @MainActor
-@Observable
-final class PurchasedStore {
+final class PurchasedStore: ObservableObject {
     static let shared = PurchasedStore()
 
     /// Danh sách app đã mua của tài khoản đang chọn (đọc từ cache trước,
     /// đồng bộ xong thì ghi đè).
-    private(set) var items: [PurchasedApp] = []
+    @Published private(set) var items: [PurchasedApp] = []
 
     /// Tài khoản mà `items` đang thuộc về (id = email).
-    private(set) var accountID: String = ""
+    @Published private(set) var accountID: String = ""
 
-    private(set) var isSyncing = false
-    private(set) var lastSyncDate: Date?
-    private(set) var lastError: String?
+    @Published private(set) var isSyncing = false
+    @Published private(set) var lastSyncDate: Date?
+    @Published private(set) var lastError: String?
 
     /// Đang đồng bộ toàn bộ lịch sử mua (bước Commerce, đợt 4 build 9).
-    private(set) var isSyncingFullHistory = false
+    @Published private(set) var isSyncingFullHistory = false
 
     /// Ghi chú khi bước Commerce thất bại nhưng DMAP vẫn cho danh sách:
     /// hiện màu cam (không phải lỗi đỏ) để người dùng biết lịch sử có
     /// thể chưa đủ.
-    private(set) var fullHistoryHint: String?
+    @Published private(set) var fullHistoryHint: String?
 
     /// Năm đồng bộ đầy đủ gần nhất theo tài khoản (đợt 4, build 9):
     /// ghi lại khi bước Commerce chạy xong 1 lượt; lần sau chỉ cần quét
     /// năm hiện tại khi đã biết dạng response (xem PurchasedCommerceService).
-    @ObservationIgnored
     private var _fullSyncYears = Persist<[String: Int]>(
         key: "PurchasedFullSyncYearByAccount",
         defaultValue: [:]
@@ -48,23 +46,22 @@ final class PurchasedStore {
     }
 
     /// Chế độ chọn nhiều để tải hàng loạt.
-    var isSelecting = false
-    var selectedIDs: Set<Int64> = []
+    @Published var isSelecting = false
+    @Published var selectedIDs: Set<Int64> = []
 
     /// Icon (artwork) tra được qua Lookup, theo Bundle ID. DMAP không trả
     /// icon nên phải tra thêm — tra lười theo từng hàng khi hiện ra.
-    private(set) var artworkURLs: [String: URL] = [:]
+    @Published private(set) var artworkURLs: [String: URL] = [:]
 
     /// Gói đầy đủ tra được qua Lookup, theo Bundle ID — dùng để mở màn
     /// chi tiết app và để tải. App đã gỡ khỏi App Store mà Lookup vẫn
     /// trả về thì tải được như thường; Lookup không trả về thì hàng đó
     /// vẫn hiện (tên + Bundle ID + ngày mua) nhưng chưa tải được từ đây.
-    private(set) var resolvedPackages: [String: AppStore.AppPackage] = [:]
+    @Published private(set) var resolvedPackages: [String: AppStore.AppPackage] = [:]
 
     /// Bundle ID đang tra Lookup dở (để không tra trùng).
     private var enrichingBundleIDs: Set<String> = []
 
-    @ObservationIgnored
     private var _cachedByAccount = Persist<[String: [PurchasedApp]]>(
         key: "PurchasedAppsByAccount",
         defaultValue: [:]

@@ -15,7 +15,7 @@ import SwiftUI
 
 struct SearchRegionSettingsView: View {
     @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
-    @State private var vm = AppStore.this
+    @StateObject private var vm = AppStore.this
     @State private var query = ""
 #if os(iOS)
     @State private var editMode: EditMode = .inactive

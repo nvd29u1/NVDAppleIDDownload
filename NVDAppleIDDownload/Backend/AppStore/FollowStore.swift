@@ -45,22 +45,18 @@ struct FollowedApp: Codable, Hashable, Identifiable {
 }
 
 @MainActor
-@Observable
-final class FollowStore {
+final class FollowStore: ObservableObject {
     static let shared = FollowStore()
 
-    @ObservationIgnored
     private var _items = Persist<[FollowedApp]>(key: "FollowedApps", defaultValue: [])
 
     var items: [FollowedApp] {
         get {
-            access(keyPath: \.items)
             return _items.wrappedValue
         }
         set {
-            withMutation(keyPath: \.items) {
-                _items.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _items.wrappedValue = newValue
         }
     }
 

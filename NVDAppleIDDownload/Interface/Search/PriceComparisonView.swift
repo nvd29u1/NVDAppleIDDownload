@@ -16,7 +16,7 @@ import SwiftUI
 struct PriceComparisonView: View {
     let bundleID: String
 
-    @State private var store = AppStore.this
+    @StateObject private var store = AppStore.this
     @State private var rows: [RegionPrice] = []
     @State private var isLoading = false
     @State private var didLoad = false

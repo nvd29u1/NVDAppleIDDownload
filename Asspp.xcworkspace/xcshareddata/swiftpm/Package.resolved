@@ -46,15 +46,6 @@
       }
     },
     {
-      "identity" : "colorfulx",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/Lakr233/ColorfulX",
-      "state" : {
-        "revision" : "2f008fcffc7f23811b2ba70eda77c57223815bc3",
-        "version" : "6.0.2"
-      }
-    },
-    {
       "identity" : "colorvector",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/Lakr233/ColorVector.git",
@@ -97,15 +88,6 @@
       "state" : {
         "revision" : "2ef543ee21d63734e1c004ad6c870255e8716c50",
         "version" : "7.12.0"
-      }
-    },
-    {
-      "identity" : "lookinside-release",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/LookInsideApp/LookInside-Release.git",
-      "state" : {
-        "revision" : "7514cfa8bd24a78f74d8b982c429e7d61ef58134",
-        "version" : "0.2.2"
       }
     },
     {

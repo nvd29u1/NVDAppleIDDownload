@@ -9,7 +9,7 @@ import ApplePackage
 import SwiftUI
 
 struct AccountView: View {
-    @State private var vm = AppStore.this
+    @StateObject private var vm = AppStore.this
     @State private var addAccount = false
     @State private var selectedID: AppStore.UserAccount.ID?
     @State private var navigationPath = NavigationPath()
@@ -27,17 +27,13 @@ struct AccountView: View {
             NavigationStack(path: $navigationPath) {
                 Group {
                     if vm.accounts.isEmpty {
-                        ContentUnavailableView(
-                            label: {
-                                Label("No Accounts", systemImage: "person.crop.circle.badge.questionmark")
-                            },
-                            description: {
-                                Text("Add an Apple ID to start downloading IPA packages.")
-                            },
-                            actions: {
-                                Button("Add Account") { addAccount.toggle() }
-                            },
-                        )
+                        NVDContentUnavailableView(
+                            "No Accounts",
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            description: "Add an Apple ID to start downloading IPA packages."
+                        ) {
+                            Button("Add Account") { addAccount.toggle() }
+                        }
                         .padding()
                     } else {
                         accountsTable
@@ -123,17 +119,13 @@ struct AccountView: View {
             NavigationStack(path: $navigationPath) {
                 Group {
                     if vm.accounts.isEmpty {
-                        ContentUnavailableView(
-                            label: {
-                                Label("No Accounts", systemImage: "person.crop.circle.badge.questionmark")
-                            },
-                            description: {
-                                Text("Add an Apple ID to start downloading IPA packages.")
-                            },
-                            actions: {
-                                Button("Add Account") { addAccount.toggle() }
-                            },
-                        )
+                        NVDContentUnavailableView(
+                            "No Accounts",
+                            systemImage: "person.crop.circle.badge.questionmark",
+                            description: "Add an Apple ID to start downloading IPA packages."
+                        ) {
+                            Button("Add Account") { addAccount.toggle() }
+                        }
                     } else {
                         Form {
                             Section {

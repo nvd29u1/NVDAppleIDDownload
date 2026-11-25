@@ -54,6 +54,7 @@ struct LibraryView: View {
                                     Button { Task { await state.addUnsigned(app) } } label: {
                                         Label(L("Install without re-signing"), systemImage: "arrow.down.app")
                                     }
+                                    .disabled(LiveContainerGuest.isGuest)
                                     Button(role: .destructive) { state.deleteLibrary(app) } label: { Label(L("Delete"), systemImage: "trash") }
                                 }
                         }
@@ -80,6 +81,9 @@ struct LibraryView: View {
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Menu {
                         Button { importing = true } label: { Label(L("Import from Files"), systemImage: "folder") }
+                            // Đợt 5, build 17: guest trong LiveContainer
+                            // không nhập file được — nút mờ đi.
+                            .disabled(LiveContainerGuest.isGuest)
                         Button { urlPrompt = true } label: { Label(L("Download from URL"), systemImage: "link") }
                     } label: {
                         Image(systemName: "plus.circle.fill").font(.title2).symbolRenderingMode(.hierarchical)
@@ -230,6 +234,7 @@ struct SignedRow: View {
                         }
                         .buttonStyle(SmallButtonStyle())
                         .nvdBorderBeam(shape: .rounded(9))
+                        .disabled(LiveContainerGuest.isGuest || installing)
                     }
                     Button { share = state.ipaURL(app) } label: { Image(systemName: "square.and.arrow.up") }
                         .buttonStyle(SmallButtonStyle(filled: false))

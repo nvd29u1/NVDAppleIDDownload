@@ -12,15 +12,14 @@ import Logging
 #endif
 import Vapor
 
-@Observable
-class Installer: Identifiable, @unchecked Sendable {
-    @ObservationIgnored let id: UUID
-    @ObservationIgnored let app: Application
-    @ObservationIgnored let archive: AppStore.AppPackage
-    @ObservationIgnored let port = Int.random(in: 4000 ... 8000)
+class Installer: Identifiable, ObservableObject, @unchecked Sendable {
+    let id: UUID
+    let app: Application
+    let archive: AppStore.AppPackage
+    let port = Int.random(in: 4000 ... 8000)
     /// Manifest server URL from Settings (NVD worker by default).
     /// Empty = use the built-in local HTTPS server + self-signed certificate.
-    @ObservationIgnored let manifestServerURL: String
+    let manifestServerURL: String
 
     /// True when installs go through the manifest server: the manifest plist
     /// comes from that server over HTTPS, the IPA is served by this phone
@@ -38,7 +37,7 @@ class Installer: Identifiable, @unchecked Sendable {
     }
 
     @MainActor
-    var status: Status = .ready
+    @Published var status: Status = .ready
 
     init(archive: AppStore.AppPackage, path packagePath: URL, manifestServerURL: String = "") async throws {
         let id: UUID = .init()

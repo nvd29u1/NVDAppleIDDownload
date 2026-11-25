@@ -8,8 +8,8 @@
 import SwiftUI
 
 struct DownloadView: View {
-    @State private var vm = Downloads.this
-    @State private var updateStore = UpdateCheckStore.shared
+    @StateObject private var vm = Downloads.this
+    @StateObject private var updateStore = UpdateCheckStore.shared
 
     var body: some View {
         NavigationStack {
@@ -26,19 +26,15 @@ struct DownloadView: View {
     private var content: some View {
         Group {
             if vm.manifests.isEmpty {
-                ContentUnavailableView(
-                    label: {
-                        Label("No Downloads", systemImage: "arrow.down.circle")
-                    },
-                    description: {
-                        Text("Search for an app or add a download link to get started.")
-                    },
-                    actions: {
-                        NavigationLink("Add Download") {
-                            AddDownloadView()
-                        }
-                    },
-                )
+                NVDContentUnavailableView(
+                    "No Downloads",
+                    systemImage: "arrow.down.circle",
+                    description: "Search for an app or add a download link to get started."
+                ) {
+                    NavigationLink("Add Download") {
+                        AddDownloadView()
+                    }
+                }
                 .padding()
             } else {
                 Form {
@@ -65,9 +61,9 @@ struct DownloadView: View {
 }
 
 private struct PackageManifestRow: View {
-    let manifest: PackageManifest
-    @State private var vm = Downloads.this
-    @State private var updateStore = UpdateCheckStore.shared
+    @ObservedObject var manifest: PackageManifest
+    @StateObject private var vm = Downloads.this
+    @StateObject private var updateStore = UpdateCheckStore.shared
 
     var body: some View {
         NavigationLink(value: manifest) {

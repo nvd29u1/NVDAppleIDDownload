@@ -58,11 +58,10 @@ enum LocalNetworkAddress {
 
 /// Máy chủ HTTP nhỏ phục vụ trang tải IPA qua Wi-Fi. Mỗi lần mở màn
 /// Chia sẻ thì tạo mới + tắt khi rời màn — không chạy nền.
-@Observable
-final class WiFiTransferServer: @unchecked Sendable {
+final class WiFiTransferServer: ObservableObject, @unchecked Sendable {
     private var app: Application?
-    private(set) var port: Int = 0
-    private(set) var isRunning = false
+    @Published private(set) var port: Int = 0
+    @Published private(set) var isRunning = false
 
     /// Địa chỉ đầy đủ để gõ vào trình duyệt máy tính, vd
     /// "http://192.168.1.10:5432". Nil khi máy chủ chưa chạy hoặc máy
@@ -96,7 +95,7 @@ final class WiFiTransferServer: @unchecked Sendable {
                 return Response(status: .notFound)
             }
             // Chỉ lấy đường dẫn file (String, Sendable) từ MainActor —
-            // manifest là class @Observable, không trả thẳng ra khỏi
+            // manifest là class ObservableObject, không trả thẳng ra khỏi
             // MainActor.run được.
             let filePath: String? = await MainActor.run {
                 Downloads.this.manifests.first { $0.id == uuid && $0.completed }?.targetLocation.path

@@ -8,10 +8,8 @@
 import ApplePackage
 import Foundation
 
-@Observable
 @MainActor
-class AppStore {
-    @ObservationIgnored
+class AppStore: ObservableObject {
     private var _accounts = Persist<[UserAccount]>(
         key: "Accounts",
         defaultValue: [],
@@ -20,17 +18,14 @@ class AppStore {
 
     var accounts: [UserAccount] {
         get {
-            access(keyPath: \.accounts)
             return _accounts.wrappedValue
         }
         set {
-            withMutation(keyPath: \.accounts) {
-                _accounts.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _accounts.wrappedValue = newValue
         }
     }
 
-    @ObservationIgnored
     private var _deviceIdentifier = Persist<String>(
         key: "DeviceIdentifier",
         defaultValue: "",
@@ -39,29 +34,24 @@ class AppStore {
 
     var deviceIdentifier: String {
         get {
-            access(keyPath: \.deviceIdentifier)
             return _deviceIdentifier.wrappedValue
         }
         set {
-            withMutation(keyPath: \.deviceIdentifier) {
-                _deviceIdentifier.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _deviceIdentifier.wrappedValue = newValue
             ApplePackage.Configuration.deviceIdentifier = newValue
         }
     }
 
-    @ObservationIgnored
     private var _demoMode = Persist<Bool>(key: "DemoMode", defaultValue: false)
 
     var demoMode: Bool {
         get {
-            access(keyPath: \.demoMode)
             return _demoMode.wrappedValue
         }
         set {
-            withMutation(keyPath: \.demoMode) {
-                _demoMode.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _demoMode.wrappedValue = newValue
         }
     }
 
@@ -70,7 +60,6 @@ class AppStore {
     /// itself never leaves the phone. Empty string = built-in local server.
     static let defaultManifestServerURL = "https://nvd-manifest.nguyenvietdung156195.workers.dev"
 
-    @ObservationIgnored
     private var _manifestServerURL = Persist<String>(
         key: "ManifestServerURL",
         defaultValue: defaultManifestServerURL,
@@ -78,13 +67,11 @@ class AppStore {
 
     var manifestServerURL: String {
         get {
-            access(keyPath: \.manifestServerURL)
             return _manifestServerURL.wrappedValue
         }
         set {
-            withMutation(keyPath: \.manifestServerURL) {
-                _manifestServerURL.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _manifestServerURL.wrappedValue = newValue
         }
     }
 
@@ -94,7 +81,6 @@ class AppStore {
     /// fetches the headers from this server before signing in and attaches
     /// them to the Apple sign-in requests. Only the server URL is stored
     /// here — no Apple ID or password is ever sent to this server.
-    @ObservationIgnored
     private var _anisetteServerURL = Persist<String>(
         key: "AnisetteServerURL",
         defaultValue: "",
@@ -102,20 +88,17 @@ class AppStore {
 
     var anisetteServerURL: String {
         get {
-            access(keyPath: \.anisetteServerURL)
             return _anisetteServerURL.wrappedValue
         }
         set {
-            withMutation(keyPath: \.anisetteServerURL) {
-                _anisetteServerURL.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _anisetteServerURL.wrappedValue = newValue
         }
     }
 
     /// Bật "Chia sẻ IPA qua Wi-Fi" (đợt 3, build 8): chỉ là công tắc cho
     /// phép mở màn Chia sẻ qua Wi-Fi — máy chủ chỉ chạy khi đang ở màn
     /// đó, rời màn là tắt, không chạy nền.
-    @ObservationIgnored
     private var _wifiTransferEnabled = Persist<Bool>(
         key: "WiFiTransferEnabled",
         defaultValue: false,
@@ -123,20 +106,17 @@ class AppStore {
 
     var wifiTransferEnabled: Bool {
         get {
-            access(keyPath: \.wifiTransferEnabled)
             return _wifiTransferEnabled.wrappedValue
         }
         set {
-            withMutation(keyPath: \.wifiTransferEnabled) {
-                _wifiTransferEnabled.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _wifiTransferEnabled.wrappedValue = newValue
         }
     }
 
     /// Bật khoá app bằng Face ID / Touch ID / mật khẩu thiết bị (đợt 3,
     /// build 8 — LocalAuthentication, không lưu mật khẩu nào trong app).
     /// Mở app lên là khoá; rời app thì khoá lại ngay.
-    @ObservationIgnored
     private var _appLockEnabled = Persist<Bool>(
         key: "AppLockEnabled",
         defaultValue: false,
@@ -144,13 +124,11 @@ class AppStore {
 
     var appLockEnabled: Bool {
         get {
-            access(keyPath: \.appLockEnabled)
             return _appLockEnabled.wrappedValue
         }
         set {
-            withMutation(keyPath: \.appLockEnabled) {
-                _appLockEnabled.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _appLockEnabled.wrappedValue = newValue
         }
     }
 
@@ -159,7 +137,6 @@ class AppStore {
     /// itms-services qua máy chủ manifest trong Cài đặt). Mặc định TẮT
     /// — tải xong vẫn phải bấm Cài đặt tay như trước. Chỉ có tác dụng
     /// trên iOS (macOS cài qua DeviceCTL, không qua đường này).
-    @ObservationIgnored
     private var _autoInstallAfterDownload = Persist<Bool>(
         key: "AutoInstallAfterDownload",
         defaultValue: false,
@@ -167,13 +144,11 @@ class AppStore {
 
     var autoInstallAfterDownload: Bool {
         get {
-            access(keyPath: \.autoInstallAfterDownload)
             return _autoInstallAfterDownload.wrappedValue
         }
         set {
-            withMutation(keyPath: \.autoInstallAfterDownload) {
-                _autoInstallAfterDownload.wrappedValue = newValue
-            }
+            objectWillChange.send()
+            _autoInstallAfterDownload.wrappedValue = newValue
         }
     }
 
@@ -182,7 +157,6 @@ class AppStore {
     /// xếp, lưu bằng Persist. Vùng tìm kiếm chỉ dùng để tìm app / tra
     /// cứu catalog, độc lập với vùng của tài khoản. Vùng đang tìm thì
     /// lưu ở AppStorage "searchRegion" (dùng chung với SearchView).
-    @ObservationIgnored
     private var _searchFavoriteRegions = Persist<[String]>(
         key: "SearchFavoriteRegions",
         defaultValue: StoreRegionCatalog.defaultFavorites,
@@ -190,13 +164,11 @@ class AppStore {
 
     var searchFavoriteRegions: [String] {
         get {
-            access(keyPath: \.searchFavoriteRegions)
             return _searchFavoriteRegions.wrappedValue.filter { StoreRegionCatalog.region(for: $0) != nil }
         }
         set {
-            withMutation(keyPath: \.searchFavoriteRegions) {
-                _searchFavoriteRegions.wrappedValue = newValue.filter { StoreRegionCatalog.region(for: $0) != nil }
-            }
+            objectWillChange.send()
+            _searchFavoriteRegions.wrappedValue = newValue.filter { StoreRegionCatalog.region(for: $0) != nil }
         }
     }
 
@@ -256,9 +228,8 @@ class AppStore {
         let updatedAccounts = (accounts.filter { $0.account.email != email } + [account])
             .sorted { $0.account.email < $1.account.email }
         do {
-            try withMutation(keyPath: \.accounts) {
-                try _accounts.setAndSave(updatedAccounts)
-            }
+            try _accounts.setAndSave(updatedAccounts)
+            objectWillChange.send()
         } catch {
             throw AccountStorageError()
         }

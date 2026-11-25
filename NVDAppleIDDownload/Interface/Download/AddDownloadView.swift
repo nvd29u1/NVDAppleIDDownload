@@ -26,8 +26,8 @@ struct AddDownloadView: View {
 
     @FocusState private var searchKeyFocused
 
-    @State private var avm = AppStore.this
-    @State private var dvm = Downloads.this
+    @StateObject private var avm = AppStore.this
+    @StateObject private var dvm = Downloads.this
 
     /// Vùng tìm kiếm đang chọn (đợt 2, build 7): tìm app / tra cứu ở đây
     /// dùng vùng này thay vì vùng của tài khoản; việc tải vẫn theo vùng

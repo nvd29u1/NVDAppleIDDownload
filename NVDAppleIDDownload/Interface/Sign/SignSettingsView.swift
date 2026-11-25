@@ -5,7 +5,7 @@ struct SignSettingsView: View {
     @EnvironmentObject var state: SignAppState
     // The manifest server is the app's own single setting (Cài đặt →
     // Install App); this view only edits it, it does not own a second one.
-    @State private var store = AppStore.this
+    @StateObject private var store = AppStore.this
     @State private var setup = false
     @State private var confirmReset = false
     @State private var cacheSize: Int64 = 0

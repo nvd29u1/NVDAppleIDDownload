@@ -16,7 +16,7 @@ import Kingfisher
 import SwiftUI
 
 struct WatchlistView: View {
-    @State private var store = FollowStore.shared
+    @StateObject private var store = FollowStore.shared
     @State private var navigationPath = NavigationPath()
     @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
 
@@ -61,10 +61,10 @@ struct WatchlistView: View {
     @ViewBuilder
     private var content: some View {
         if store.items.isEmpty {
-            ContentUnavailableView(
+            NVDContentUnavailableView(
                 "Chưa theo dõi app nào",
                 systemImage: "eye",
-                description: Text("Mở màn chi tiết một app rồi bấm \"Theo dõi app này\" — giá hiện tại và lịch sử giá sẽ hiện ở đây."),
+                description: "Mở màn chi tiết một app rồi bấm \"Theo dõi app này\" — giá hiện tại và lịch sử giá sẽ hiện ở đây."
             )
         } else {
             List {

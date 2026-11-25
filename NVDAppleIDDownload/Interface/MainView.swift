@@ -29,10 +29,9 @@ enum MainTab: Hashable {
 }
 
 @MainActor
-@Observable
-final class MainTabSelection {
+final class MainTabSelection: ObservableObject {
     static let shared = MainTabSelection()
-    var tab = MainTab.downloads
+    @Published var tab = MainTab.downloads
 }
 
 struct MainView: View {
@@ -48,7 +47,7 @@ struct MainView: View {
 #if os(macOS)
     private struct MacSidebarMainView: View {
         @State private var selection: SidebarSection? = .accounts
-        @State private var downloads = Downloads.this
+        @StateObject private var downloads = Downloads.this
 
         var body: some View {
             NavigationSplitView {
@@ -223,8 +222,8 @@ struct MainView: View {
     }
 #else
     private struct LegacyTabMainView: View {
-        @State private var selection = MainTabSelection.shared
-        @State var dvm = Downloads.this
+        @StateObject private var selection = MainTabSelection.shared
+        @StateObject var dvm = Downloads.this
 
         var body: some View {
             TabView(selection: $selection.tab) {
@@ -258,8 +257,8 @@ struct MainView: View {
 
     @available(iOS 18.0, *)
     struct NewMainView: View {
-        @State private var selection = MainTabSelection.shared
-        @State var dvm = Downloads.this
+        @StateObject private var selection = MainTabSelection.shared
+        @StateObject var dvm = Downloads.this
 
         var body: some View {
             TabView(selection: $selection.tab) {

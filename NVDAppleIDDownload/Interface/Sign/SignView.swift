@@ -188,6 +188,24 @@ struct SignView: View {
                             .buttonStyle(PrimaryButtonStyle())
                             .listRowBackground(Color.clear)
                             .nvdBorderBeam(shape: .rounded(13))
+                            // Đợt 5, build 17: guest trong LiveContainer
+                            // không cài được — nút mờ đi, banner ở đầu
+                            // tab Ký IPA đã giải thích.
+                            .disabled(LiveContainerGuest.isGuest)
+                        // Đợt 5, build 17: nối nút vào openTrollStore đã
+                        // có sẵn (trước đây dead code, 0 caller). Chỉ
+                        // hiện khi máy đã cài TrollStore; chỉ cần file
+                        // .ipa chuẩn, không cần .tipa.
+                        if SignInstaller.trollStoreAvailable {
+                            Button {
+                                if !SignInstaller.openTrollStore(state.ipaURL(s)) {
+                                    self.error = L("TrollStore is not installed")
+                                }
+                            } label: { Label(L("Install with TrollStore"), systemImage: "arrow.down.app") }
+                                .buttonStyle(PrimaryButtonStyle())
+                                .listRowBackground(Color.clear)
+                                .nvdBorderBeam(shape: .rounded(13))
+                        }
                     }
                 } else {
                     Section {

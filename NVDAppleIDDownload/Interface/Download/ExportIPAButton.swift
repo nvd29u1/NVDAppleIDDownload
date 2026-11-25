@@ -11,7 +11,7 @@
 import SwiftUI
 
 struct ExportIPAButton: View {
-    let manifest: PackageManifest
+    @ObservedObject var manifest: PackageManifest
 
     @State private var showError = false
 

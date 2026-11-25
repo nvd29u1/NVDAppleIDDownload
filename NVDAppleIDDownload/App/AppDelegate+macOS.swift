@@ -5,9 +5,11 @@
 
 #if canImport(AppKit) && !canImport(UIKit)
     import AppKit
+    import Combine
 
     class AppDelegate: NSObject, NSApplicationDelegate {
         var activityToken: NSObjectProtocol?
+        private var downloadCountCancellable: AnyCancellable?
 
         func applicationWillFinishLaunching(_: Notification) {
             // Remove the "Show Tab Bar" / "Show All Tabs" items from the View
@@ -21,17 +23,24 @@
             }
         }
 
+        /// Như bản iOS: objectWillChange phát trước khi giá trị đổi nên
+        /// đọc lại ở lượt MainActor sau. withObservationTracking không
+        /// còn dùng được vì Downloads đã là ObservableObject (tracking
+        /// cũ chỉ theo dõi @Observable, không phát nữa).
         @MainActor
         private func observeDownloadCount() {
-            withObservationTracking {
-                let count = Downloads.this.runningTaskCount
-                NSApp.dockTile.badgeLabel = count > 0 ? "\(count)" : nil
-                updateProcessActivity(isDownloading: count > 0)
-            } onChange: {
-                Task { @MainActor in
-                    self.observeDownloadCount()
+            applyDownloadCount()
+            downloadCountCancellable = Downloads.this.objectWillChange
+                .sink { [weak self] _ in
+                    Task { @MainActor in self?.applyDownloadCount() }
                 }
-            }
+        }
+
+        @MainActor
+        private func applyDownloadCount() {
+            let count = Downloads.this.runningTaskCount
+            NSApp.dockTile.badgeLabel = count > 0 ? "\(count)" : nil
+            updateProcessActivity(isDownloading: count > 0)
         }
 
         private func updateProcessActivity(isDownloading: Bool) {

@@ -37,6 +37,42 @@ let version = [
 .compactMap { $0 ?? "?" }
 .joined(separator: " ")
 
+/// Đầu trên của khoảng iOS hỗ trợ hiển thị ở mục Giới thiệu (Cài đặt
+/// chính). Mốc ổn định anh chốt 19/11/2026: trên 27.2 là ngoài vùng ổn
+/// định đã biết (Apple bắt đầu vá từ 27.2 beta 3 với Airlift, 27.3
+/// beta 2 với worse_query). Đầu dưới lấy từ MinimumOSVersion của
+/// binary — đổi min ở Base.xcconfig thì About tự cập nhật theo.
+let maxSupportedIOSVersion = "27.2"
+/// iOS cao nhất đã kiểm chứng thật trên máy anh (iOS 27.0) — dòng ghi
+/// chú nhỏ ở mục Giới thiệu, KHÔNG phải đầu trên của khoảng hỗ trợ.
+let testedIOSVersion = "27.0"
+
+/// Đầu dưới của khoảng iOS hỗ trợ, đọc từ MinimumOSVersion của binary.
+let minSupportedIOSVersion =
+    Bundle.main.infoDictionary?["MinimumOSVersion"] as? String ?? "16.0"
+
+#if os(iOS)
+/// true khi iOS của máy đang chạy nằm trong khoảng hỗ trợ
+/// [minSupportedIOSVersion, maxSupportedIOSVersion] (so theo
+/// major.minor, bỏ patch — "27.0.1" vẫn là 27.0).
+let isCurrentIOSSupported: Bool = {
+    func majorMinor(_ s: String) -> (Int, Int) {
+        let parts = s.split(separator: ".").compactMap { Int($0) }
+        return (parts.first ?? 0, parts.dropFirst().first ?? 0)
+    }
+    func atLeast(_ a: (Int, Int), _ b: (Int, Int)) -> Bool {
+        a.0 > b.0 || (a.0 == b.0 && a.1 >= b.1)
+    }
+    func atMost(_ a: (Int, Int), _ b: (Int, Int)) -> Bool {
+        a.0 < b.0 || (a.0 == b.0 && a.1 <= b.1)
+    }
+    let v = ProcessInfo.processInfo.operatingSystemVersion
+    let current = (v.majorVersion, v.minorVersion)
+    return atLeast(current, majorMinor(minSupportedIOSVersion))
+        && atMost(current, majorMinor(maxSupportedIOSVersion))
+}()
+#endif
+
 let bundleIdentifier = Bundle.main.bundleIdentifier!
 logger.info("NVDAppleIDDownload \(bundleIdentifier) \(version) starting up...")
 logger.info("Platform: \(ProcessInfo.processInfo.operatingSystemVersionString)")

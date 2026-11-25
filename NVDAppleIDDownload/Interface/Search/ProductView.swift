@@ -11,7 +11,7 @@ import Kingfisher
 import SwiftUI
 
 struct ProductView: View {
-    @State private var archive: AppPackageArchive
+    @ObservedObject private var archive: AppPackageArchive
     @Binding var navigationPath: NavigationPath
 
     var region: String {
@@ -23,9 +23,9 @@ struct ProductView: View {
         _navigationPath = navigationPath
     }
 
-    @State private var vm = AppStore.this
-    @State private var dvm = Downloads.this
-    @State private var followStore = FollowStore.shared
+    @StateObject private var vm = AppStore.this
+    @StateObject private var dvm = Downloads.this
+    @StateObject private var followStore = FollowStore.shared
 
     var eligibleAccounts: [AppStore.UserAccount] {
         vm.eligibleAccounts(for: region)
@@ -293,7 +293,7 @@ struct ProductView: View {
         .onAppear {
             selectFallbackAccount()
         }
-        .onChange(of: vm.accounts) { _, _ in
+        .onChange(of: vm.accounts) { _ in
             // Sau khi đăng xuất / đăng nhập lại (kể cả bằng Apple ID khác),
             // id tài khoản đã chọn có thể không còn tồn tại — chọn lại tài
             // khoản đầu tiên còn đăng nhập (ưu tiên đúng vùng, fallback

@@ -16,6 +16,22 @@ struct SignRootView: View {
     var body: some View {
         ZStack(alignment: .top) {
             VStack(spacing: 0) {
+                // Đợt 5, build 17: chạy dạng guest trong LiveContainer thì
+                // nhập file/cài đặt không hoạt động được (đã chứng minh với
+                // NVDsign 24/11) — báo rõ ngay đầu tab thay vì lỗi lặng lẽ.
+                if LiveContainerGuest.isGuest {
+                    HStack(alignment: .top, spacing: 8) {
+                        Image(systemName: "exclamationmark.triangle.fill")
+                        Text(L("Running inside LiveContainer: file import and install don't work here. Install the real app via SideStore or AltStore to use them."))
+                            .font(.footnote)
+                            .multilineTextAlignment(.leading)
+                    }
+                    .foregroundStyle(.orange)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .background(Color.orange.opacity(0.12))
+                }
                 Group {
                     switch state.tab {
                     case 1:

@@ -4,10 +4,12 @@
 //
 
 #if canImport(UIKit)
+    import Combine
     import UIKit
 
     class AppDelegate: NSObject, UIApplicationDelegate {
         var backgroundTaskIdentifier: UIBackgroundTaskIdentifier = .invalid
+        private var downloadCountCancellable: AnyCancellable?
 
         func application(
             _: UIApplication,
@@ -19,17 +21,23 @@
             return true
         }
 
+        /// Downloads là ObservableObject (iOS 16, bản 17): objectWillChange
+        /// phát TRƯỚC khi giá trị đổi nên đọc lại số lượng ở lượt
+        /// MainActor sau, thay cho withObservationTracking (iOS 17+).
         @MainActor
         private func observeDownloadCount() {
-            withObservationTracking {
-                let count = Downloads.this.runningTaskCount
-                UIApplication.shared.isIdleTimerDisabled = count > 0
-                BackgroundAudioPlayer.shared.setActive(count > 0)
-            } onChange: {
-                Task { @MainActor in
-                    self.observeDownloadCount()
+            applyDownloadCount()
+            downloadCountCancellable = Downloads.this.objectWillChange
+                .sink { [weak self] _ in
+                    Task { @MainActor in self?.applyDownloadCount() }
                 }
-            }
+        }
+
+        @MainActor
+        private func applyDownloadCount() {
+            let count = Downloads.this.runningTaskCount
+            UIApplication.shared.isIdleTimerDisabled = count > 0
+            BackgroundAudioPlayer.shared.setActive(count > 0)
         }
 
         func applicationWillResignActive(_: UIApplication) {

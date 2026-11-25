@@ -3089,6 +3089,22 @@
         }
       }
     },
+    "Running inside LiveContainer: file import and install don't work here. Install the real app via SideStore or AltStore to use them.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Running inside LiveContainer: file import and install don't work here. Install the real app via SideStore or AltStore to use them."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chạy trong LiveContainer: nhập file và cài đặt không hoạt động ở đây. Cài app thật qua SideStore hoặc AltStore để dùng các tính năng này."
+          }
+        }
+      }
+    },
     "Save": {
       "localizations": {
         "en": {
@@ -7770,6 +7786,22 @@
         }
       }
     },
+    "TrollStore is not installed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "TrollStore is not installed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa cài TrollStore"
+          }
+        }
+      }
+    },
     "Try another search or refresh your sources.": {
       "localizations": {
         "en": {
@@ -9110,6 +9142,22 @@
           "stringUnit": {
             "state": "translated",
             "value": "Quản lý tài khoản Apple ID"
+          }
+        }
+      }
+    },
+    "Install with TrollStore": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install with TrollStore"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài bằng TrollStore"
           }
         }
       }

@@ -23,14 +23,13 @@ import SwiftUI
 #endif
 
 @MainActor
-@Observable
-final class AppLock {
+final class AppLock: ObservableObject {
     static let shared = AppLock()
 
     /// Đang ở màn khoá (che toàn bộ nội dung app).
-    var isLocked = false
+    @Published var isLocked = false
     /// Lỗi mở khoá gần nhất (vd. thiết bị chưa đặt mật khẩu).
-    var errorMessage: String?
+    @Published var errorMessage: String?
 
     private init() {}
 
@@ -71,8 +70,8 @@ final class AppLock {
 struct AppLockGate<Content: View>: View {
     let content: Content
     @Environment(\.scenePhase) private var scenePhase
-    @State private var lock = AppLock.shared
-    @State private var store = AppStore.this
+    @StateObject private var lock = AppLock.shared
+    @StateObject private var store = AppStore.this
 
     init(@ViewBuilder content: () -> Content) {
         self.content = content()
@@ -91,7 +90,7 @@ struct AppLockGate<Content: View>: View {
                 lock.isLocked = true
             }
         }
-        .onChange(of: scenePhase) { _, phase in
+        .onChange(of: scenePhase) { phase in
             // Rời app (sang nền / đa nhiệm) thì khoá lại ngay — ảnh chụp
             // màn hình đa nhiệm cũng chỉ thấy màn khoá.
             if phase != .active {
