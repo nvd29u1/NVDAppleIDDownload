@@ -304,6 +304,20 @@ struct SettingView: View {
                 Text("Dựa trên Asspp của Lakr233 (MIT). Tính năng ký được cá nhân hoá từ SayoSign của murk-sus (GPL-3.0). Hiệu ứng viền sáng BorderBeam của ismnoiet (MIT).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
+                // Chuyển từ mục Giới thiệu cũ ở Cài đặt Ký IPA (bỏ ở
+                // build 16 theo lệnh anh — Cài đặt chính đã có giới
+                // thiệu rồi): link GitHub của app gộp, dòng Twemoji
+                // (CC-BY 4.0), link BorderBeam. Giữ attribution đủ
+                // vì app phân phối công khai (GPL-3.0/MIT).
+                Link(destination: URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!) {
+                    Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
+                }
+                Text("Được làm với 🎀 bởi tác giả gốc. Giấy phép GPL-3.0. Icon dùng Twemoji (CC-BY 4.0).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                Link(destination: URL(string: "https://github.com/ismnoiet/border-beam-ios")!) {
+                    Label("BorderBeam", systemImage: "sun.max")
+                }
             } header: {
                 Text("Giới thiệu")
             }

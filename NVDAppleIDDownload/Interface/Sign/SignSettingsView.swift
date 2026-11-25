@@ -168,18 +168,6 @@ struct SignSettingsView: View {
                     Button(L("Refresh")) { installLog = InstallServer.shared.logLines() }.nvdBorderBeam(shape: .rounded(10))
                 }
 
-                Section(header: Text(L("About"))) {
-                    Link(destination: URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!) {
-                        Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                    }
-                    Text(L("Made with 🎀 by murk. Licensed under GPL-3.0. Icon uses Twemoji (CC-BY 4.0)."))
-                        .font(.caption).foregroundColor(.secondary)
-                    Text("Tính năng ký trong app này được cá nhân hoá từ SayoSign của murk-sus (GPL-3.0). Hiệu ứng viền sáng BorderBeam của ismnoiet (MIT).")
-                        .font(.caption).foregroundColor(.secondary)
-                    Link(destination: URL(string: "https://github.com/ismnoiet/border-beam-ios")!) {
-                        Label("BorderBeam", systemImage: "sun.max")
-                    }
-                }
             }
             .navigationTitle(L("Settings"))
             .sheet(isPresented: $setup) { InstallSetupView().environmentObject(state) }
