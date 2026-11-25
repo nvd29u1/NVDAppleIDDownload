@@ -832,3 +832,76 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     iPhone thật — cần anh test: gõ tên app ở tab Tìm kiếm, tải
     Facebook lại, mở tab Đã mua xem còn văng không, xem thứ tự
     tab + màn Cài đặt của tab Ký IPA đã mất card header chưa.
+
+- Đợt 5 build 14 (25 Nov 2026, 2.0 build 14): sửa lỗi Đã mua báo "Phiên
+  đăng nhập đã hết hạn" sau khi bản 13 đã hết văng (anh báo 16:41
+  25/11, có ảnh: tab mở được, lỗi đỏ "Phiên đăng nhập đã hết hạn. Hãy
+  đăng nhập lại tài khoản rồi bấm Đồng bộ lại." + "Chưa có app nào
+  trong mục Đã mua."). Chưa kiểm chứng trên iPhone thật.
+  - CHẨN ĐOÁN (đọc code, không có log máy thật để đối chiếu bước nào):
+    lỗi là `PurchasedDMAPError.sessionExpired`, ném ở `checkHTTP` khi
+    login/update/items trả 401/403. "Phiên hết hạn" chưa chắc đúng:
+    đường tải cùng tài khoản vẫn chạy được lúc 15:40 25/11 (~1 giờ
+    trước) — nhưng đường tải xác thực bằng COOKIE
+    (`StoreDownloadService.fetch`: `account.cookie.buildCookieHeader`),
+    còn DMAP trước đây CHỈ gửi `X-Token: passwordToken` và không gửi
+    cookie — nên tải chạy được chỉ chứng minh cookie còn sống, không
+    chứng minh token còn sống. Token cấp lúc đăng nhập 24/11 ~22:41,
+    mới ~18 giờ nên ít khả năng tự hết, nhưng DMAP là đường duy nhất
+    dùng trực tiếp token đã lưu (đường mua thì rotate token trước mỗi
+    lần mua, build 6) nên token cũ là nghi phạm số 1; thiếu cookie +
+    thiếu header Anisette trên request DAAP là nghi phạm số 2 (iTunes
+    thật gửi cả cookie + token; Apple chặn request thiếu xác minh thiết
+    bị từ 11/2026 như đường đăng nhập / mua). X-GUID/storefront/UA đã
+    rà: đúng (store IN 143467 + hậu tố "34"/"13", GUID đã cài,
+    UA chung). Không thể kết luận bước nào trả 401/403 nếu không có
+    log máy thật — log `Purchased DMAP: <label> HTTP=<status>` đã có
+    sẵn trong LogManager (Cài đặt → Nhật ký).
+  - FIX (theo thứ tự ưu tiên, đều trong `PurchasedDMAPService` +
+    `PurchasedStore`, KHÔNG động đường tải):
+    (a) Gửi kèm cookie phiên đã đăng nhập trên mọi request DMAP
+    (`applyHeaders`: `account.cookie.buildCookieHeader(url)`, giống
+    hệt đường tải) — giữ nguyên X-Token.
+    (b) Gắn header Anisette khi đã cấu hình máy chủ
+    (`fetchPurchasedApps` lấy qua `anisetteHeadersForStoreCall()` rồi
+    chuyền vào `fetchStorefront` → `applyHeaders`; URL trống thì [:],
+    hành vi cũ; lấy không được thì dừng với lỗi đó như đường mua).
+    (c) Gặp 401/403 thì làm mới token lặng lẽ 1 lần rồi thử lại
+    (`PurchasedStore.fetchDMAPWithTokenRefresh`, dùng chung cho sync
+    thường + bước DMAP của đồng bộ toàn bộ): `rotatePasswordToken`
+    với header Anisette (cùng mẫu `acquireLicense` build 6, fork
+    541c43a — re-auth bằng email + mật khẩu + cookie đã lưu, ghi đè
+    token mới qua `withAccount`); làm mới thất bại vì lỗi Anisette
+    thì báo đúng lỗi đó; lỗi khác (kể cả Apple đòi mã 2FA) thì giữ
+    lỗi hết hạn gốc. Chỉ khi làm mới cũng thất bại mới coi là phiên
+    hết hạn thật và bắt đăng nhập lại.
+    (d) Lỗi ghi rõ bước + mã HTTP: `sessionExpired(step:status:)`,
+    màn hình hiện vd "Phiên đăng nhập đã hết hạn (bước login, HTTP
+    401). Hãy đăng nhập lại..." để lần sau chẩn đoán chính xác.
+    Bước Commerce không sửa (thất bại ở đó không chặn danh sách).
+  - Version: 2.0 build 14 (`CURRENT_PROJECT_VERSION` 13 → 14, chỉ
+    trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả
+    xcconfig và pbxproj).
+  - CI + IPA: remote `358bad18` (commit code `386526f`), CI "Build App"
+    run 45588810275 `success` cả build-ios + build-osx, không lỗi lần
+    nào. Artifact `NVDAppleIDDownload.ipa` (25.191.314 byte, chưa ký)
+    tải về qua redirect-capture, ký ad-hoc bằng zsign `-a -z 9`
+    (lưu ý: không có `-z` thì zsign xuất IPA không nén ~67 MB;
+    có `-z 9` thì ~25,7 MB như các bản trước). IPA
+    `deliver/NVDAppleIDDownload.ipa` (25.729.281 byte, SHA256
+    `daac44d5500deb742737c7a9cea95d89b905b1b2e1e26a87c904c9d6298b4d06`):
+    kiểm chứng 2.0 build 14, bundle `com.NVD.appleiddownload`, min
+    iOS 17.0, binary có chuỗi mới ("Phiên đăng nhập đã hết hạn" 2 hit,
+    "session expired, rotating token" 1 hit, ô tìm kiếm "Tìm tên app
+    hoặc Bundle ID"), symbol PurchasedView/SearchView/SignRootView/
+    WatchlistView, framework CydiaSubstrate đã embed, superblob hợp
+    lệ (magic 0xfade0cc0, slot 0+2); thứ tự tab không đổi so với
+    build 13 (diff bản này chỉ 2 file Swift + xcconfig, MainView
+    không động). Build 13 giữ lại ở
+    `deliver/NVDAppleIDDownload-2.0-build13-backup.ipa` (SHA256
+    `750ad4a3…` khớp bản đã giao). Chưa kiểm chứng trên iPhone thật —
+    cần anh test: mở tab Đã mua xem danh sách có hiện không (đừng
+    đăng nhập lại vội — app sẽ tự làm mới token rồi mới báo), bấm
+    "Đồng bộ lại" nếu cần; nếu vẫn báo hết hạn thì chụp lại câu lỗi
+    (giờ có ghi bước + mã HTTP) và xem Cài đặt → Nhật ký dòng
+    "Purchased DMAP: <bước> HTTP=<mã>".
