@@ -815,3 +815,20 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 13 (`CURRENT_PROJECT_VERSION` 12 → 13,
     chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
     ở cả xcconfig và pbxproj).
+  - CI + IPA: remote `58d017a1` (commit code `d803c9d`), CI "Build
+    App" run 45582242354 `success` cả build-ios + build-osx. IPA
+    `deliver/NVDAppleIDDownload.ipa` (25.361.767 byte, SHA256
+    `750ad4a3bf408c39771b9a953c1fbc17bd424a174265b06189baf205982c0b96`):
+    kiểm chứng 2.0 build 13, bundle `com.NVD.appleiddownload`,
+    min iOS 17.0, binary có chuỗi ô tìm kiếm mới ("Tìm tên app
+    hoặc Bundle ID"), ".staging" (5 hit), lỗi finalize tiếng Việt,
+    symbol PurchasedView/SearchView/SignRootView/WatchlistView,
+    `sayo_idev` (35 hit), framework CydiaSubstrate đã embed; thứ
+    tự tab mới kiểm chứng ở source cả 2 biến thể iOS (Ký IPA,
+    Tìm kiếm, Lượt tải, Tài khoản rồi Đã mua, Đang theo dõi,
+    Cài đặt). Build 12 giữ lại ở
+    `deliver/NVDAppleIDDownload-2.0-build12-backup.ipa`
+    (SHA256 `f18f0f58…` khớp bản đã giao). Chưa kiểm chứng trên
+    iPhone thật — cần anh test: gõ tên app ở tab Tìm kiếm, tải
+    Facebook lại, mở tab Đã mua xem còn văng không, xem thứ tự
+    tab + màn Cài đặt của tab Ký IPA đã mất card header chưa.
