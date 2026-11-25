@@ -15,6 +15,28 @@
 import Foundation
 
 enum AnisetteService {
+    /// Các máy chủ Anisette công cộng (Mac) cho đường store — cùng danh
+    /// sách preset với tab Ký IPA (`Anisette.presets` trong
+    /// SignAppleID.swift, giữ tên/URL giống hệt để 2 chỗ chọn giống
+    /// nhau). Định nghĩa lại ở đây thay vì dùng chung vì code tab Ký
+    /// chỉ biên dịch trên iOS (`#if os(iOS)`), còn đường store dùng
+    /// chung cả macOS.
+    static let storePresets: [(name: String, url: String)] = [
+        ("iloader", "https://ani.iloader.app"),
+        ("jkcoxson (Mac)", "https://mac-ani.jkcoxson.com"),
+        ("SideStore (new)", "https://new.ani.sidestore.io"),
+    ]
+
+    /// Máy chủ mặc định của đường store khi chưa có giá trị lưu: jkcoxson
+    /// (máy chủ anh đang dùng, đã kiểm chứng sống 25/11 — nút "Kiểm tra"
+    /// trả "Kết nối OK — 10 header", DMAP login HTTP=200). KHÔNG dùng
+    /// iloader (mặc định của tab Ký) cho đường store: iloader chỉ phục vụ
+    /// giao thức v3 provisioning của tab Ký; GET / trần của nó trả
+    /// HTTP 403 (đo bằng curl 25/11), trong khi đường store lấy header
+    /// bằng GET / JSON — fetch sẽ lỗi ngay. Tab Ký giữ nguyên mặc định
+    /// iloader của nó, không động.
+    static let defaultServerURL = "https://mac-ani.jkcoxson.com"
+
     enum AnisetteError: LocalizedError {
         case invalidURL
         case unreachable(String)

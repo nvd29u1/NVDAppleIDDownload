@@ -27,7 +27,13 @@ let logger = {
     return logger
 }()
 
-APLogger.verbose = false
+// Bật log request/response của fork ApplePackage (`>>> POST` +
+// `<<< status` — chỉ URL + TÊN header, giá trị header/mật khẩu/token
+// không bao giờ được log, xem `APLogger.safeHeaderValue`): cần cho
+// chẩn đoán lỗi đăng nhập (build 18) — trước đây tắt nên lần test sau
+// không có bằng chứng request nào. Log vào Cài đặt → Nhật ký qua
+// LogManager như mọi log khác.
+APLogger.verbose = true
 APLogger.logger = Logger(label: "com.NVD.appleiddownload.applepackage")
 
 let version = [

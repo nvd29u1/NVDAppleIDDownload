@@ -24,6 +24,22 @@ struct SettingView: View {
 
     @State private var isCheckingAnisette = false
     @State private var anisetteCheckResult: String?
+    @State private var anisetteCustomServer = false
+
+    /// Picker máy chủ Anisette ở Cài đặt chính — cùng mẫu với tab Ký
+    /// IPA (SignSettingsView.serverChoice): chọn preset thì ghi URL
+    /// của preset, chọn "Tùy chỉnh" thì hiện ô nhập URL riêng. Giá trị
+    /// đang lưu (hoặc mặc định jkcoxson khi chưa lưu gì) luôn khớp
+    /// đúng 1 preset hoặc "Tùy chỉnh" nên picker không bao giờ trống.
+    var anisetteServerChoice: Binding<String> {
+        Binding(get: {
+            if anisetteCustomServer { return "custom" }
+            return AnisetteService.storePresets.contains(where: { $0.url == vm.anisetteServerURL }) ? vm.anisetteServerURL : "custom"
+        }, set: { v in
+            anisetteCheckResult = nil
+            if v == "custom" { anisetteCustomServer = true } else { anisetteCustomServer = false; vm.anisetteServerURL = v }
+        })
+    }
 
     var body: some View {
         NavigationStack {
@@ -119,13 +135,19 @@ struct SettingView: View {
             }
 
             Section {
-                TextField("Ví dụ: http://192.168.1.10:6969", text: $vm.anisetteServerURL)
-                    .font(.system(.body, design: .monospaced))
-                    .autocorrectionDisabled()
-                    #if canImport(UIKit)
-                        .textInputAutocapitalization(.never)
-                        .keyboardType(.URL)
-                    #endif
+                Picker("Máy chủ", selection: anisetteServerChoice) {
+                    ForEach(AnisetteService.storePresets, id: \.url) { p in Text(p.name).tag(p.url) }
+                    Text("Tùy chỉnh").tag("custom")
+                }
+                if anisetteServerChoice.wrappedValue == "custom" {
+                    TextField("https://…", text: $vm.anisetteServerURL)
+                        .font(.system(.body, design: .monospaced))
+                        .autocorrectionDisabled()
+                        #if canImport(UIKit)
+                            .textInputAutocapitalization(.never)
+                            .keyboardType(.URL)
+                        #endif
+                }
                 Button("Kiểm tra") {
                     isCheckingAnisette = true
                     anisetteCheckResult = nil
@@ -135,7 +157,13 @@ struct SettingView: View {
                         isCheckingAnisette = false
                     }
                 }
-                .disabled(vm.anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || isCheckingAnisette)
+                .disabled(isCheckingAnisette)
+                Button("Khôi phục mặc định") {
+                    vm.anisetteServerURL = AnisetteService.defaultServerURL
+                    anisetteCustomServer = false
+                    anisetteCheckResult = nil
+                }
+                .disabled(vm.anisetteServerURL == AnisetteService.defaultServerURL)
                 if isCheckingAnisette {
                     Text("Đang kiểm tra máy chủ…")
                         .font(.footnote)
@@ -148,7 +176,7 @@ struct SettingView: View {
             } header: {
                 Text("Máy chủ Anisette")
             } footer: {
-                Text("Từ tháng 11/2026 Apple yêu cầu đăng nhập App Store phải kèm header xác minh thiết bị (Anisette). Điền địa chỉ máy chủ Anisette của riêng bạn (máy tính trong mạng nhà, ví dụ http://192.168.1.10:6969) — app sẽ lấy header từ máy chủ đó trước mỗi lần đăng nhập. Để trống là tắt, đăng nhập như trước. Chỉ có địa chỉ máy chủ được lưu ở đây; mật khẩu Apple ID KHÔNG BAO GIỜ được gửi tới máy chủ này — máy chủ chỉ trả về header, không nhận mật khẩu.")
+                Text("Từ tháng 11/2026 Apple yêu cầu đăng nhập App Store phải kèm header xác minh thiết bị (Anisette). Chọn 1 máy chủ trong danh sách (mặc định đã có sẵn, không cần gõ tay) hoặc chọn \"Tùy chỉnh\" để nhập địa chỉ máy chủ Anisette của riêng bạn (máy tính trong mạng nhà, ví dụ http://192.168.1.10:6969) — app sẽ lấy header từ máy chủ đó trước mỗi lần đăng nhập. Chỉ có địa chỉ máy chủ được lưu ở đây; mật khẩu Apple ID KHÔNG BAO GIỜ được gửi tới máy chủ này — máy chủ chỉ trả về header, không nhận mật khẩu.")
             }
 
             // Vùng tìm kiếm (đợt 2, build 7): độc lập với vùng tài khoản,

@@ -8,7 +8,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 NVDAppleIDDownload (nvd29u1, based on Asspp 4.2.2 by Lakr233, MIT) is a multi-account App Store management app (iOS + macOS) for searching, downloading, and installing IPA files. It uses an Xcode workspace (`Asspp.xcworkspace`) with SPM dependencies including [ApplePackage](https://github.com/Lakr233/ApplePackage), the core library for App Store API communication, IPA handling, and signature injection.
 
-Bundle ID: `com.NVD.appleiddownload` (upstream Asspp used `wiki.qaq.Asspp`). Deployment targets: iOS 17.0, macOS 15.0. Supports iPhone, iPad, and Mac (native, not Catalyst). No test targets exist.
+Bundle ID: `com.NVD.appleiddownload` (upstream Asspp used `wiki.qaq.Asspp`). Deployment targets: iOS 16.0 (từ build 17), macOS 15.0. Supports iPhone, iPad, and Mac (native, not Catalyst). No test targets exist.
 
 ## Build Commands
 
@@ -1220,3 +1220,145 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     đặt chính hiện "Hỗ trợ iOS 16.0 – 27.2" kèm tích xanh; (3) cài bản
     17 vào LiveContainer, mở tab Ký IPA xem banner cam có hiện và các
     nút nhập/cài có mờ đi không.
+
+- **Chờ làm ở bản sau (anh chốt 20:26 25/11) — ĐÃ LÀM ở build 18:**
+  README.md dòng 145 "iOS 17.0 or later" → "iOS 16.0 or later" cho
+  khớp min iOS của bản 17. Gộp vào bản 18 (không sửa riêng).
+- **Chờ làm ở bản sau (anh báo 20:27 25/11, dặn 20:28: lúc nào anh tổng
+  hợp các lỗi xong mới làm tiếp) — ĐÃ LÀM ở build 18 (cùng bản soi
+  đăng nhập anh chốt 20:35):** banner "Đang chạy trong LiveContainer"
+  hiện CẢ KHI cài qua SideStore. Kết luận soi: tiêu chí bản 17 (chỉ
+  khác bundle ID) KHÔNG đủ để kết luận guest — bundle ID của IPA đã
+  giao đã kiểm chứng là đúng com.NVD.appleiddownload, nên SideStore
+  vẫn có thể bị nhận nhầm qua 1 tín hiệu duy nhất này. Sửa: isGuest
+  chỉ true khi CẢ HAI đúng (Bundle.main khác app VÀ processName ==
+  "LiveContainer"); lần test sau log chẩn đoán ghi rõ
+  bundleIdentifier + processName thật để đối chiếu. Xem notes build 18.
+- **Lỗi đăng nhập (cập nhật 20:32 25/11) — ĐÃ SOI SÂU ở build 18
+  (anh chốt "soi sâu đường đăng nhập ngay" 20:35 25/11):** kết luận +
+  sửa xem notes build 18. Tóm tắt: đường authenticate trong fork
+  KHÔNG đổi từ bản 5 (đã chạy được 24/11) → nguyên nhân chính là
+  Apple-side; điểm khác cụ thể duy nhất có bằng chứng với iPadn là
+  endpoint thiếu dấu "/" cuối (iPadn ghi bare path "can return an
+  unusable response") nên bản 18 đổi sang dạng có "/" + bật log
+  `>>> POST` để lần test sau có bằng chứng request.
+
+## Đợt 5 build 18 — soi sâu đường đăng nhập + picker preset Anisette ở Cài đặt chính + sửa banner LiveContainer + README iOS 16.0
+  (Anh chốt "soi sâu đường đăng nhập ngay" 20:35 25/11; bổ sung 20:36
+  "máy chủ Anisette tự động thêm" + làm rõ 20:38 "giống bên kí ipa";
+  README + banner là 2 mục chờ từ 20:26–20:27. Chưa kiểm chứng trên
+  iPhone thật.)
+
+  ### 1. Kết luận điều tra đăng nhập (soi sâu, chỉ đọc + đối chiếu)
+  - Đường authenticate trong fork KHÔNG ĐỔI từ bản 5 (bản đăng nhập
+    CHẠY ĐƯỢC 24/11, tải Telegram 22:41): tự kiểm chứng bằng GitHub
+    API compare pin bản 5 `9dc423a` → pin hiện tại `541c43a`: chỉ 2
+    file đổi (Authenticate.swift +11/-2, Purchase.swift +23/-2); patch
+    Authenticate.swift chỉ thêm tham số tuỳ chọn `anisetteHeaders` cho
+    `rotatePasswordToken` + comment — `init` / `authenticate` /
+    `makeRequest` / `parseResponse` / `createInitialRequestEndpoint` /
+    Bag / SAP giống hệt. → Lỗi không do code app đổi; nguyên nhân
+    chính là Apple-side (gateway/protocol đổi — khớp Special Notice
+    trong README: Apple từng siết gateway/kiểm tra request).
+  - Đối chiếu với iPadn v2.3.5 (clone mới `~/workspace/ipadn-fresh/`,
+    commit c7be403; ApplePackage fork clone `~/workspace/applepackage-fork/`
+    pin 541c43a — chỉ đọc, KHÔNG copy code iPadn GPL-2.0):
+    (a) iPadn chuẩn hoá endpoint thành `.../wa/authenticate/` (dấu "/"
+    cuối) với comment "Apple's bare authenticate path on buy pods can
+    return an unusable response" — fork dùng bare path. Đây là điểm
+    khác DUY NHẤT có bằng chứng liên quan trực tiếp tới triệu chứng
+    (204/trống/redirect không địa chỉ) → sửa ở bản này.
+    (b) `attempt`: iPadn "1" (chưa có mã) / "2" (có mã), fork "4"/"2" —
+    KHÔNG đổi (đã chạy được 24/11 với "4", không có bằng chứng "4" bị
+    từ chối).
+    (c) User-Agent: iPadn Configurator/2.21, fork 2.17 — KHÔNG đổi (1
+    biến 1 lúc; không có bằng chứng Apple chặn 2.17).
+    (d) `X-Apple-Store-Front` ở đăng nhập: iPadn chỉ gửi khi Apple ID
+    là SỐ ĐIỆN THOẠI (Trung Quốc 143465 / Ấn Độ 143467) — cả 2 tài
+    khoản test đều là gmail nên iPadn cũng không gửi → không khác.
+    (e) iPadn retry 1 lần khi 200-body-lỗi hoặc 204; app retry 3 lần
+    với Authenticator mới — app retry NHIỀU hơn, không phải thiếu.
+    (f) iPadn KHÔNG gắn AMD/store-proof header ở bước authenticate
+    (needsStoreProof=false) — giống fork. Bag: cả hai đều GET
+    `init.itunes.apple.com/bag.xml?guid=`; endpoint trong log máy thật
+    đã đúng `buy.itunes.apple.com/.../wa/authenticate`.
+  - Dòng log `>>> POST`: fork CÓ (`APLogger.logRequest` trong
+    `makeRequest`, `logResponse` trong `parseResponse`; chỉ log URL +
+    TÊN header — giá trị header/mật khẩu/token được redact bởi
+    `safeHeaderValue`, body không log, query GUID bị strip bởi
+    `safeURL`) nhưng app tắt (`APLogger.verbose = false` ở
+    main.swift:30) nên log máy thật không có dòng này. Bản này bật
+    lên (`verbose = true`) để lần test sau có bằng chứng request.
+  - SỬA (fork nvd29u1/ApplePackage, commit `78eb66f7`, từ pin
+    `541c43a`): `createInitialRequestEndpoint` chuẩn hoá path có dấu
+    "/" cuối trước khi gắn `?guid=` (chỉ đúng chỗ này; redirect vẫn
+    theo Location của Apple như cũ). App nâng SPM pin
+    (Package.resolved) lên `78eb66f7`. Commit fork bằng GitHub API
+    (Git Data API: blob → tree → commit → ref) vì clone bằng chứng
+    không được chạy git bên trong.
+  - Nếu sau bản này đăng nhập vẫn lỗi: chụp Cài đặt → Nhật ký quanh
+    dòng `>>> POST` + `<<<` (giờ đã có) để đối chiếu request thật với
+    iPadn; các lựa chọn còn lại vẫn là chờ Apple / thử lại sau /
+    ipatool 2.8.1 trên PC. KHÔNG tự đổi máy chủ Anisette khác, KHÔNG
+    làm Anisette on-device.
+
+  ### 2. Picker preset máy chủ Anisette ở Cài đặt chính (anh dặn
+  20:36 + làm rõ 20:38 "giống bên kí ipa")
+  - Thay ô TextField trần (SettingView) bằng Picker GIỐNG tab Ký
+    (SignSettingsView.serverChoice): 3 preset
+    iloader / jkcoxson (Mac) / SideStore (new) + "Tùy chỉnh" (hiện ô
+    nhập URL riêng), nút "Kiểm tra" + nút "Khôi phục mặc định". Danh
+    sách preset định nghĩa lại ở `AnisetteService.storePresets` (cùng
+    tên/URL với `Anisette.presets` của tab Ký) vì code tab Ký chỉ biên
+    dịch trên iOS, còn đường store dùng chung cả macOS.
+  - BẮT BUỘC giữ đúng máy chủ anh đang dùng: giá trị đã lưu
+    `https://mac-ani.jkcoxson.com` khớp đúng preset jkcoxson nên
+    picker hiển thị đúng "jkcoxson (Mac)" đang chọn, không đổi ngầm.
+    Cài mới (chưa lưu gì) mặc định jkcoxson (`AnisetteService.
+    defaultServerURL`): KHÔNG lấy iloader như tab Ký — đo bằng curl
+    25/11: GET / trần của iloader trả HTTP 403 (nó chỉ phục vụ giao
+    thức v3 provisioning của tab Ký), trong khi đường store lấy header
+    bằng GET / JSON; jkcoxson trả HTTP 200 + header JSON (đã kiểm
+    chứng trên máy thật: "Kết nối OK — 10 header", DMAP login 200).
+    Tab Ký giữ nguyên mặc định iloader của nó.
+  - Cơ chế: `AppStore.anisetteServerURL` (getter) trả giá trị đã lưu
+    nếu có, không thì trả mặc định jkcoxson — nên picker không bao giờ
+    trống và đường store luôn có máy chủ. Không còn "để trống là tắt":
+    từ 11/2026 Apple chặn đăng nhập thiếu header Anisette (xoá URL
+    rồi đăng nhập vẫn lỗi 204, đã chứng minh 20:32 25/11) nên tắt chỉ
+    cho ra lỗi khó hiểu. Footer mục đã viết lại cho đúng. Không đổi
+    logic fetch header, không gửi mật khẩu Apple ID đi đâu (chỉ URL
+    máy chủ được lưu). Các case lỗi *NoServer ở ProductView (build 15)
+    giờ không còn chạm tới được (máy luôn được cấu hình mặc định) —
+    giữ lại làm dự phòng, không xoá.
+  - Chuỗi mới dùng literal tiếng Việt (như build 7–9): runtime hiển
+    thị đúng, chưa thêm vào Localizable.xcstrings (cần cập nhật ở
+    Xcode sau).
+
+  ### 3. Banner LiveContainer báo sai trên SideStore
+  - Sửa `LiveContainerGuest.isGuest`: chỉ true khi CẢ HAI đúng —
+    Bundle.main khác `com.NVD.appleiddownload` VÀ processName ==
+    "LiveContainer". Một mình khác bundle ID không kết luận được
+    (bản 17 báo sai trên SideStore dù bundle ID IPA đã giao đã kiểm
+    chứng là đúng). Cài trực tiếp thì processName là tên executable
+    của app ("NVDAppleIDDownload") nên banner tắt.
+  - Thêm log chẩn đoán 1 lần khi mở tab Ký IPA
+    (`logDetectionOnce`, ghi bundleIdentifier + processName +
+    isGuest vào Nhật ký) để lần test sau đối chiếu được banner
+    hiện/ẩn là đúng hay sai. Banner + 5 chỗ .disabled không đổi.
+
+  ### 4. Khác
+  - README.md:145 "iOS 17.0 or later" → "iOS 16.0 or later" (mục chờ
+    từ 20:26). Sửa luôn dòng "Deployment targets: iOS 17.0" ở đầu
+    AGENTS.md (lỗi thời từ build 17) → iOS 16.0.
+  - Version: 2.0 build 18 (`CURRENT_PROJECT_VERSION` 17 → 18, chỉ
+    trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0).
+  - CI + IPA: (điền sau khi push — remote head + run "Build App" +
+    size/SHA256 + kết quả kiểm chứng).
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) đăng nhập lại
+    bằng tài khoản phụ (kumit.95bt@gmail.com) xem còn lỗi 204 không;
+    nếu vẫn lỗi thì chụp Nhật ký quanh dòng `>>> POST` + `<<<` để soi
+    tiếp; (2) Cài đặt → Máy chủ Anisette hiện picker đang chọn
+    "jkcoxson (Mac)", bấm "Kiểm tra" phải báo OK 10 header; (3) cài
+    qua SideStore, mở tab Ký IPA xem banner LiveContainer đã hết chưa;
+    cài vào LiveContainer xem banner có hiện đúng không.

@@ -78,6 +78,10 @@ struct SignRootView: View {
             if p == .active { Task { await state.scanInbox() } }
         }
         .task {
+            // Build 18: ghi 1 lần các giá trị phát hiện guest thật
+            // (bundleIdentifier + processName) để lần test sau đối chiếu
+            // được banner hiện/ẩn là đúng hay sai.
+            LiveContainerGuest.logDetectionOnce()
             if Diagnostics.enabled { await Diagnostics.run(state) }
             await state.scanInbox()
             if state.certificates.contains(where: { $0.ocspChecked == nil || $0.ocspChecked! < Date().addingTimeInterval(-3600) }) {

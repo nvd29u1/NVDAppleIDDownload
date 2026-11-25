@@ -75,12 +75,21 @@ class AppStore: ObservableObject {
         }
     }
 
-    /// URL of the user's own Anisette server (e.g. http://192.168.1.10:6969)
+    /// URL of the Anisette server (e.g. http://192.168.1.10:6969)
     /// that serves device-verification (Anisette/ADI) headers as JSON.
-    /// Empty = off: sign-in works exactly as before. When set, the app
-    /// fetches the headers from this server before signing in and attaches
-    /// them to the Apple sign-in requests. Only the server URL is stored
-    /// here — no Apple ID or password is ever sent to this server.
+    /// The app fetches the headers from this server before signing in
+    /// and attaches them to the Apple sign-in requests. Only the server
+    /// URL is stored here — no Apple ID or password is ever sent to
+    /// this server.
+    /// Build 18: no stored value means "use the default server"
+    /// (`AnisetteService.defaultServerURL`, jkcoxson — the server the
+    /// user already uses, verified live), so the store path always has
+    /// a server and the user never has to type one by hand. There is no
+    /// "off" anymore: since Nov 2026 Apple gates sign-in on Anisette
+    /// headers, signing in header-less fails with an empty 204 (proven
+    /// on the real device 20:32 25/11 when the URL was deleted) — the
+    /// old "empty = off" behaviour only produced a cryptic failure.
+    /// The picker in Settings shows this effective value, never blank.
     private var _anisetteServerURL = Persist<String>(
         key: "AnisetteServerURL",
         defaultValue: "",
@@ -88,7 +97,8 @@ class AppStore: ObservableObject {
 
     var anisetteServerURL: String {
         get {
-            return _anisetteServerURL.wrappedValue
+            let stored = _anisetteServerURL.wrappedValue.trimmingCharacters(in: .whitespacesAndNewlines)
+            return stored.isEmpty ? AnisetteService.defaultServerURL : stored
         }
         set {
             objectWillChange.send()

@@ -142,7 +142,7 @@ Fork this repository to automatically build and sign the app with your own devel
 
 ## 🛠 Requirements
 
-- **iOS**: iOS 17.0 or later.
+- **iOS**: iOS 16.0 or later.
 - **macOS**: macOS 15.0 or later.
 - **Apple ID**: Required to communicate with App Store APIs.
 
