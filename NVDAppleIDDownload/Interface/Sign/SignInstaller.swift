@@ -135,7 +135,7 @@ enum LocalCA {
                                     "PayloadIdentifier": "com.NVD.appleiddownload.sign.localca.cert",
                                     "PayloadUUID": UUID().uuidString,
                                     "PayloadDisplayName": "NVDAppleIDDownload Local CA",
-                                    "PayloadDescription": "Lets NVDAppleIDDownload install apps from this iPhone. The private key never leaves the device.",
+                                    "PayloadDescription": String(localized: "Lets NVDAppleIDDownload install apps from this iPhone. The private key never leaves the device."),
                                     "PayloadCertificateFileName": "NVDAppleIDDownloadLocalCA.cer",
                                     "PayloadContent": ca]
         let outer: [String: Any] = ["PayloadType": "Configuration",
@@ -144,7 +144,7 @@ enum LocalCA {
                                     "PayloadUUID": UUID().uuidString,
                                     "PayloadDisplayName": "NVDAppleIDDownload Local Installer",
                                     "PayloadOrganization": "NVDAppleIDDownload",
-                                    "PayloadDescription": "Trust for the on-device install server of NVDAppleIDDownload.",
+                                    "PayloadDescription": String(localized: "Trust for the on-device install server of NVDAppleIDDownload."),
                                     "PayloadRemovalDisallowed": false,
                                     "PayloadContent": [inner]]
         return try? PropertyListSerialization.data(fromPropertyList: outer, format: .xml, options: 0)
@@ -416,7 +416,7 @@ final class InstallServer {
         let content: [String: Any] = ["URL": "\(base)/udid/receive", "DeviceAttributes": ["UDID", "PRODUCT"]]
         let p: [String: Any] = ["PayloadContent": content, "PayloadOrganization": "NVDAppleIDDownload",
                                 "PayloadDisplayName": "NVDAppleIDDownload UDID",
-                                "PayloadDescription": "Sends this iPhone's UDID to the NVDAppleIDDownload app on this iPhone. Nothing is installed.",
+                                "PayloadDescription": String(localized: "Sends this iPhone's UDID to the NVDAppleIDDownload app on this iPhone. Nothing is installed."),
                                 "PayloadIdentifier": "com.NVD.appleiddownload.sign.udid", "PayloadUUID": UUID().uuidString,
                                 "PayloadType": "Profile Service", "PayloadVersion": 1]
         return (try? PropertyListSerialization.data(fromPropertyList: p, format: .xml, options: 0)) ?? Data()

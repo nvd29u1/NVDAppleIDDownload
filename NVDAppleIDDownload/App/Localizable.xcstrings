@@ -10313,6 +10313,294 @@
           }
         }
       }
+    },
+    "Signing failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ký thất bại"
+          }
+        }
+      }
+    },
+    "Unknown error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unknown error"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lỗi không xác định"
+          }
+        }
+      }
+    },
+    "Unzip failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unzip failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giải nén thất bại"
+          }
+        }
+      }
+    },
+    "Zip failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Zip failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nén file thất bại"
+          }
+        }
+      }
+    },
+    "Decryption failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Decryption failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giải mã thất bại"
+          }
+        }
+      }
+    },
+    "Cannot extract .deb": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot extract .deb"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không giải nén được file .deb"
+          }
+        }
+      }
+    },
+    "Token decryption failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Token decryption failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giải mã token thất bại"
+          }
+        }
+      }
+    },
+    "SRP failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "SRP failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xác thực SRP thất bại"
+          }
+        }
+      }
+    },
+    "File not found": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File not found"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy file"
+          }
+        }
+      }
+    },
+    "Not Available": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not Available"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có sẵn"
+          }
+        }
+      }
+    },
+    "Examining contents...": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Examining contents..."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang xem nội dung…"
+          }
+        }
+      }
+    },
+    "Extracted File": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extracted File"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File đã trích xuất"
+          }
+        }
+      }
+    },
+    "Client info": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client info"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thông tin client"
+          }
+        }
+      }
+    },
+    "Paused at %lld%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paused at %lld%"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã tạm dừng ở %lld%"
+          }
+        }
+      }
+    },
+    "Downloading App Store packages": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloading App Store packages"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tải gói App Store"
+          }
+        }
+      }
+    },
+    "Lets NVDAppleIDDownload install apps from this iPhone. The private key never leaves the device.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lets NVDAppleIDDownload install apps from this iPhone. The private key never leaves the device."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cho phép NVDAppleIDDownload cài đặt app từ iPhone này. Khoá riêng không bao giờ rời khỏi máy."
+          }
+        }
+      }
+    },
+    "Sends this iPhone's UDID to the NVDAppleIDDownload app on this iPhone. Nothing is installed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sends this iPhone's UDID to the NVDAppleIDDownload app on this iPhone. Nothing is installed."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gửi UDID của iPhone này cho app NVDAppleIDDownload trên chính iPhone này. Không cài đặt gì cả."
+          }
+        }
+      }
+    },
+    "Trust for the on-device install server of NVDAppleIDDownload.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trust for the on-device install server of NVDAppleIDDownload."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tin cậy máy chủ cài đặt trên thiết bị của NVDAppleIDDownload."
+          }
+        }
+      }
     }
   },
   "version": "1.1"

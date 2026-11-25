@@ -102,7 +102,7 @@ struct FileAnalysisView: View {
                 }
                 .transition(.opacity)
             } else {
-                Text(message.isEmpty ? "Not Available" : message)
+                Text(message.isEmpty ? String(localized: "Not Available") : message)
                     .foregroundStyle(.secondary)
                     .transition(.opacity)
             }
@@ -111,7 +111,7 @@ struct FileAnalysisView: View {
         .animation(.spring, value: relativePath)
         .animation(.spring, value: extractedFile)
         .onAppear {
-            message = "Examining contents..."
+            message = String(localized: "Examining contents...")
             Task {
                 do { try await loadContents() }
                 catch {
@@ -131,7 +131,7 @@ struct FileAnalysisView: View {
         guard let file = archive[relativePath] else {
             assertionFailure()
             throw NSError(domain: "FileAnalysisView", code: 0, userInfo: [
-                NSLocalizedDescriptionKey: "File not found",
+                NSLocalizedDescriptionKey: String(localized: "File not found"),
             ])
         }
         let destination = tempDir.appendingPathComponent(relativePath)
@@ -152,7 +152,7 @@ struct FileAnalysisView: View {
             previewText = text
         }
         await MainActor.run {
-            message = "Extracted File"
+            message = String(localized: "Extracted File")
             extractedFile = destination
             thumbnail = previewImage
             textPreview = previewText

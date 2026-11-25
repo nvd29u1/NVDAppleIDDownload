@@ -84,12 +84,19 @@ class AppStore: ObservableObject {
     /// Build 18: no stored value means "use the default server"
     /// (`AnisetteService.defaultServerURL`, jkcoxson — the server the
     /// user already uses, verified live), so the store path always has
-    /// a server and the user never has to type one by hand. There is no
-    /// "off" anymore: since Nov 2026 Apple gates sign-in on Anisette
-    /// headers, signing in header-less fails with an empty 204 (proven
-    /// on the real device 20:32 25/11 when the URL was deleted) — the
-    /// old "empty = off" behaviour only produced a cryptic failure.
-    /// The picker in Settings shows this effective value, never blank.
+    /// a server and the user never has to type one by hand. The default
+    /// applies to STORE calls (rotate / DMAP / purchase), which keep
+    /// using Anisette headers. Sign-in does NOT use this server at all
+    /// since build 19 (iPadn proves Apple accepts header-less sign-in;
+    /// see AuthenticationService). ĐÍNH CHÍNH 25/11: ghi chú cũ ở đây
+    /// từng khẳng định "đăng nhập thiếu header thì 204, đã chứng minh
+    /// 20:32 25/11 khi xoá URL" — kết luận đó SAI: test 20:32 vẫn dùng
+    /// attempt "4" + UA Configurator/2.17, nên nó không chứng minh được
+    /// gì về header; bằng chứng mới (iPadn đăng nhập ngon không header
+    /// lúc 22:30 25/11 + bản 5 của app đăng nhập được lúc 24/11 khi
+    /// chưa cấu hình máy chủ) cho thấy header KHÔNG phải thứ bắt buộc
+    /// ở đăng nhập. The picker in Settings shows this effective value,
+    /// never blank.
     private var _anisetteServerURL = Persist<String>(
         key: "AnisetteServerURL",
         defaultValue: "",

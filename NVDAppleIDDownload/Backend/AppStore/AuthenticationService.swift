@@ -26,13 +26,7 @@ extension AppStore {
     /// Apple sometimes answers the MZFinance authenticate endpoint with an
     /// empty response (HTTP 204, occasionally 403/404/5xx) before judging the
     /// credentials at all — the request is dropped by Apple's edge, so it is
-    /// not a wrong-password or 2FA verdict. Since Nov 2026 Apple also gates
-    /// App Store sign-in on device verification (Anisette/ADI provisioning),
-    /// which ApplePackage 2.0.3 does not perform, so a 204 can be systematic
-    /// rather than flaky. There is no newer ApplePackage that fixes this and
-    /// upstream Asspp is archived, so the app retries a few times with a fresh
-    /// SAP session (fresh bag + fresh handshake) and otherwise explains the
-    /// failure plainly instead of showing a bare "HTTP 204".
+    /// not a wrong-password or 2FA verdict.
     ///
     /// Same family, second shape (24 Nov 2026): Apple answers with a redirect
     /// status (301/302/303/307/308) but no usable `Location` header, so
@@ -46,14 +40,20 @@ extension AppStore {
     /// URL (see ipatool #513); when the edge drops the client it answers
     /// with an empty 204 or a destination-less redirect instead.
     ///
-    /// Anisette (24 Nov 2026): when the user has set an Anisette server URL
-    /// in Settings, the app fetches fresh Anisette/ADI headers from that
-    /// server first and attaches them to the authenticator
-    /// (`Authenticator.anisetteHeaders`, fork nvd29u1/ApplePackage), so
-    /// every sign-in and 2FA request carries them. If the server cannot be
-    /// reached, sign-in stops here with a plain Vietnamese explanation —
-    /// signing in without the headers just reproduces the 204/404 above.
-    /// With the URL empty, the flow is unchanged.
+    /// Sign-in shape (build 19, corrected 25/11): sign-in sends NO
+    /// Anisette headers. Proof: iPadn v2.3.5 logs in fine on the same
+    /// device/account/network at 22:30 25/11 (even as a LiveContainer
+    /// guest) with only Content-Type + X-Apple-ActionSignature on the
+    /// authenticate request (AppleService.performLogin +
+    /// AppleLoginResponse.body + HTTPClient.userAgent, read 25/11), and
+    /// our own build 5 logged in fine on 24/11 when no Anisette server
+    /// was configured. The 20:32 25/11 "header-less still 204" test does
+    /// NOT refute this: that request still carried attempt "4" + UA
+    /// Configurator/2.17. Build 19 aligns the whole sign-in request with
+    /// iPadn's proven shape: attempt "1" (fork makeRequest), UA
+    /// Configurator/2.21 (below), no Anisette headers. Anisette headers
+    /// are still used by store calls (rotate / DMAP / purchase) via
+    /// `anisetteHeadersForStoreCall()`, which keep working as before.
     enum AuthenticationGateError: LocalizedError {
         case appleEmptyResponse
         case appleRedirectRefused
@@ -68,26 +68,24 @@ extension AppStore {
         }
     }
 
+    /// User-Agent iPadn v2.3.5 dùng cho request đăng nhập
+    /// (`HTTPClient.userAgent`, đọc từ source 25/11) — Configurator/2.21
+    /// kèm hậu tố AppleWebKit. Bản 19 gắn UA này cho request đăng nhập
+    /// (qua fork `Authenticator.requestUserAgent`); UA tĩnh của fork
+    /// (Configurator/2.17) vẫn dùng cho các lệnh store khác.
+    private static let ipadnSignInUserAgent = "Configurator/2.21 (Macintosh; OS X 15.2; 24C5089c) AppleWebKit/0620.1.16.11.6"
+
     @MainActor
     func authenticate(email: String, password: String, code: String, using session: ApplePackage.Authenticator) async throws -> UserAccount {
         logger.info("starting authentication for user")
         var currentSession = session
         var lastError: Error?
-        // Anisette: when a server URL is set, fetch fresh headers first and
-        // attach them to the session (and to every fresh retry session).
-        // A failed fetch stops sign-in here with a plain explanation.
-        let anisetteHeaders: [String: String]
-        if !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
-            guard let serverURL = AnisetteService.normalizedServerURL(anisetteServerURL) else {
-                throw AnisetteService.AnisetteError.invalidURL
-            }
-            logger.info("fetching Anisette headers from user server")
-            anisetteHeaders = try await AnisetteService.fetchHeaders(from: serverURL)
-            logger.info("fetched \(anisetteHeaders.count) Anisette headers")
-            await currentSession.setAnisetteHeaders(anisetteHeaders)
-        } else {
-            anisetteHeaders = [:]
-        }
+        // Build 19: đăng nhập KHÔNG gắn header Anisette (xem ghi chú ở
+        // AuthenticationGateError: iPadn đăng nhập ngon không cần header,
+        // và bản 5 của app cũng vậy lúc 24/11). Chỉ gắn UA iPadn cho
+        // session này (và mọi session retry mới tạo sau) để request khớp
+        // hình dạng đã chứng minh được Apple chấp nhận.
+        await currentSession.setRequestUserAgent(Self.ipadnSignInUserAgent)
         // Up to 3 attempts: the first with the session the UI created (so a
         // 2FA code flow keeps its authenticator), retries with a fresh
         // Authenticator (fresh bag endpoint + fresh SAP handshake).
@@ -113,9 +111,9 @@ extension AppStore {
                 try? await Task.sleep(nanoseconds: 2_000_000_000)
                 do {
                     currentSession = try await ApplePackage.Authenticator()
-                    // A fresh session loses the headers — attach them again
-                    // so retries sign in with Anisette headers too.
-                    await currentSession.setAnisetteHeaders(anisetteHeaders)
+                    // Session mới mất UA iPadn — gắn lại (đăng nhập vẫn
+                    // không dùng header Anisette, xem ghi chú đầu hàm).
+                    await currentSession.setRequestUserAgent(Self.ipadnSignInUserAgent)
                 } catch {
                     // A fresh session could not even be created (bag/SAP
                     // handshake failed); keep the original error.
@@ -154,12 +152,12 @@ extension AppStore {
         return message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded")
     }
 
-    /// Anisette headers cho một lệnh store (mua license / rotate token).
-    /// Cùng chính sách như đăng nhập: nếu đã đặt URL máy chủ Anisette thì
-    /// lấy header mới trước; lấy không được thì dừng lại với giải thích
-    /// tiếng Việt thay vì gọi Apple thiếu header (Apple sẽ từ chối ngay
-    /// bằng 204 / redirect không địa chỉ). URL trống nghĩa là không dùng
-    /// header — hành vi cũ giữ nguyên.
+    /// Anisette headers cho một lệnh store (mua license / rotate token /
+    /// DMAP). Nếu đã đặt URL máy chủ Anisette thì lấy header mới trước;
+    /// lấy không được thì dừng lại với giải thích tiếng Việt thay vì gọi
+    /// Apple thiếu header. URL trống nghĩa là không dùng header — hành vi
+    /// cũ giữ nguyên. (Đăng nhập thì KHÔNG dùng hàm này nữa, xem ghi chú
+    /// ở AuthenticationGateError.)
     @MainActor
     func anisetteHeadersForStoreCall() async throws -> [String: String] {
         guard !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty else { return [:] }
@@ -182,7 +180,8 @@ extension AppStore {
         }
         do {
             // Token rotation signs in again, so it needs the Anisette
-            // headers too when a server URL is set.
+            // headers too when a server URL is set (giữ nguyên như bản
+            // 18 — đường này đang chạy được: DMAP đồng bộ 368 app).
             var anisetteHeaders: [String: String] = [:]
             if !anisetteServerURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty {
                 guard let serverURL = AnisetteService.normalizedServerURL(anisetteServerURL) else {

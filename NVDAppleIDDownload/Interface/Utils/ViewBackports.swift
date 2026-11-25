@@ -83,16 +83,23 @@ extension View {
 /// Empty-state view tương thích iOS 16 (bản 17): trên iOS 17+ /
 /// macOS 14+ dùng ContentUnavailableView của hệ thống, dưới đó vẽ lại
 /// bằng VStack (icon lớn + tiêu đề + mô tả + nút hành động).
+///
+/// Bản 19: title/description là LocalizedStringKey, KHÔNG phải String —
+/// String thường truyền vào Text/Label sẽ hiện nguyên văn (không qua
+/// catalog dịch), đó là lý do màn Lượt tải / Tài khoản trống hiện "No
+/// Downloads" / "No Accounts" tiếng Anh dù Localizable.xcstrings đã có
+/// bản dịch Việt ("Chưa có lượt tải" / "Chưa có tài khoản"). Literal ở
+/// chỗ gọi tự đổi thành LocalizedStringKey nên bản dịch được dùng.
 struct NVDContentUnavailableView<Actions: View>: View {
-    let title: String
+    let title: LocalizedStringKey
     let systemImage: String
-    let description: String?
+    let description: LocalizedStringKey?
     @ViewBuilder let actions: () -> Actions
 
     init(
-        _ title: String,
+        _ title: LocalizedStringKey,
         systemImage: String,
-        description: String? = nil,
+        description: LocalizedStringKey? = nil,
         @ViewBuilder actions: @escaping () -> Actions = { EmptyView() }
     ) {
         self.title = title

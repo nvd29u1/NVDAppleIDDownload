@@ -95,7 +95,7 @@ struct FileListView: View {
             .onAppear {
                 Task {
                     await MainActor.run {
-                        message = "Examining contents..."
+                        message = String(localized: "Examining contents...")
                     }
                     do { try await loadContents() }
                     catch {

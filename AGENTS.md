@@ -1395,3 +1395,166 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     "jkcoxson (Mac)", bấm "Kiểm tra" phải báo OK 10 header; (3) cài
     qua SideStore, mở tab Ký IPA xem banner LiveContainer đã hết chưa;
     cài vào LiveContainer xem banner có hiện đúng không.
+
+## Đợt 5 build 19 — UA khớp client info Anisette cho đăng nhập + Việt hoá chuỗi sót + dọn README (BẢN CUỐI dãy 2.0)
+  (Anh test bản 18 trên máy thật 22:10–22:15 25/11, 5 ảnh; chốt dọn
+  README 22:21; báo banner đã hết 22:22. Sau build 19 sang 2.1.)
+
+  ### 0. Kết quả test bản 18 trên máy thật
+  - Picker Anisette bản 18 HOẠT ĐỘNG: Cài đặt hiện đúng "Máy chủ:
+    jkcoxson (Mac)" + "Kiểm tra" + "Khôi phục mặc định". Không động
+    vào phần này nữa.
+  - Đăng nhập VẪN LỖI: log Nhật ký 15:10:40Z (đã bật verbose ở bản
+    18): bag resolve `.../wa/authenticate` (không "/"), `>>> POST`
+    cùng URL (không "/"), UA Configurator/2.17, đủ header Anisette
+    X-Apple-I-* (giá trị redact), `<<< 301 (162 bytes)` text/html,
+    KHÔNG có header Location nào → "failed to retrieve redirect
+    location".
+  - **Banner LiveContainer ĐÃ HẾT trên SideStore (anh báo 22:22
+    25/11)** — fix bản 18 (isGuest chỉ true khi cả bundle khác app VÀ
+    processName == "LiveContainer") đã kiểm chứng đúng trên máy thật.
+    Không động vào code banner nữa.
+
+  ### 1. Kết luận điều tra đăng nhập lần 2 — ĐÍNH CHÍNH kết luận bản 18
+  - Fix trailing-slash của bản 18 (fork 78eb66f7) CÓ tới được request
+    authenticate thật — kết luận "đặt sai vị trí" ở báo cáo bản 18 là
+    SAI về cơ chế. Bằng chứng: (a) GitHub API xác nhận fork 78eb66f7
+    chỉ đổi Authenticate.swift (+7/-0) trên nền 541c43a, và Bag.swift
+    ở pin đó ĐÃ có `normalizedAuthEndpoint` (thêm "/" cho legacy
+    host); file local clone khớp byte với remote. (b) Fetch bag thật
+    (`init.itunes.apple.com/bag.xml?guid=...`, HTTP 200) cho
+    `authenticateAccount` đúng
+    `https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/authenticate`
+    — khớp exact điều kiện của normalizedAuthEndpoint. (c) Hai lớp
+    chuẩn hoá (Bag.parse + createInitialRequestEndpoint) đều thêm "/".
+    → URL request thật đã có "/" cuối.
+  - Log hiện không có "/" chỉ vì `APLogger.safeURL` dựng lại URL từ
+    `scheme://host + URL.path`, mà `URL.path` lược dấu "/" cuối —
+    chứng minh bằng swift trên máy (`URL.path` của
+    `.../authenticate/?guid=...` ra `.../authenticate`). Bản 19 sửa
+    safeURL: cắt query/fragment khỏi chuỗi gốc thay vì dựng lại từ
+    URL.path, để log lần sau hiện đúng URL đã gửi (kèm dấu "/").
+  - 301 không Location xảy ra DÙ đã có slash → slash không phải thuốc
+    chữa. Bằng chứng curl (request dummy, không chữ ký SAP, không tài
+    khoản thật): bare path → 404 (146B HTML); slashed → tới được app
+    MZFinance (403 WebObjects); slashed+guid+Anisette → 500 (170B);
+    slashed+guid không Anisette → 204. Các mã 204/301/403/404/500 dao
+    động theo request — cửa Apple từ chối trước khi xét tài khoản
+    (200 + plist mới là phán quyết tài khoản thật).
+  - **BẰNG CHỨNG QUYẾT ĐỊNH 22:30 25/11 (anh test, có ảnh chụp):
+    iPadn chạy guest trong LiveContainer vẫn ĐĂNG NHẬP NGON với đúng
+    tài khoản kumit.95bt@gmail.com (Storefront: IN, có tick chọn tài
+    khoản). Cùng máy, cùng mạng, cùng thời điểm — app mình vẫn lỗi
+    301 không Location. → Giả thuyết "Apple-side" ở bản 18 BỊ BÁC:
+    Apple vẫn cho đăng nhập bình thường ngay lúc này. Lỗi CHẮC CHẮN
+    nằm ở hình dạng request của app mình. Anh dặn "xử lý triệt để".**
+  - So sánh TỪNG TRƯỜNG request authenticate (iPadn v2.3.5, đọc
+    source `~/workspace/ipadn-fresh/` 25/11, chỉ đọc — GPL-2.0, không
+    copy code — vs fork + app mình), bảng đầy đủ:
+    | Trường | iPadn (đăng nhập được) | App mình bản 18 (lỗi) |
+    | Endpoint | bag URL + "/" + ?guid= (normalizedEndpoint) | bag URL + "/" + ?guid= (2 lớp chuẩn hoá) — GIỐNG |
+    | Method | POST | POST — GIỐNG |
+    | UA | Configurator/2.21 (Macintosh; OS X 15.2; 24C5089c) AppleWebKit/0620.1.16.11.6 (HTTPClient.userAgent) | Configurator/2.17, cùng hậu tố AppleWebKit (fork Configuration.userAgent — KHÁC số version) |
+    | Content-Type | application/x-apple-plist | application/x-apple-plist — GIỐNG |
+    | Body | appleId, attempt "1"/"2", guid 12-hex ngẫu nhiên, password+code, rmp "0", why "signIn" (AppleLoginResponse.body) | appleId, attempt **"4"**/"2", guid 12-hex ngẫu nhiên, password+code, rmp "0", why "signIn" — KHÁC attempt |
+    | X-Apple-ActionSignature | SAP ký body, session SAP khởi tạo với guid (sapInitialize(guid)) | SAP ký body, session qua fpinit (SAPSigner.connect) — cùng họ, khác implementation |
+    | Header Anisette | **KHÔNG GỬI** (chỉ Content-Type + ActionSignature + X-Apple-Store-Front nếu email là số điện thoại; AppleService.performLogin + HTTPClient.requestOnce — không chỗ nào chèn X-Apple-I-*) | **GỬI ĐỦ bộ jkcoxson** (X-Apple-I-*, X-MMe-*) — KHÁC, nghi nhất |
+    | Cookie | không (fresh) | không (fresh) — GIỐNG |
+    | HTTP stack | URLSession (native) | AsyncHTTPClient (SwiftNIO, redirect .disallow) — KHÁC cấu trúc |
+    | Retry khi 204 | thử lại 1 lần sau 1s, giữ nguyên payload đã ký | app thử lại 3 lần, session mới (2s) |
+  - Ba điểm khác có bằng chứng, bản 19 căn cả ba theo hình dạng
+    iPadn (mỗi điểm đều có mẫu đang chạy được, không phải đoán mò):
+    (1) **Đăng nhập KHÔNG gắn header Anisette** — header jkcoxson
+    được làm cho máy Mac của máy chủ (X-MMe-Client-Info:
+    MacBookPro13,3 / OS X 10.12.6 / akd/1.0), trong khi guid là
+    12-hex ngẫu nhiên phía iPhone và UA nói Configurator/2.17 —
+    ba danh tính khác nhau trong một request; cửa Apple từ tháng
+    10/2026 từ chối anisette không khớp client info. Bằng chứng
+    phụ: bản 5 của app đăng nhập được 24/11 lúc chưa cấu hình máy
+    chủ Anisette nào (812d1b9: URL trống = không header).
+    (2) **attempt "4" → "1"** (fork makeRequest; giữ "2" khi có mã).
+    (3) **UA đăng nhập = Configurator/2.21** của iPadn (qua fork
+    `requestUserAgent`, chỉ cho đăng nhập; UA tĩnh 2.17 giữ nguyên
+    cho các lệnh store khác). Rotate / DMAP / mua license GIỮ NGUYÊN
+    như bản 18 (header jkcoxson + UA tĩnh) vì các đường đó đang
+    chạy được (DMAP 368 app).
+  - ĐÍNH CHÍNH test 20:32 25/11 ("xoá URL Anisette mà vẫn 204" —
+    từng dùng làm bằng chứng "thiếu header thì lỗi"): test đó vẫn
+    dùng attempt "4" + UA 2.17 nên KHÔNG chứng minh được gì về
+    header. Ghi chú cũ ở AppStore.swift (khẳng định "đăng nhập
+    thiếu header thì 204, đã chứng minh 20:32") đã sửa lại cho đúng;
+    getter `anisetteServerURL` vẫn fallback jkcoxson khi trống —
+    nhưng chỉ còn áp cho lệnh store, đăng nhập không dùng nữa.
+  - SỬA (bản 19): fork commit `cdf46aa2` (parent 585aae70, đã xác
+    minh remote: attempt "1" có, "4" hết, safeURL còn) — attempt
+    "1"; giữ `requestUserAgent`/`setRequestUserAgent` + safeURL +
+    slash. App: `AuthenticationService.authenticate` bỏ hẳn bước
+    lấy header, gắn UA iPadn cho session + session retry; gỡ
+    `AnisetteService.fetchServerUserAgent` + `legacyFallbackUserAgent`
+    (cơ chế UA-từ-máy-chủ theo giả thuyết cũ đã bỏ);
+    `anisetteHeadersForStoreCall()` về lại chỉ trả header;
+    rotate/ProductView/PurchasedStore/DMAP về lại như bản 18.
+    **Lưu ý quy trình fork: lần đẩy đầu (fc00c36d) đã làm rớt
+    Logger.swift vì push-tree reuse blob khi local HEAD blob khớp
+    remote — phải commit local TRƯỚC khi push-tree; đã bù bằng
+    commit 585aae70 và kiểm chứng nội dung remote sau mỗi lần đẩy.**
+  - Nếu vẫn lỗi sau bản 19: điểm khác cấu trúc còn lại duy nhất là
+    HTTP stack (AsyncHTTPClient vs URLSession của iPadn) — sửa nó
+    nghĩa là viết lại tầng HTTP của fork, KHÔNG làm trong bản 19;
+    báo lại để anh chốt hướng. Khi test: chụp Nhật ký quanh
+    `>>> POST` + `<<<` (giờ safeURL đã giữ dấu "/" và UA phải hiện
+    2.21). Các lựa chọn còn lại vẫn là thử lại sau / ipatool 2.8.1
+    trên PC. KHÔNG tự đổi máy chủ Anisette khác, KHÔNG làm
+    Anisette on-device.
+
+  ### 2. Việt hoá chuỗi tiếng Anh còn sót (anh báo "xót tiếng Anh"
+  22:15 25/11, ảnh màn Lượt tải + Tài khoản trống)
+  - NGUYÊN NHÂN: `NVDContentUnavailableView` nhận `title` /
+    `description` kiểu `String` — String thường truyền vào
+    Text/Label hiện nguyên văn, KHÔNG qua catalog dịch — dù
+    Localizable.xcstrings đã có bản dịch Việt ("No Downloads" →
+    "Chưa có lượt tải", "No Accounts" → "Chưa có tài khoản").
+    Sửa: 2 tham số đổi sang `LocalizedStringKey` (literal ở chỗ gọi
+    tự đổi kiểu nên bản dịch được dùng), sửa cả 5 chỗ gọi.
+  - Rà soát toàn bộ literal UI: thêm 18 key vi mới vào
+    Localizable.xcstrings (tổng 580 key): lỗi fallback của tab Ký
+    ("Signing failed" → "Ký thất bại", "Unknown error", "Unzip
+    failed", "Zip failed", "Decryption failed", "Cannot extract
+    .deb", "Token decryption failed", "SRP failed"), "File not
+    found", "Not Available", "Examining contents...",
+    "Extracted File", "Client info", "Paused at %lld%",
+    "Downloading App Store packages" + 3 câu PayloadDescription của
+    mobileconfig (hiện trong Cài đặt iOS khi cài hồ sơ). Kèm sửa
+    code để các chuỗi này đi qua đường dịch: `SayoError.last`
+    dịch fallback bằng L() (chuỗi lỗi do thư viện C/Rust trả về thì
+    giữ nguyên tiếng Anh — không sửa được từ app),
+    FileAnalysisView/FileListView dùng `String(localized:)`,
+    SignSettingsView dùng L("Client info"), PayloadDescription dùng
+    `String(localized:)`.
+  - KHÔNG dịch: chuỗi matching lỗi trong code (HTTP 204,
+    failureType, "failed to retrieve redirect location"...) — code
+    so khớp bằng chuỗi đó; log kỹ thuật (Nhật ký) giữ tiếng Anh;
+    tên riêng (preset jkcoxson/SideStore, "NVDAppleIDDownload Local
+    CA", "Mac ✓", UA akd, version).
+
+  ### 3. Dọn README (anh chốt 22:21 25/11, gộp cùng lần đẩy bản 19)
+  - Chỉ còn 1 tiêu đề H1; bỏ nửa sau tiếng Anh trùng lặp (từ H1 thứ
+    2 ở dòng 97: giới thiệu tiếng Anh, link zh-Hans, ảnh Preview
+    logo dứa cũ, mục "Why NVDAppleIDDownload?"); bỏ mục "Sponsor"
+    (LookInside) + ảnh fable5.jpg; giữ "Copyright © 2025 Lakr
+    Aream". Giữ khối tiếng Việt đầu file (giới thiệu NVD, manifest,
+    giới hạn, ghi chú lỗi 204 — đang live), Installation thu gọn
+    (Releases + SideStore/AltStore; macOS 2 bước + 1 dòng Gatekeeper,
+    bỏ fork guide dài), Requirements (iOS 16.0), Special Notice,
+    Disclaimer, Acknowledgments, License. Ghi chú từng bản cũ thu
+    gọn giữ ý chính, không bỏ cảnh báo còn hiệu lực (Apple ID phụ,
+    FairPlay, lỗi 204, altstore-source). Không động file khác: giữ
+    LICENSE, ghi công Lakr233/Asspp (MIT), giữ
+    `Resources/i18n/zh-Hans/README.md` (chỉ bỏ link tới nó), không
+    xoá ảnh/file nào.
+
+  ### 4. Version + CI/IPA
+  - Version: 2.0 build 19 (`CURRENT_PROJECT_VERSION` 18 → 19, chỉ
+    trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0). BẢN CUỐI
+    dãy 2.0 — sau 19 sang 2.1 (MARKETING_VERSION 2.0 → 2.1, đổi ở cả
+    xcconfig và pbxproj).

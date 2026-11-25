@@ -8,7 +8,10 @@ struct SayoError: LocalizedError {
     init(_ message: String) { self.message = message }
     static func last(_ fallback: String = "Unknown error") -> SayoError {
         let s = String(cString: sayo_last_error())
-        return SayoError(s.isEmpty ? fallback : s)
+        // Bản 19: dịch fallback qua catalog (vd. "Signing failed" →
+        // "Ký thất bại"); chuỗi lỗi do thư viện C/Rust trả về thì giữ
+        // nguyên tiếng Anh (không sửa được từ phía app).
+        return SayoError(s.isEmpty ? L(fallback) : s)
     }
 }
 

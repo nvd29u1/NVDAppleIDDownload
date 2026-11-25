@@ -37,7 +37,7 @@ struct SignSettingsView: View {
                 (L("Protocol"), a.version),
                 (L("Status"), a.isProvisioned ? L("Provisioned") : L("Not provisioned")),
                 (L("Client"), a.isMacClient ? "Mac ✓" : (a.isLegacyClient ? L("Legacy (rejected by Apple)") : L("Non-Mac"))),
-                ("Client info", a.clientInfo),
+                (L("Client info"), a.clientInfo),
                 ("User-Agent", a.userAgent),
                 (L("Device ID"), a.deviceID),
             ]
