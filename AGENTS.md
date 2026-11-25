@@ -1691,7 +1691,14 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     `Configuration/Version.xcconfig` LẪN `Asspp.xcodeproj/project.pbxproj`
     dòng 522 + 565; `CURRENT_PROJECT_VERSION` 19 → 20, chỉ trong
     xcconfig). BẢN ĐẦU dãy 2.1 (2.0 dừng ở build 19).
-  - CI + IPA: (điền sau khi CI chạy xong)
+  - Đẩy: remote `e2379f9b` (local `1d807d2`, base build 19 `e9e1e535`);
+    push-tree tạo 32 blob mới + tái dùng 193; đã kiểm chứng remote có đủ
+    file IPadnLogin + SAPRuntime part00..05 + LICENSES.md +
+    LICENSE-iPadn-GPL-2.0, và sap.wasm KHÔNG nằm trong tree (chỉ dạng
+    part). Backup bản 19:
+    `deliver/NVDAppleIDDownload-2.0-build19-backup.ipa` (SHA256
+    `e06314da…` khớp bản đã giao).
+  - CI "Build App" run 45655927457 (đang chạy — điền kết quả sau):
   - Chưa kiểm chứng trên iPhone thật — cần anh test: đăng nhập bằng
     tài khoản phụ (kumit.95bt@gmail.com) xem vào được không; nếu vẫn lỗi
     thì chụp Nhật ký quanh dòng "ipadn login: ..." (stage + mã HTTP, không

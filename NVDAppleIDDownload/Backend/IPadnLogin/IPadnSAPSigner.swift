@@ -369,7 +369,7 @@ final class IPadnSAPSigner: NSObject, ObservableObject, WKNavigationDelegate, WK
                     throw RuntimeRetry.coldStart
                 }
                 let classified = IPadnSAPRuntimeError.classify(error, stage: stageIndex)
-                logger.info("sap: " + classified.diagnosticCode)
+                logger.info("sap: \(classified.diagnosticCode)")
                 throw classified
             }
             try checkActive(id)
@@ -417,7 +417,7 @@ final class IPadnSAPSigner: NSObject, ObservableObject, WKNavigationDelegate, WK
         timeout?.cancel()
         timeout = Task { @MainActor [weak self] in
             do { try await Task.sleep(nanoseconds: seconds * 1_000_000_000) } catch { return }
-            logger.info("sap: " + error.diagnosticCode)
+            logger.info("sap: \(error.diagnosticCode)")
             self?.stop(id: id, error: error)
         }
     }
@@ -490,7 +490,7 @@ final class IPadnSAPSigner: NSObject, ObservableObject, WKNavigationDelegate, WK
     }
     func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
         guard webView === self.webView, let id = operationID else { return }
-        logger.info("sap: " + IPadnSAPRuntimeError.webProcessTerminated.diagnosticCode)
+        logger.info("sap: \(IPadnSAPRuntimeError.webProcessTerminated.diagnosticCode)")
         stop(id: id, error: IPadnSAPRuntimeError.webProcessTerminated)
     }
 }

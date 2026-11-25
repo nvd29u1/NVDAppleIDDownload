@@ -122,7 +122,7 @@ final class IPadnLoopbackServer: @unchecked Sendable {
                 }
                 if let url = self.baseURL, let port = url.port.flatMap({ UInt16(exactly: $0) }) {
                     if await Self.isListening(port: port) { return }
-                    logger.info((self.identity == nil ? "http" : "https") + " server unreachable, restarting")
+                    logger.info("\(self.identity == nil ? "http" : "https") server unreachable, restarting")
                     await self.reset()
                     do { try await self.startListener() }
                     catch {
@@ -230,13 +230,13 @@ final class IPadnLoopbackServer: @unchecked Sendable {
                             self.lock.unlock()
                             self.finishStart(.success(()))
                         case .failed(let error):
-                            logger.info((self.identity == nil ? "http" : "https") + " server stopped: \(error)")
+                            logger.info("\(self.identity == nil ? "http" : "https") server stopped: \(error)")
                             self.lock.lock(); self.readyURL = nil; self.lock.unlock()
                             self.listener = nil
                             self.finishStart(.failure(error))
                             listener.cancel()
                         case .cancelled:
-                            logger.info((self.identity == nil ? "http" : "https") + " server closed")
+                            logger.info("\(self.identity == nil ? "http" : "https") server closed")
                             self.lock.lock(); self.readyURL = nil; self.lock.unlock()
                             self.listener = nil
                             self.finishStart(.failure(IPadnToolError.message("Quá trình đã bị ngắt, hãy thử lại.")))
@@ -259,9 +259,9 @@ final class IPadnLoopbackServer: @unchecked Sendable {
                         connection.stateUpdateHandler = { [weak self] state in
                             switch state {
                             case .ready: if secure { logger.info("https connection ready (TLS done)") }
-                            case .waiting(let error): logger.info(kind + " connection waiting: \(error)")
+                            case .waiting(let error): logger.info("\(kind) connection waiting: \(error)")
                             case .failed(let error):
-                                logger.info(kind + " connection failed: \(error)")
+                                logger.info("\(kind) connection failed: \(error)")
                                 self?.lastActivity.removeValue(forKey: id)
                             case .cancelled: self?.lastActivity.removeValue(forKey: id)
                             default: break
@@ -314,7 +314,7 @@ final class IPadnLoopbackServer: @unchecked Sendable {
     private func read(_ connection: NWConnection, accumulated: Data) {
         connection.receive(minimumIncompleteLength: 1, maximumLength: 65_536) { data, _, ended, error in
             if let error {
-                logger.info((self.identity == nil ? "http" : "https") + " receive error: \(error)")
+                logger.info("\(self.identity == nil ? "http" : "https") receive error: \(error)")
                 connection.cancel(); return
             }
             self.touch(connection)
@@ -409,7 +409,7 @@ final class IPadnLoopbackServer: @unchecked Sendable {
         } else if parts.count == 3, parts[0] == "files" {
             lock.lock(); let file = registeredFiles[parts[1]]; lock.unlock()
             guard let file = file, file.lastPathComponent == parts[2] else { logger.info("\(method) package: 404"); reply(connection, status: 404); return }
-            logger.info("\(method) package" + (headers["range"] == nil ? "" : " (range)"))
+            logger.info("\(method) package\(headers["range"] == nil ? "" : " (range)")")
             sendFile(connection, url: file, range: headers["range"], head: method == "HEAD", package: true)
         } else { reply(connection, status: 404) }
     }
