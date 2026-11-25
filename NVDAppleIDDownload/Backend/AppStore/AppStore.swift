@@ -154,6 +154,29 @@ class AppStore {
         }
     }
 
+    /// Bật "Tải xong tự cài đặt" (đợt 4, build 9 — ý tưởng iPadn mục 8):
+    /// tải xong thì tự mở đường cài đặt hiện có của iOS (Installer +
+    /// itms-services qua máy chủ manifest trong Cài đặt). Mặc định TẮT
+    /// — tải xong vẫn phải bấm Cài đặt tay như trước. Chỉ có tác dụng
+    /// trên iOS (macOS cài qua DeviceCTL, không qua đường này).
+    @ObservationIgnored
+    private var _autoInstallAfterDownload = Persist<Bool>(
+        key: "AutoInstallAfterDownload",
+        defaultValue: false,
+    )
+
+    var autoInstallAfterDownload: Bool {
+        get {
+            access(keyPath: \.autoInstallAfterDownload)
+            return _autoInstallAfterDownload.wrappedValue
+        }
+        set {
+            withMutation(keyPath: \.autoInstallAfterDownload) {
+                _autoInstallAfterDownload.wrappedValue = newValue
+            }
+        }
+    }
+
     /// Vùng App Store ưa thích để tìm kiếm (đợt 2, build 7 — ý tưởng
     /// iPadn mục 4): danh sách mã vùng ISO-2 theo thứ tự người dùng sắp
     /// xếp, lưu bằng Persist. Vùng tìm kiếm chỉ dùng để tìm app / tra

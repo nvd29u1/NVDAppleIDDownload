@@ -77,6 +77,18 @@ struct SettingView: View {
                 Text("Bật thì mỗi lần mở app đều phải mở khoá bằng Face ID / Touch ID hoặc mật khẩu thiết bị. Rời app (sang nền / đa nhiệm) thì khoá lại ngay nên màn hình đa nhiệm cũng chỉ thấy màn khoá. Thiết bị chưa đặt mật khẩu thì không khoá được.")
             }
 
+            // Tải xong tự cài đặt (đợt 4, build 9 — ý tưởng iPadn mục 8):
+            // chỉ có tác dụng trên iOS, mặc định tắt.
+            #if os(iOS)
+                Section {
+                    Toggle("Tải xong tự cài đặt", isOn: $vm.autoInstallAfterDownload)
+                } header: {
+                    Text("Tải xuống")
+                } footer: {
+                    Text("Bật thì tải xong app sẽ tự mở màn cài đặt (qua máy chủ manifest trong Cài đặt) mà không cần bấm Cài đặt tay. Chỉ chạy khi app đang mở; tải xong lúc app đang ở nền thì không tự cài. Mặc định tắt.")
+                }
+            #endif
+
             Section {
                 Toggle("Demo Mode", isOn: $vm.demoMode)
                 Button("Delete All Downloads", role: .destructive) {

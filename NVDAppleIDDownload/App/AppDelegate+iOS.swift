@@ -46,5 +46,19 @@
             UIApplication.shared.endBackgroundTask(backgroundTaskIdentifier)
             backgroundTaskIdentifier = .invalid
         }
+
+        /// Hệ thống đánh thức app dưới nền khi 1 task tải nền xong:
+        /// giao completion handler cho BackgroundDownloadService, nó sẽ
+        /// gọi lại khi đã nhận xong mọi sự kiện (đợt 4, build 9).
+        func application(
+            _: UIApplication,
+            handleEventsForBackgroundURLSession identifier: String,
+            completionHandler: @escaping () -> Void,
+        ) {
+            BackgroundDownloadService.shared.handleEventsForBackgroundURLSession(
+                identifier: identifier,
+                completionHandler: completionHandler,
+            )
+        }
     }
 #endif

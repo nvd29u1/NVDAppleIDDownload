@@ -36,6 +36,14 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
     /// tải; lưu cùng manifest nên thoát app vẫn nhớ.
     var pinned: Bool = false
 
+    /// Dữ liệu nối tiếp tải nền (đợt 4, build 9 — URLSession background):
+    /// tạm dừng bằng cancel(byProducingResumeData:) thì hệ thống trả
+    /// resumeData, lưu ở đây để lần tiếp tục dùng
+    /// downloadTask(withResumeData:). Nil = chưa từng tạm dừng / đã tải
+    /// xong / resumeData hỏng đã bị xoá. Manifest cũ không có trường
+    /// này thì mặc định nil.
+    var resumeData: Data? = nil
+
     var targetLocation: URL {
         packagesDir
             .appendingPathComponent(package.software.bundleID)
@@ -91,6 +99,25 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
         state = try container.decode(PackageState.self, forKey: .runtime)
         // Manifest cũ (trước build 8) chưa có cờ này — mặc định không giữ.
         pinned = try container.decodeIfPresent(Bool.self, forKey: .pinned) ?? false
+        // Manifest cũ (trước build 9) chưa có resumeData — mặc định nil.
+        resumeData = try container.decodeIfPresent(Data.self, forKey: .resumeData)
+    }
+
+    /// Link CDN hết hạn (403/410, đợt 4 build 9): lấy URL có chữ ký mới
+    /// + SINF/metadata mới từ StoreDownloadService rồi thay vào
+    /// manifest để tải lại bằng URL mới. ResumeData cũ gắn với URL cũ
+    /// nên phải xoá cùng lúc (caller tự xoá).
+    func refreshDownloadOutput(_ output: ApplePackage.DownloadOutput) throws {
+        guard let newURL = URL(string: output.downloadURL) else {
+            throw NSError(
+                domain: "NVDAppleIDDownload.Download",
+                code: 2,
+                userInfo: [NSLocalizedDescriptionKey: "Invalid download URL: \(output.downloadURL)"],
+            )
+        }
+        url = newURL
+        signatures = output.sinfs
+        iTunesMetadata = output.iTunesMetadata
     }
 
     func encode(to encoder: Encoder) throws {
@@ -104,10 +131,11 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
         try container.encode(creation, forKey: .creation)
         try container.encode(state, forKey: .runtime)
         try container.encode(pinned, forKey: .pinned)
+        try container.encodeIfPresent(resumeData, forKey: .resumeData)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, account, package, url, signatures, iTunesMetadata, creation, runtime, pinned
+        case id, account, package, url, signatures, iTunesMetadata, creation, runtime, pinned, resumeData
     }
 
     /// Identity is the immutable UUID; hashing mutable fields like `state` would

@@ -467,3 +467,63 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 8 (`CURRENT_PROJECT_VERSION` 7 → 8, chỉ trong
     `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả xcconfig và
     pbxproj).
+- Đợt 4 build 9 (25 Nov 2026, 2.0 build 9): tải nền thật + Đã mua bước
+  Commerce + icon đúng từng phiên bản + "Tải xong tự cài đặt" (mục 8,
+  3, 6 `docs/IPADN-SO-SANH.md`). Học ý tưởng iPadn rồi viết lại sạch,
+  KHÔNG copy code iPadn (GPL-2.0), giữ MIT. Chưa kiểm chứng trên
+  iPhone thật.
+  - Tải nền thật (`BackgroundDownloadService`, URLSession background
+    `com.NVD.appleiddownload.downloads` + URLSessionDownloadTask):
+    tạm dừng bằng cancel(byProducingResumeData:) → resumeData lưu vào
+    `PackageManifest.resumeData` (decodeIfPresent, manifest cũ vẫn đọc
+    được); tiếp tục bằng downloadTask(withResumeData:), resumeData hỏng
+    thì tải mới; app bị tắt / sang nền thì hệ thống vẫn tải tiếp, mở
+    lại app reattach() qua getAllTasks (taskDescription = UUID
+    manifest); số byte đã tải / tổng số ghi vào `PackageState`
+    (downloadedBytes/totalBytes) nên mở lại app vẫn hiện đúng;
+    AppDelegate nối handleEventsForBackgroundURLSession; finalize()
+    khi app ở nền chạy trong beginBackgroundTask. Link CDN hết hạn
+    (403/410) thì Downloads gọi lại StoreDownloadService.download()
+    lấy URL mới rồi tải lại — resumeData gắn chặt với URL cũ nên
+    KHÔNG nối tiếp được, đây là giới hạn của URLSession (ghi rõ trong
+    code). Digger KHÔNG xoá, chỉ còn là đường dự phòng khi không tạo
+    được background task (đường Digger tạm dừng vẫn mất tiến độ).
+  - "Tải xong tự cài đặt" (`AppStore.autoInstallAfterDownload`,
+    Persist Bool mặc định TẮT, Toggle trong Cài đặt, chỉ iOS): tải
+    xong + bật + app đang mở thì tạo Installer như cũ rồi mở
+    itms-services; Installer được giữ lại trong Downloads để máy chủ
+    Vapor còn phục vụ file; tắt thì tải xong vẫn bấm Cài đặt tay.
+    KHÔNG làm Live Activity (cần extension + 1 App ID mới).
+  - Đã mua bước Commerce (`PurchasedCommerceService`,
+    `/commerce/account/purchases` JSON:API, xác thực bằng phiên đã đăng
+    nhập — X-Token, X-DSID, X-Apple-Store-Front, ký SAP như DMAP):
+    ⚠️ dạng request/response chính xác CHƯA xác minh bằng tài khoản
+    thật — code đọc JSON:API linh hoạt (data/results/purchases/items,
+    attributes nhiều tên trường, included, links.next tối đa 10 trang,
+    gọi tuần tự) nhưng nếu Apple trả dạng khác thì ném unknownShape,
+    PurchasedStore giữ nguyên danh sách DMAP + ghi chú cam, không
+    crash, không bịa app. Nút "Đồng bộ toàn bộ lịch sử mua" trong
+    PurchasedView; gộp Commerce + DMAP, khử trùng theo App ID; năm
+    đồng bộ đầy đủ gần nhất lưu theo tài khoản
+    (Persist `PurchasedFullSyncYearByAccount`). Không quét theo từng
+    năm (chưa biết endpoint có tham số lọc năm không) — ghi rõ trong
+    code + báo cáo; cần thử thật rồi sửa parser theo response thật.
+  - Icon đúng từng phiên bản (`VersionIconService` + icon 44x44 trong
+    `ProductHistoryView`): lấy URL tải có chữ ký qua
+    StoreDownloadService.download() rồi 2–4 Range-request (đuôi file
+    IPA → EOCD + Central Directory của ZIP → entry icon → dữ liệu
+    nén); parse ZIP tay, ưu tiên AppIcon60x60@2x.png ngay dưới *.app/,
+    không thì AppIcon*.png lớn nhất; giải nén deflate bằng inflate
+    thuần Swift trong cùng file (~200 dòng, RFC 1951 — Swift trên
+    Apple không có module `zlib`, Compression chỉ giải zlib có header);
+    cache PNG theo version ID xuống đĩa
+    (Documents/NVDAppleIDDownload/VersionIcons/); chỉ tải lười khi
+    dòng hiện ra, 1 lần/version ID/phiên; Apple không phục vụ Range /
+    không đọc được thì hiện icon giữ chỗ, không crash, không bịa.
+  - Mac PKG vẫn CHƯA làm được (lý do như đợt 3: fork ApplePackage
+    không có endpoint tải PKG Mac App Store; muốn làm phải thêm giao
+    thức mới vào fork nvd29u1/ApplePackage rồi nâng pin + kiểm chứng
+    qua CI — tách thành việc riêng). Không thêm nút giả.
+  - Version: 2.0 build 9 (`CURRENT_PROJECT_VERSION` 8 → 9, chỉ trong
+    `Version.xcconfig`; pbxproj không pin CURRENT_PROJECT_VERSION,
+    chỉ pin MARKETING_VERSION 2.0 nên không cần sửa pbxproj).

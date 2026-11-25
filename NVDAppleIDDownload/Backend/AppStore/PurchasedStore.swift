@@ -24,6 +24,29 @@ final class PurchasedStore {
     private(set) var lastSyncDate: Date?
     private(set) var lastError: String?
 
+    /// Đang đồng bộ toàn bộ lịch sử mua (bước Commerce, đợt 4 build 9).
+    private(set) var isSyncingFullHistory = false
+
+    /// Ghi chú khi bước Commerce thất bại nhưng DMAP vẫn cho danh sách:
+    /// hiện màu cam (không phải lỗi đỏ) để người dùng biết lịch sử có
+    /// thể chưa đủ.
+    private(set) var fullHistoryHint: String?
+
+    /// Năm đồng bộ đầy đủ gần nhất theo tài khoản (đợt 4, build 9):
+    /// ghi lại khi bước Commerce chạy xong 1 lượt; lần sau chỉ cần quét
+    /// năm hiện tại khi đã biết dạng response (xem PurchasedCommerceService).
+    @ObservationIgnored
+    private var _fullSyncYears = Persist<[String: Int]>(
+        key: "PurchasedFullSyncYearByAccount",
+        defaultValue: [:]
+    )
+
+    /// Năm đồng bộ đầy đủ gần nhất của tài khoản đang chọn (nil = chưa
+    /// bao giờ đồng bộ toàn bộ).
+    var lastFullSyncYear: Int? {
+        _fullSyncYears.wrappedValue[accountID]
+    }
+
     /// Chế độ chọn nhiều để tải hàng loạt.
     var isSelecting = false
     var selectedIDs: Set<Int64> = []
@@ -97,6 +120,117 @@ final class PurchasedStore {
         if let lastFailure {
             lastError = lastFailure.localizedDescription
             logger.error("Purchased sync failed: \(StoreDiagnostics.errorSummary(lastFailure))")
+        }
+    }
+
+    /// Đồng bộ toàn bộ lịch sử mua (đợt 4, build 9): bước Commerce
+    /// (/commerce/account/purchases) gộp với bước DMAP, khử trùng theo
+    /// App ID. Commerce thất bại (dạng response chưa xác minh — xem
+    /// PurchasedCommerceService) thì vẫn giữ danh sách DMAP và chỉ ghi
+    /// chú cam, không xoá danh sách, không báo lỗi đỏ. Commerce chạy
+    /// xong thì ghi năm đồng bộ đầy đủ cho tài khoản này.
+    func syncFullHistory() async {
+        guard !accountID.isEmpty, !isSyncing, !isSyncingFullHistory else { return }
+        let accountID = self.accountID
+        isSyncingFullHistory = true
+        lastError = nil
+        fullHistoryHint = nil
+        defer { isSyncingFullHistory = false }
+
+        // 1. Bước Commerce: 1 lượt phân trang tuần tự (không song song
+        // để khỏi bị Apple gắn cờ). Thất bại thì ghi chú, không dừng.
+        var commerceApps: [PurchasedApp] = []
+        var commerceError: Error?
+        do {
+            commerceApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                try await PurchasedCommerceService.fetchAllPurchasedApps(account: userAccount.account)
+            }
+        } catch {
+            commerceError = error
+            logger.error("Purchased full sync: commerce step failed: \(StoreDiagnostics.errorSummary(error))")
+        }
+
+        // 2. Bước DMAP (như sync thường, retry tối đa 3 lần).
+        var dmapApps: [PurchasedApp] = []
+        var dmapFailure: Error?
+        for attempt in 1 ... 3 {
+            do {
+                dmapApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                    try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
+                }
+                dmapFailure = nil
+                break
+            } catch {
+                dmapFailure = error
+                if let dmapError = error as? PurchasedDMAPError, case .sessionExpired = dmapError {
+                    break
+                }
+                guard Self.isTransientSyncError(error), attempt < 3 else { break }
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+        }
+        if let dmapFailure, commerceError != nil {
+            // Cả hai bước đều hỏng: báo lỗi đỏ như sync thường.
+            lastError = dmapFailure.localizedDescription
+            logger.error("Purchased full sync failed: \(StoreDiagnostics.errorSummary(dmapFailure))")
+            return
+        }
+
+        // 3. Gộp Commerce + DMAP, khử trùng theo App ID.
+        let merged = Self.merge(commerce: commerceApps, dmap: dmapApps)
+        items = merged
+        var cached = _cachedByAccount.wrappedValue
+        cached[accountID] = merged
+        _cachedByAccount.wrappedValue = cached
+        lastSyncDate = Date()
+        if commerceError == nil {
+            var years = _fullSyncYears.wrappedValue
+            years[accountID] = Calendar.current.component(.year, from: Date())
+            _fullSyncYears.wrappedValue = years
+            logger.info("Purchased full sync: \(merged.count) apps (\(commerceApps.count) commerce + \(dmapApps.count) DMAP) for account")
+        } else {
+            fullHistoryHint = commerceError?.localizedDescription
+            logger.info("Purchased full sync: \(merged.count) apps (DMAP only, commerce step failed) for account")
+        }
+    }
+
+    /// Gộp 2 nguồn Đã mua, khử trùng theo App ID: giữ tên / Bundle ID /
+    /// phiên bản đã có, lấy ngày mua mới nhất, gộp nền tảng (DMAP cho
+    /// nền tảng, Commerce thường không trả nền tảng).
+    private static func merge(commerce: [PurchasedApp], dmap: [PurchasedApp]) -> [PurchasedApp] {
+        var byID: [Int64: PurchasedApp] = [:]
+        for app in commerce + dmap {
+            if var existing = byID[app.appID] {
+                var platforms = existing.platforms
+                for platform in app.platforms where !platforms.contains(platform) {
+                    platforms.append(platform)
+                }
+                let date: Date?
+                if let new = app.purchaseDate, let old = existing.purchaseDate {
+                    date = max(new, old)
+                } else {
+                    date = app.purchaseDate ?? existing.purchaseDate
+                }
+                existing = PurchasedApp(
+                    appID: existing.appID,
+                    bundleID: existing.bundleID.isEmpty ? app.bundleID : existing.bundleID,
+                    name: existing.name.isEmpty ? app.name : existing.name,
+                    version: existing.version.isEmpty ? app.version : existing.version,
+                    purchaseDate: date,
+                    platforms: platforms
+                )
+                byID[app.appID] = existing
+            } else {
+                byID[app.appID] = app
+            }
+        }
+        return byID.values.sorted {
+            switch ($0.purchaseDate, $1.purchaseDate) {
+            case let (a?, b?): a > b
+            case (_?, nil): true
+            case (nil, _?): false
+            default: $0.name < $1.name
+            }
         }
     }
 

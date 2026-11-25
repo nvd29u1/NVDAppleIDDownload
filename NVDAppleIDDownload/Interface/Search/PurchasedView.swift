@@ -127,6 +127,34 @@ struct PurchasedView: View {
                             .foregroundStyle(.red)
                     }
                 }
+                if let fullHistoryHint = store.fullHistoryHint {
+                    Section {
+                        Text(fullHistoryHint)
+                            .foregroundStyle(.orange)
+                    }
+                }
+                Section {
+                    AsyncButton {
+                        await store.syncFullHistory()
+                    } label: {
+                        if store.isSyncingFullHistory {
+                            HStack {
+                                ProgressView()
+                                Text("Đang đồng bộ toàn bộ lịch sử mua…")
+                            }
+                        } else {
+                            Label("Đồng bộ toàn bộ lịch sử mua", systemImage: "arrow.triangle.2.circlepath")
+                        }
+                    }
+                    .disabledWhenLoading()
+                    .disabled(store.isSyncing || store.isSyncingFullHistory || account == nil)
+                } footer: {
+                    if let year = store.lastFullSyncYear {
+                        Text("Đã đồng bộ toàn bộ lịch sử mua năm \(year) (bước /commerce/account/purchases gộp với DMAP).")
+                    } else {
+                        Text("Đồng bộ toàn bộ sẽ quét thêm bước lịch sử mua đầy đủ của Apple (/commerce/account/purchases) rồi gộp với danh sách DMAP — một số app mua gần đây chưa hiện ở DMAP có thể sẽ hiện thêm.")
+                    }
+                }
                 if store.isSelecting, !store.selectedIDs.isEmpty {
                     Section {
                         AsyncButton {
@@ -186,11 +214,17 @@ struct PurchasedView: View {
     }
 
     private var dmapNote: String {
-        var note = "Danh sách lấy qua DMAP (MZPurchaseDaap) của Apple."
+        var note = "Danh sách lấy qua DMAP (MZPurchaseDaap) của Apple"
+        if store.lastFullSyncYear != nil {
+            note += " gộp với bước lịch sử mua đầy đủ (/commerce/account/purchases)"
+        }
+        note += "."
         if let lastSyncDate = store.lastSyncDate {
             note += " Đồng bộ lần cuối: \(lastSyncDate.formatted(date: .abbreviated, time: .shortened))."
         }
-        note += " Bước đồng bộ lịch sử mua đầy đủ (/commerce/account/purchases) chưa làm trong đợt này — một số app mua gần đây có thể chưa hiện."
+        if store.lastFullSyncYear == nil {
+            note += " Bước đồng bộ lịch sử mua đầy đủ (/commerce/account/purchases) chưa chạy — một số app mua gần đây có thể chưa hiện; bấm \"Đồng bộ toàn bộ lịch sử mua\" để quét thêm. Lưu ý: dạng dữ liệu của bước này chưa xác minh bằng tài khoản thật, nếu Apple trả về dạng khác thì màn sẽ báo rõ và vẫn giữ danh sách DMAP."
+        }
         return note
     }
 

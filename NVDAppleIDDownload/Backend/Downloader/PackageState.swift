@@ -30,6 +30,13 @@ struct PackageState: Codable, Hashable, Equatable {
     }
 
     var speed: String = ""
+
+    /// Số byte đã tải + tổng số byte (đợt 4, build 9 — tải nền):
+    /// ghi vào trạng thái để mở lại app vẫn hiện đúng tiến độ. Cả hai
+    /// đều có giá trị mặc định nên manifest cũ (không có 2 trường này)
+    /// vẫn giải mã được (decodeIfPresent).
+    var downloadedBytes: Int64 = 0
+    var totalBytes: Int64 = 0
 }
 
 extension PackageState {
@@ -48,5 +55,8 @@ extension PackageState {
         percent = 1
         speed = ""
         error = nil
+        if totalBytes > 0 {
+            downloadedBytes = totalBytes
+        }
     }
 }
