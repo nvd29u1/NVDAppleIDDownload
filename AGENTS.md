@@ -619,6 +619,16 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     tính năng ký chưa kiểm chứng trên iPhone thật (lần đầu dùng
     Apple ID phụ); app ký PHẢI cài trực tiếp qua SideStore,
     không chạy trong LiveContainer (đã chứng minh 24/11).
+  - Sửa lỗi CI của build 9 (runner giờ dùng Xcode 26.6 — code
+    biên dịch được ngày 24/11 giờ lỗi): 7 chỗ
+    `UIApplication.shared.open(...)` thiếu `await` (SDK mới chỉ
+    còn overload async `open(_:)`) — InstallerView (2 chỗ, Button
+    + onAppear), Downloads auto-install, SignInstaller
+    openTrollStore, SignAppleID detectUDID, SignSettingsView,
+    SignPairing (bọc `Task { @MainActor in _ = await ... }`, riêng
+    Downloads đã trong Task nên thêm `await` thẳng); 1 chỗ
+    `Color(.systemBackground)` ở AppLockService làm job macOS lỗi
+    — đổi sang `Color.background` (dùng chung iOS/macOS).
   - Version: 2.0 build 10 (`CURRENT_PROJECT_VERSION` 9 → 10,
     chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
     ở cả xcconfig và pbxproj).

@@ -190,7 +190,7 @@ struct PairingView: View {
                             HStack { ProgressView(); Text(host.state).font(.subheadline) }
                         }
                         if host.pin != nil { Text(host.state).font(.caption).foregroundColor(.secondary) }
-                        Button(L("Open Settings")) { if let u = URL(string: UIApplication.openSettingsURLString) { UIApplication.shared.open(u) } }.nvdBorderBeam(shape: .rounded(10))
+                        Button(L("Open Settings")) { if let u = URL(string: UIApplication.openSettingsURLString) { Task { @MainActor in _ = await UIApplication.shared.open(u) } } }.nvdBorderBeam(shape: .rounded(10))
                         Button(L("Cancel"), role: .destructive) { host.stop() }.nvdBorderBeam(shape: .rounded(10))
                     } else {
                         Button { host.start() } label: { Label(L("Pair this iPhone"), systemImage: "iphone.and.arrow.forward") }.nvdBorderBeam(shape: .rounded(10))

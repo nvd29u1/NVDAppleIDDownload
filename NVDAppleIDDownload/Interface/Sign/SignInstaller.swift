@@ -542,7 +542,7 @@ enum SignInstaller {
     static func openTrollStore(_ ipa: URL) -> Bool {
         guard let u = URL(string: "apple-magnifier://install?url=" + (ipa.absoluteString.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? "")),
               UIApplication.shared.canOpenURL(u) else { return false }
-        UIApplication.shared.open(u)
+        Task { @MainActor in _ = await UIApplication.shared.open(u) }
         return true
     }
 }

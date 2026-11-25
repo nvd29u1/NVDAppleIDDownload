@@ -249,7 +249,7 @@ struct InstallSetupView: View {
                     step(2, L("Install it"), L("Settings → General → VPN & Device Management → NVDAppleIDDownload Local Installer → Install.")) {
                         Button(L("Open Settings")) {
                             if let u = URL(string: "App-prefs:General&path=ManagedConfigurationList") ?? URL(string: UIApplication.openSettingsURLString) {
-                                UIApplication.shared.open(u)
+                                Task { @MainActor in _ = await UIApplication.shared.open(u) }
                             }
                         }.buttonStyle(SmallButtonStyle(filled: false)).nvdBorderBeam(shape: .rounded(9))
                     }

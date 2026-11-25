@@ -932,7 +932,7 @@ struct AppleIDView: View {
         }
         server.keepAlive(true)
         DispatchQueue.main.asyncAfter(deadline: .now() + 300) { server.keepAlive(false) }
-        if let u = URL(string: "\(server.httpBase)/udid.mobileconfig") { UIApplication.shared.open(u) }
+        if let u = URL(string: "\(server.httpBase)/udid.mobileconfig") { Task { @MainActor in _ = await UIApplication.shared.open(u) } }
     }
 
     func start() async {

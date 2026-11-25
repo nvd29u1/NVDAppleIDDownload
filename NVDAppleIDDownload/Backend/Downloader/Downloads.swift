@@ -407,7 +407,7 @@ class Downloads {
                     )
                     self.autoInstallers[manifest.id] = installer
                     installer.beginInstall()
-                    UIApplication.shared.open(installer.iTunesLink)
+                    _ = await UIApplication.shared.open(installer.iTunesLink)
                     logger.info("auto-install started for \(manifest.id)")
                 } catch {
                     logger.error("auto-install failed for \(manifest.id): \(StoreDiagnostics.errorSummary(error))")

@@ -54,7 +54,7 @@
                 Button {
                     if case .ready = installer.status {
                         installer.beginInstall()
-                        UIApplication.shared.open(installer.iTunesLink)
+                        Task { @MainActor in _ = await UIApplication.shared.open(installer.iTunesLink) }
                     }
                 } label: {
                     VStack(spacing: 32) {
@@ -74,7 +74,7 @@
                 .onAppear {
                     if case .ready = installer.status {
                         installer.beginInstall()
-                        UIApplication.shared.open(installer.iTunesLink)
+                        Task { @MainActor in _ = await UIApplication.shared.open(installer.iTunesLink) }
                     }
                 }
                 VStack {
