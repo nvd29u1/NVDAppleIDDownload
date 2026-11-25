@@ -171,17 +171,23 @@ final class PurchasedStore: ObservableObject {
         // 1. Bước Commerce: 1 lượt phân trang tuần tự (không song song
         // để khỏi bị Apple gắn cờ). Thất bại thì ghi chú, không dừng.
         // Lỗi tạm thời (vd Apple trả 500) thì thử lại tối đa 3 lần như
-        // bước DMAP. Header Anisette lấy chung 1 lần như DMAP (build
-        // 14/15); lấy không được thì bước này lỗi với đúng lỗi đó —
-        // bước DMAP phía sau cũng sẽ báo lỗi đó (cùng chính sách).
+        // bước DMAP. Build 17: bước này KHÔNG gửi Anisette headers nữa
+        // (chẩn đoán sau test bản 16 lúc 19:34 25/11 — Commerce trả
+        // HTTP 403 {"status":-1,"errors":[{"code":"authentication"}]}
+        // thay vì 500, tức hình dạng request đã đúng nhưng Apple vẫn
+        // từ chối xác thực; iPadn không gửi header xác minh thiết bị ở
+        // endpoint này — đó là điểm khác duy nhất còn lại). DMAP vẫn
+        // gửi Anisette headers như cũ (đường đó đang chạy, 368 app).
+        // Không fetch header ở bước này nữa để bước Commerce không còn
+        // phụ thuộc máy chủ Anisette; nếu vẫn 403 thì log body nguyên
+        // văn (đã có từ build 16) để soi tiếp.
         var commerceApps: [PurchasedApp] = []
         var commerceError: Error?
         do {
-            let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
             for attempt in 1 ... 3 {
                 do {
                     commerceApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                        try await PurchasedCommerceService.fetchAllPurchasedApps(account: userAccount.account, anisetteHeaders: anisetteHeaders)
+                        try await PurchasedCommerceService.fetchAllPurchasedApps(account: userAccount.account)
                     }
                     commerceError = nil
                     break

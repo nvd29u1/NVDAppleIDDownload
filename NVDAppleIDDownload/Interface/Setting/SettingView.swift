@@ -318,9 +318,6 @@ struct SettingView: View {
                 Link(destination: URL(string: "https://github.com/nvd29u1/SayoSign")!) {
                     Label("SayoSign", systemImage: "signature")
                 }
-                Text("Được làm với 🎀 bởi tác giả gốc. Giấy phép GPL-3.0. Icon dùng Twemoji (CC-BY 4.0).")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
                 Link(destination: URL(string: "https://github.com/ismnoiet/border-beam-ios")!) {
                     Label("BorderBeam", systemImage: "sun.max")
                 }

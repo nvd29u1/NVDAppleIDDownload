@@ -86,9 +86,11 @@ enum PurchasedCommerceService {
     /// Lấy toàn bộ lịch sử mua: quét từng năm từ năm hiện tại lùi về
     /// 2008 (tuần tự, không song song để khỏi bị Apple gắn cờ). `account`
     /// chỉ đọc — hàm không đổi gì trong tài khoản đã lưu.
-    /// `anisetteHeaders` (build 14/15): header xác minh thiết bị lấy từ
-    /// máy chủ Anisette trong Cài đặt — cùng chính sách như DMAP; rỗng
-    /// khi chưa cấu hình.
+    /// `anisetteHeaders` (build 14/15 gửi, build 17 BỎ ở Commerce):
+    /// tham số giữ lại, mặc định rỗng — chẩn đoán sau test bản 16
+    /// (19:34 25/11: Commerce trả 403 authentication thay vì 500;
+    /// iPadn không gửi header xác minh thiết bị ở endpoint này).
+    /// DMAP vẫn gửi Anisette headers như cũ.
     /// Năm hiện tại lỗi thì ném ngay (lỗi có hệ thống sẽ giống hệt ở
     /// mọi năm, quét tiếp chỉ tốn lượt); năm cũ lỗi thì bỏ qua năm đó
     /// rồi quét tiếp — danh sách trả về có thể thiếu năm đó nhưng các
@@ -269,9 +271,11 @@ enum PurchasedCommerceService {
 
     /// Header cho Commerce — đúng tập đã chứng minh chạy được (iPadn
     /// v2.3.5): User-Agent, Accept-Language, X-Dsid, X-Apple-Store-Front,
-    /// Cookie, X-Token, cộng header Anisette của app (cơ chế xác minh
-    /// thiết bị riêng của app). Không Accept riêng, không X-Apple-I-*,
-    /// không X-GUID, không chữ ký SAP (lệnh này Apple không ký).
+    /// Cookie, X-Token. Header Anisette: build 17 KHÔNG gửi nữa ở
+    /// Commerce (chẩn đoán 403 bản 16 — iPadn không gửi ở endpoint này;
+    /// vòng lặp dưới giữ lại cho tham số, mặc định rỗng). Không Accept
+    /// riêng, không X-Apple-I-*, không X-GUID, không chữ ký SAP (lệnh
+    /// này Apple không ký).
     private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, cookie: String, anisetteHeaders: [String: String] = [:]) {
         request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
         request.setValue("en-us", forHTTPHeaderField: "Accept-Language")

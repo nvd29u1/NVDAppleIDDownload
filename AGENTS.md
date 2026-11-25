@@ -1129,6 +1129,33 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     `.symbolEffect` không gate ngoài file macOS-only. CI build với
     target 16.0 là cửa kiểm chứng cuối cho Digger source,
     KeychainAccess min, LookInside (đã gỡ), NIO.
+  12. Bổ sung 19:34 25/11 (anh chốt sau khi test bản 16, commit tiếp
+      theo trên main — CI chạy lại): xoá ĐÚNG 1 dòng credit ở mục Giới
+      thiệu (Cài đặt chính): "Được làm với 🎀 bởi tác giả gốc. Giấy
+      phép GPL-3.0. Icon dùng Twemoji (CC-BY 4.0)." — giữ nguyên mọi
+      credit còn lại (dòng Asspp/SayoSign/BorderBeam, link GitHub,
+      link SayoSign, link BorderBeam) và các file LICENSE trong repo.
+  13. Bổ sung 19:34 25/11 — Commerce 403 (bước chẩn đoán đã ghi ở
+      bản 16): test bản 16 lúc 19:31:14–19:31:24Z — DMAP login/update
+      HTTP 200 (danh sách 368 app còn hiện), Commerce trả HTTP 403
+      bytes=50 body={"status":-1,"errors":[{"code":"authentication"}]}
+      thay vì 500 (hình dạng request đã đúng, Apple trả lời rõ ràng
+      nhưng từ chối xác thực; năm 2026 fail và bị skip,
+      PurchasedCommerceError code=2). Sửa: bước Commerce KHÔNG gửi
+      Anisette headers nữa (iPadn không gửi header xác minh thiết bị
+      ở endpoint này — điểm khác duy nhất còn lại); chỉ đổi đúng chỗ
+      đó — PurchasedStore bỏ luôn lệnh fetch header ở bước Commerce
+      (không còn phụ thuộc máy chủ Anisette), gọi
+      fetchAllPurchasedApps(account:) với mặc định [:]; giữ nguyên
+      cookie + X-Token + query range theo năm + host theo pod +
+      parser invoices. Tham số anisetteHeaders trong
+      PurchasedCommerceService giữ lại (mặc định rỗng) để dễ hoàn tác;
+      DMAP (PurchasedDMAPService:212, PurchasedStore:138) và đường mua
+      (ProductView:428) vẫn gửi Anisette headers như cũ. Nếu vẫn 403
+      thì log body nguyên văn (đã có từ build 16) để soi tiếp — không
+      đoán thêm, không đổi endpoint/method/parser. (Lỗi NSURLError
+      -1005 lúc 12:31:20Z trong log chỉ là rớt mạng thoáng qua rồi
+      thử lại, không phải lỗi cần sửa.)
   - CI + IPA: (bổ sung sau khi push main và chạy CI).
   - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) cài bản 17
     qua SideStore như mọi khi, mở app, kiểm tra tab Ký IPA/Tìm kiếm/
