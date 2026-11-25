@@ -720,3 +720,25 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 12 (`CURRENT_PROJECT_VERSION` 11 → 12,
     chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
     ở cả xcconfig và pbxproj).
+  - CI + IPA: lần đẩy đầu (remote `333db971`) CI "Build App"
+    run 45563851543 `failure` cả build-ios + build-osx ở bước
+    Build — lỗi do chính dòng `mstc` mới thêm:
+    `UInt32(truncatingIfNeeded: Double)` không có overload
+    (annotation: "cannot convert value of type 'TimeInterval'
+    to expected argument type 'BitArray'",
+    PurchasedDMAPService.swift:281); sửa bằng trung gian
+    `UInt64(...)` rồi đẩy lại (remote `c1254f82`), run
+    45567881357 `success` cả 2 job. IPA
+    `deliver/NVDAppleIDDownload.ipa` (25.354.068 byte, SHA256
+    `f18f0f58969a6f27d1da9500637b2797e0e75390662aa4e7cfd6e0b09cb07097`):
+    kiểm chứng 2.0 build 12, bundle
+    `com.NVD.appleiddownload`, min iOS 17.0, đủ nhãn 7 tab +
+    chuỗi Đã mua trong binary, framework CydiaSubstrate đã
+    embed, chuỗi pairing mới 1 hit. Build 11 giữ lại ở
+    `deliver/NVDAppleIDDownload-2.0-build11-backup.ipa`
+    (SHA256 `1514fe66…` khớp bản đã giao). Thứ tự tab mới chỉ
+    kiểm chứng ở source + biên dịch CI, chưa kiểm chứng hiển
+    thị trên iPhone thật (cần anh mở tab bar xem 4 tab đầu).
+    Quy tắc version dòng 2.0 (dừng ở build 19, xong đến 2.1)
+    đã ghi ở mục Build Configuration, giữ nguyên khi ghi chú
+    bản này.
