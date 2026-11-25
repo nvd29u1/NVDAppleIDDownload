@@ -18,6 +18,10 @@ import ButtonKit
 import LocalAuthentication
 import SwiftUI
 
+#if os(macOS)
+    import AppKit
+#endif
+
 @MainActor
 @Observable
 final class AppLock {
@@ -125,7 +129,11 @@ struct AppLockGate<Content: View>: View {
         }
         .padding()
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.background)
+        #if os(macOS)
+            .background(Color(nsColor: .windowBackgroundColor))
+        #else
+            .background(Color(uiColor: .systemBackground))
+        #endif
         .ignoresSafeArea()
     }
 }
