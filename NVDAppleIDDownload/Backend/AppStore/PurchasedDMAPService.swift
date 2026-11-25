@@ -188,6 +188,11 @@ enum PurchasedDMAPService {
     /// 34 + 13, gộp + khử trùng, mới nhất lên đầu). `account` chỉ đọc —
     /// hàm không đổi gì trong tài khoản đã lưu.
     static func fetchPurchasedApps(account: ApplePackage.Account) async throws -> [PurchasedApp] {
+        // Fork ApplePackage trap (precondition) ở cấu hình TLS khi chưa
+        // cài device identifier; AppStore.init cài sẵn identifier đã
+        // lưu / tạo ngẫu nhiên vào Configuration, nên chạm vào nó trước
+        // khi SAPSigner.connect() mở HTTP client đầu tiên.
+        await MainActor.run { _ = AppStore.this }
         let signer: ApplePackage.SAPSigner
         do {
             signer = try await ApplePackage.SAPSigner.connect()
@@ -222,9 +227,14 @@ enum PurchasedDMAPService {
         let (loginData, loginResponse) = try await session.data(for: loginRequest)
         try checkHTTP(loginResponse, label: "login")
         try DMAP.requireOK(loginData)
+        // mlid là session id 32-bit của DAAP; Apple mà trả tag 8 byte
+        // với giá trị vượt UInt32 thì ép kiểu trực tiếp sẽ trap và văng
+        // app — coi như response hỏng, báo lỗi tiếng Việt thay vì crash.
         guard let sessionData = DMAP.first(loginData, code: "mlid"),
-              let sessionID = DMAP.intValue(sessionData).map({ UInt32($0) })
+              let sessionValue = DMAP.intValue(sessionData),
+              sessionValue <= UInt64(UInt32.max)
         else { throw PurchasedDMAPError.badResponse }
+        let sessionID = UInt32(sessionValue)
 
         // 2. Update: POST form session-id + revision + query, ký SAP.
         // Trả về revision trong tag "musr".
@@ -239,9 +249,13 @@ enum PurchasedDMAPService {
         let (updateData, updateResponse) = try await session.data(for: updateRequest)
         try checkHTTP(updateResponse, label: "update")
         try DMAP.requireOK(updateData)
+        // Như mlid ở trên: musr là revision 32-bit, ép kiểu trực tiếp
+        // từ tag 8 byte vượt UInt32 sẽ trap — chặn lại thành badResponse.
         guard let revisionData = DMAP.first(updateData, code: "musr"),
-              let revision = DMAP.intValue(revisionData).map({ UInt32($0) })
+              let revisionValue = DMAP.intValue(revisionData),
+              revisionValue <= UInt64(UInt32.max)
         else { throw PurchasedDMAPError.badResponse }
+        let revision = UInt32(revisionValue)
 
         // 3. Items: POST body DMAP "adsr", ký SAP. Trả về các mục "mlit".
         let itemsBody = itemsRequestBody(sessionID: sessionID, revision: revision)
@@ -264,7 +278,7 @@ enum PurchasedDMAPService {
     /// (aetl).
     private static func itemsRequestBody(sessionID: UInt32, revision: UInt32) -> Data {
         var inner = Data()
-        inner.append(DMAP.encodeUInt32(code: "mstc", value: UInt32(Date().timeIntervalSince1970)))
+        inner.append(DMAP.encodeUInt32(code: "mstc", value: UInt32(truncatingIfNeeded: Date().timeIntervalSince1970)))
         inner.append(DMAP.encodeUInt32(code: "mlid", value: sessionID))
         inner.append(DMAP.encodeUInt8(code: "mikd", value: 2))
         inner.append(DMAP.encodeUInt32(code: "musr", value: revision))
@@ -327,7 +341,12 @@ enum PurchasedDMAPService {
         for (code, payload) in DMAP.children(of: data) {
             switch code {
             case "aeSI":
-                appID = Int64(DMAP.intValue(payload) ?? 0)
+                // App ID ép sang Int64 trực tiếp sẽ trap nếu tag 8 byte
+                // có bit cao bật; không vừa thì bỏ mục này (guard
+                // appID != 0 bên dưới) thay vì văng app.
+                if let value = DMAP.intValue(payload), let appIDValue = Int64(exactly: value) {
+                    appID = appIDValue
+                }
             case "aeBI":
                 bundleID = DMAP.stringValue(payload)
             case "aeLN":

@@ -17,10 +17,10 @@ import SwiftUI
 enum MainTab: Hashable {
     case accounts
     case search
-    case purchased
-    case watchlist
     case downloads
     case sign
+    case purchased
+    case watchlist
     case settings
 }
 
@@ -76,14 +76,14 @@ struct MainView: View {
                 AccountView()
             case .search:
                 SearchView()
-            case .purchased:
-                PurchasedView()
-            case .watchlist:
-                WatchlistView()
             case .downloads:
                 DownloadView()
             case .sign:
                 SignUnavailableView()
+            case .purchased:
+                PurchasedView()
+            case .watchlist:
+                WatchlistView()
             case .settings:
                 SettingView()
             }
@@ -111,10 +111,10 @@ struct MainView: View {
     enum SidebarSection: Hashable, CaseIterable, Identifiable {
         case accounts
         case search
-        case purchased
-        case watchlist
         case downloads
         case sign
+        case purchased
+        case watchlist
         case settings
 
         var id: Self {
@@ -230,12 +230,6 @@ struct MainView: View {
                 SearchView()
                     .tabItem { Label("Search", systemImage: "magnifyingglass") }
                     .tag(MainTab.search)
-                PurchasedView()
-                    .tabItem { Label("Đã mua", systemImage: "bag") }
-                    .tag(MainTab.purchased)
-                WatchlistView()
-                    .tabItem { Label("Đang theo dõi", systemImage: "eye") }
-                    .tag(MainTab.watchlist)
                 DownloadView()
                     .tabItem {
                         Label("Downloads", systemImage: "arrow.down.circle")
@@ -245,6 +239,12 @@ struct MainView: View {
                 SignRootView()
                     .tabItem { Label("Ký IPA", systemImage: "signature") }
                     .tag(MainTab.sign)
+                PurchasedView()
+                    .tabItem { Label("Đã mua", systemImage: "bag") }
+                    .tag(MainTab.purchased)
+                WatchlistView()
+                    .tabItem { Label("Đang theo dõi", systemImage: "eye") }
+                    .tag(MainTab.watchlist)
                 SettingView()
                     .tabItem { Label("Settings", systemImage: "gear") }
                     .tag(MainTab.settings)
@@ -261,11 +261,11 @@ struct MainView: View {
             TabView(selection: $selection.tab) {
                 Tab("Accounts", systemImage: "person", value: .accounts) { AccountView() }
                 Tab("Search", systemImage: "magnifyingglass", value: .search) { SearchView() }
-                Tab("Đã mua", systemImage: "bag", value: .purchased) { PurchasedView() }
-                Tab("Đang theo dõi", systemImage: "eye", value: .watchlist) { WatchlistView() }
                 Tab("Downloads", systemImage: "arrow.down.circle", value: .downloads) { DownloadView() }
                     .badge(dvm.runningTaskCount)
                 Tab("Ký IPA", systemImage: "signature", value: .sign) { SignRootView() }
+                Tab("Đã mua", systemImage: "bag", value: .purchased) { PurchasedView() }
+                Tab("Đang theo dõi", systemImage: "eye", value: .watchlist) { WatchlistView() }
                 Tab("Settings", systemImage: "gear", value: .settings) { SettingView() }
             }
             .neverMinimizeTab()

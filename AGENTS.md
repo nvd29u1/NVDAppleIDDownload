@@ -676,3 +676,47 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 11 (`CURRENT_PROJECT_VERSION` 10 → 11,
     chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
     ở cả xcconfig và pbxproj).
+- Đợt 5 build 12 (25 Nov 2026, 2.0 build 12): xếp lại tab + chặn
+  crash tab Đã mua (2 lỗi anh báo trên iPhone thật 13:45 25/11,
+  sau khi cài build 11).
+  - Xếp lại tab: iPhone chỉ hiện 4 tab + menu Thêm nên thứ tự
+    build 11 chôn Lượt tải + Ký IPA trong Thêm. Thứ tự mới ở cả
+    3 biến thể (LegacyTabMainView, NewMainView iOS 26+, sidebar
+    macOS): Tài khoản, Tìm kiếm, Lượt tải, Ký IPA hiện trực
+    tiếp; Đã mua, Đang theo dõi, Cài đặt vào menu Thêm. Không
+    bỏ tab nào — chỉ đổi thứ tự (`MainTab` /
+    `SidebarSection.allCases` + `detailView`, thứ tự case trong
+    enum đổi theo). Tab mặc định vẫn Lượt tải.
+  - Chặn crash tab Đã mua: triệu chứng — ấn tab, màn mở được,
+    hiện "Đang đồng bộ danh sách Đã mua..." rồi văng app trong
+    lúc đồng bộ (auto-sync DMAP). Rà soát toàn bộ đường đồng bộ
+    (`PurchasedView` + `PurchasedStore` + `PurchasedDMAPService`
+    + `PurchasedCommerceService` + fork ApplePackage pin
+    541c43a): code app KHÔNG có force unwrap / force cast /
+    force try nào trên đường này; `Persist` decode hỏng thì về
+    mặc định, `Lookup` đã có `ensure` chặn trước `.first!`,
+    `SAPSigner.connect()` cũng là đường đăng nhập đã chạy được
+    trên máy thật 24/11. Nghi phạm rõ ràng nhất là 3 chỗ ép
+    kiểu số nguyên trong parser DMAP tự viết — ép trực tiếp sẽ
+    trap (văng app, không throw được) nếu Apple trả tag 8 byte
+    vượt giới hạn: `UInt32(mlid)` / `UInt32(musr)` ở
+    `fetchStorefront` và `Int64(aeSI)` ở `parseItem`. Đã sửa:
+    mlid/musr kiểm tra `<= UInt32.max` rồi mới ép, vượt thì ném
+    `badResponse` (màn hiện lỗi tiếng Việt, giữ danh sách cũ);
+    aeSI dùng `Int64(exactly:)`, không vừa thì bỏ mục đó;
+    `mstc` dùng `truncatingIfNeeded`. Thêm 1 chốt phòng thủ:
+    `fetchPurchasedApps` chạm `AppStore.this` trước khi
+    `SAPSigner.connect()` mở HTTP client — fork có
+    `precondition(!deviceIdentifier.isEmpty)` ở cấu hình TLS,
+    trap nếu chưa cài device identifier (AppStore.init cài sẵn
+    identifier đã lưu / tạo ngẫu nhiên). Đường Commerce
+    (`syncFullHistory`, chỉ chạy khi bấm nút) không có trap
+    nào tương tự. ⚠️ Chưa chắc chắn 100%: không có iPhone thật
+    + không có crash log nên không khẳng định trap nào trên đây
+    là đúng thủ phạm — chỉ biết chắc là sau bản này không còn
+    đường trap nào rõ ràng trên đường đồng bộ; nếu anh vẫn thấy
+    văng thì cần gửi crash log (Cài đặt → Quyền riêng tư →
+    Phân tích) để đối chiếu đúng dòng.
+  - Version: 2.0 build 12 (`CURRENT_PROJECT_VERSION` 11 → 12,
+    chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
+    ở cả xcconfig và pbxproj).
