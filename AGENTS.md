@@ -1176,7 +1176,43 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     PackageView.pkg, PackageManifestRow/ExportIPAButton.manifest)
     đều là truyền vào nên đúng. 2 warning còn lại không chặn build.
     Fix ở commit tiếp theo trên main, CI chạy lại.
-  - CI + IPA: (bổ sung sau khi CI lần 2 pass).
+  - CI lần 2 SUCCESS (run 45618660037, head 6c7b7859, cả build-ios +
+    build-osx). Artifact `NVDAppleIDDownload.ipa` chưa ký
+    (25.276.764 byte) tải về qua redirect-capture, ký ad-hoc bằng
+    zsign `-a -z 9` (lần này zsign đòi `-o` nên ký ra /tmp rồi mv
+    vào — /tmp trống 512M, không gặp vụ đầy như build 16). IPA
+    `deliver/NVDAppleIDDownload.ipa` (25.638.506 byte, SHA256
+    `13308ad7a881e53799a23c0c8135d0f4b831e43385a7a127768e6e2fdaa940eb`):
+    kiểm chứng 2.0 build 17, bundle `com.NVD.appleiddownload`, min
+    iOS 16.0 trong Info.plist, iPhone+iPad; superblob hợp lệ (magic
+    0xfade0cc0, slot 0+2, không có slot entitlements — như bản 16);
+    framework CydiaSubstrate đã embed, superblob riêng hợp lệ
+    (slot 0+2+5); binary có chuỗi mới ("Install with TrollStore" 1,
+    "TrollStore is not installed" 1, "Running inside LiveContainer"
+    1, "Đã kiểm chứng tới iOS" 1, "Đang chạy trong LiveContainer" 1);
+    dòng Twemoji đã xoá ("Được làm với" 0 hit); vi.lproj
+    Localizable.strings đủ 3 bản dịch mới ("Cài bằng TrollStore",
+    "Chưa cài TrollStore", banner LiveContainer — tổng 561 chuỗi,
+    bằng 562 key nguồn trừ key rỗng); "Hỗ trợ iOS 16.0" 0 hit là
+    ĐÚNG — chuỗi nội suy ≤15 byte Swift lưu dạng immediate, không
+    có trong binary dạng literal (như bài học "isJsonApiFormat" ở
+    build 16), hàng About chứng minh bằng literal kề bên "Đã kiểm
+    chứng tới iOS". Diff từ build 16 (9d04416b..6c7b7859): 48 file;
+    MainView.swift chỉ đổi ObservableObject (thứ tự tab giữ nguyên);
+    PurchasedDMAPService + BackgroundDownloadService không động
+    (đường DMAP + tải giữ nguyên); bước Commerce không còn fetch
+    header Anisette (chỉ đúng chỗ đó). IPA để ở worktree b17
+    (`deliver/NVDAppleIDDownload.ipa`) — KHÔNG chép vào worktree
+    chính. Chưa kiểm chứng trên iPhone thật — cần anh test: (1) cài
+    bản 17 qua SideStore như mọi khi, mở app, kiểm tra tab Ký IPA/
+    Tìm kiếm/Lượt tải/Tài khoản còn đúng thứ tự, Đã mua đồng bộ
+    được; (2) mục Giới thiệu ở Cài đặt chính hiện "Hỗ trợ iOS
+    16.0 – 27.2" kèm tích xanh, dòng Twemoji đã mất; (3) bấm "Đồng
+    bộ toàn bộ lịch sử mua" xem Commerce còn 403 không (bản này bỏ
+    header Anisette ở Commerce); (4) cài bản 17 vào LiveContainer,
+    mở tab Ký IPA xem banner cam có hiện và các nút nhập/cài có mờ
+    đi không; (5) máy TrollStore (iOS 14.0–16.6.1/17.0) thì nút "Cài
+    bằng TrollStore" chỉ hiện khi đã cài TrollStore.
   - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) cài bản 17
     qua SideStore như mọi khi, mở app, kiểm tra tab Ký IPA/Tìm kiếm/
     Lượt tải/Tài khoản còn đúng thứ tự, Đã mua đồng bộ được (đường
