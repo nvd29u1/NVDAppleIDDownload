@@ -1156,7 +1156,27 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
       đoán thêm, không đổi endpoint/method/parser. (Lỗi NSURLError
       -1005 lúc 12:31:20Z trong log chỉ là rớt mạng thoáng qua rồi
       thử lại, không phải lỗi cần sửa.)
-  - CI + IPA: (bổ sung sau khi push main và chạy CI).
+  - CI lần 1 FAIL (run 45615578760, head 375815e6, cả build-ios +
+    build-osx đều lỗi ở bước Build — log tải qua API
+    `/actions/jobs/{id}/logs`, endpoint trả text thuần, không phải
+    zip): 3 lỗi iOS / 1 lỗi macOS. (a) 2× `'onChange(of:initial:_:)'
+    is only available in iOS 17.0 or newer` ở AddAccountView:124-125
+    — closure 0 tham số `{ resetAuthentication() }` chỉ khớp overload
+    iOS 17+; đã sửa thành `{ _ in resetAuthentication() }` (overload
+    1 tham số có từ iOS 14). Bài học: sweep onChange phải gồm cả
+    closure 0 tham số, không chỉ 2 tham số — rà lại toàn repo: mọi
+    `.onChange(of:` còn lại đều dùng closure 1 tham số, sạch.
+    (b) 1× `cannot assign value of type 'State<AppPackageArchive>' to
+    type 'ObservedObject<AppPackageArchive>'` ở ProductView:22 — lỗi
+    phân loại của đợt chuyển đổi: archive do view TỰ TẠO trong init
+    (không phải truyền vào) nên phải là @StateObject (giữ ngữ nghĩa
+    sở hữu như @State cũ), đã sửa khai báo + init sang
+    `StateObject(wrappedValue:)`; đã kiểm tra lại các @ObservedObject
+    khác (ProductHistoryView.vm, InstallerView.installer,
+    PackageView.pkg, PackageManifestRow/ExportIPAButton.manifest)
+    đều là truyền vào nên đúng. 2 warning còn lại không chặn build.
+    Fix ở commit tiếp theo trên main, CI chạy lại.
+  - CI + IPA: (bổ sung sau khi CI lần 2 pass).
   - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) cài bản 17
     qua SideStore như mọi khi, mở app, kiểm tra tab Ký IPA/Tìm kiếm/
     Lượt tải/Tài khoản còn đúng thứ tự, Đã mua đồng bộ được (đường

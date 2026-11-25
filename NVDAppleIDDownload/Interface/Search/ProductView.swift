@@ -11,7 +11,11 @@ import Kingfisher
 import SwiftUI
 
 struct ProductView: View {
-    @ObservedObject private var archive: AppPackageArchive
+    // Đợt 5, build 17: archive do view TỰ TẠO trong init (không phải
+    // truyền vào) nên phải là @StateObject (giữ như @State cũ) — dùng
+    // @ObservedObject thì init gán State(initialValue:) không biên
+    // dịch được (CI run 45615578760).
+    @StateObject private var archive: AppPackageArchive
     @Binding var navigationPath: NavigationPath
 
     var region: String {
@@ -19,7 +23,7 @@ struct ProductView: View {
     }
 
     init(archive: AppStore.AppPackage, region: String, navigationPath: Binding<NavigationPath>) {
-        _archive = State(initialValue: AppPackageArchive(accountID: nil, region: region, package: archive))
+        _archive = StateObject(wrappedValue: AppPackageArchive(accountID: nil, region: region, package: archive))
         _navigationPath = navigationPath
     }
 

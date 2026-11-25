@@ -121,8 +121,11 @@ struct AddAccountView: View {
         .disabled(isAuthenticating)
         .formStyle(.grouped)
         .animation(.spring, value: codeRequired)
-        .onChange(of: email) { resetAuthentication() }
-        .onChange(of: password) { resetAuthentication() }
+        // Đợt 5, build 17: closure 0 tham số chỉ khớp overload
+        // onChange(of:initial:) của iOS 17+ — thêm `_ in` để dùng
+        // overload 1 tham số có từ iOS 14 (CI run 45615578760).
+        .onChange(of: email) { _ in resetAuthentication() }
+        .onChange(of: password) { _ in resetAuthentication() }
         #if os(iOS)
             .listStyle(.insetGrouped)
             .navigationBarTitleDisplayMode(.inline)
