@@ -619,6 +619,11 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     tính năng ký chưa kiểm chứng trên iPhone thật (lần đầu dùng
     Apple ID phụ); app ký PHẢI cài trực tiếp qua SideStore,
     không chạy trong LiveContainer (đã chứng minh 24/11).
+  - Sửa lỗi job macOS `LSSupportsOpeningDocumentsInPlace = NO
+    is not supported on macOS`: key này do đợt gộp thêm từ
+    project.yml của NVDsign (chỉ iOS) vào Info.plist dùng chung
+    2 target — đã xoá hẳn (trên iOS thiếu key mặc định đã là
+    NO nên không đổi hành vi).
   - Sửa lỗi link "no rule to process file ... of type
     'sourcecode.c'" (18 file C không biên dịch, symbol sayo_*
     thiếu): `lastKnownFileType` của file `.c` phải là
