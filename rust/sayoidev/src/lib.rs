@@ -220,7 +220,7 @@ async fn open_tunnel(
     // which the device does not allow from here, so an invalid pairing just fails.
     rpc.connect(&mut rpf, || async { String::from("000000") })
         .await
-        .map_err(|e| format!("the iPhone rejected the pairing ({e}); pair again in SayoSign"))?;
+        .map_err(|e| format!("the iPhone rejected the pairing ({e}); pair again in NVDAppleIDDownload"))?;
     let tunnel_port = rpc.create_tcp_listener().await.map_err(describe)?;
     let mut taddr = addr;
     taddr.set_port(tunnel_port);

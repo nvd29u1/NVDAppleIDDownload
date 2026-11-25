@@ -16,6 +16,9 @@ import SwiftUI
 /// a downloaded IPA for signing.
 enum MainTab: Hashable {
     case accounts
+    case search
+    case purchased
+    case watchlist
     case downloads
     case sign
     case settings
@@ -71,6 +74,12 @@ struct MainView: View {
             switch section {
             case .accounts:
                 AccountView()
+            case .search:
+                SearchView()
+            case .purchased:
+                PurchasedView()
+            case .watchlist:
+                WatchlistView()
             case .downloads:
                 DownloadView()
             case .sign:
@@ -101,6 +110,9 @@ struct MainView: View {
 
     enum SidebarSection: Hashable, CaseIterable, Identifiable {
         case accounts
+        case search
+        case purchased
+        case watchlist
         case downloads
         case sign
         case settings
@@ -113,6 +125,12 @@ struct MainView: View {
             switch self {
             case .accounts:
                 "Accounts"
+            case .search:
+                "Search"
+            case .purchased:
+                "Đã mua"
+            case .watchlist:
+                "Đang theo dõi"
             case .downloads:
                 "Downloads"
             case .sign:
@@ -126,6 +144,12 @@ struct MainView: View {
             switch self {
             case .accounts:
                 "person"
+            case .search:
+                "magnifyingglass"
+            case .purchased:
+                "bag"
+            case .watchlist:
+                "eye"
             case .downloads:
                 "arrow.down.circle"
             case .sign:
@@ -178,6 +202,14 @@ struct MainView: View {
                     .keyboardShortcut(",", modifiers: .command)
                     .disabled(selection == nil)
             }
+            CommandGroup(after: .sidebar) {
+                Button("Search") {
+                    selection?.wrappedValue = .search
+                    SearchFieldFocus.shared.requestFocus()
+                }
+                .keyboardShortcut("f", modifiers: .command)
+                .disabled(selection == nil)
+            }
             CommandGroup(replacing: .help) {
                 Button("NVDAppleIDDownload Help", systemImage: "") {
                     NSWorkspace.shared.open(URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!)
@@ -195,6 +227,15 @@ struct MainView: View {
                 AccountView()
                     .tabItem { Label("Accounts", systemImage: "person") }
                     .tag(MainTab.accounts)
+                SearchView()
+                    .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                    .tag(MainTab.search)
+                PurchasedView()
+                    .tabItem { Label("Đã mua", systemImage: "bag") }
+                    .tag(MainTab.purchased)
+                WatchlistView()
+                    .tabItem { Label("Đang theo dõi", systemImage: "eye") }
+                    .tag(MainTab.watchlist)
                 DownloadView()
                     .tabItem {
                         Label("Downloads", systemImage: "arrow.down.circle")
@@ -219,6 +260,9 @@ struct MainView: View {
         var body: some View {
             TabView(selection: $selection.tab) {
                 Tab("Accounts", systemImage: "person", value: .accounts) { AccountView() }
+                Tab("Search", systemImage: "magnifyingglass", value: .search) { SearchView() }
+                Tab("Đã mua", systemImage: "bag", value: .purchased) { PurchasedView() }
+                Tab("Đang theo dõi", systemImage: "eye", value: .watchlist) { WatchlistView() }
                 Tab("Downloads", systemImage: "arrow.down.circle", value: .downloads) { DownloadView() }
                     .badge(dvm.runningTaskCount)
                 Tab("Ký IPA", systemImage: "signature", value: .sign) { SignRootView() }
