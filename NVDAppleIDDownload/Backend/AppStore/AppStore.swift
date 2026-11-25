@@ -112,6 +112,48 @@ class AppStore {
         }
     }
 
+    /// Bật "Chia sẻ IPA qua Wi-Fi" (đợt 3, build 8): chỉ là công tắc cho
+    /// phép mở màn Chia sẻ qua Wi-Fi — máy chủ chỉ chạy khi đang ở màn
+    /// đó, rời màn là tắt, không chạy nền.
+    @ObservationIgnored
+    private var _wifiTransferEnabled = Persist<Bool>(
+        key: "WiFiTransferEnabled",
+        defaultValue: false,
+    )
+
+    var wifiTransferEnabled: Bool {
+        get {
+            access(keyPath: \.wifiTransferEnabled)
+            return _wifiTransferEnabled.wrappedValue
+        }
+        set {
+            withMutation(keyPath: \.wifiTransferEnabled) {
+                _wifiTransferEnabled.wrappedValue = newValue
+            }
+        }
+    }
+
+    /// Bật khoá app bằng Face ID / Touch ID / mật khẩu thiết bị (đợt 3,
+    /// build 8 — LocalAuthentication, không lưu mật khẩu nào trong app).
+    /// Mở app lên là khoá; rời app thì khoá lại ngay.
+    @ObservationIgnored
+    private var _appLockEnabled = Persist<Bool>(
+        key: "AppLockEnabled",
+        defaultValue: false,
+    )
+
+    var appLockEnabled: Bool {
+        get {
+            access(keyPath: \.appLockEnabled)
+            return _appLockEnabled.wrappedValue
+        }
+        set {
+            withMutation(keyPath: \.appLockEnabled) {
+                _appLockEnabled.wrappedValue = newValue
+            }
+        }
+    }
+
     /// Vùng App Store ưa thích để tìm kiếm (đợt 2, build 7 — ý tưởng
     /// iPadn mục 4): danh sách mã vùng ISO-2 theo thứ tự người dùng sắp
     /// xếp, lưu bằng Persist. Vùng tìm kiếm chỉ dùng để tìm app / tra

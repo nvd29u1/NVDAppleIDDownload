@@ -35,15 +35,45 @@ enum StoreDownloadService {
         }
     }
 
-    static func versionMetadata(account: inout Account, package: AppStore.AppPackage, versionID: String, region: String? = nil) async throws -> VersionMetadata {
+    /// Metadata của 1 phiên bản cũ + thông tin giàu thêm (dung lượng IPA
+    /// + ghi chú cập nhật, đợt 3 build 8 — ý tưởng iPadn mục 6). Dung
+    /// lượng/ghi chú đọc từ chính metadata tải của Apple khi có (xem
+    /// versionExtra); Apple không trả thì để nil — AppPackageArchive sẽ
+    /// tra thêm qua Lookup cho phiên bản mới nhất, còn bản cũ không có
+    /// thì UI hiện "—" thay vì bịa số.
+    static func versionMetadata(account: inout Account, package: AppStore.AppPackage, versionID: String, region: String? = nil) async throws -> (metadata: VersionMetadata, extra: VersionExtra) {
         try await product(account: &account, package: package, version: versionID, operation: "version-metadata", region: region) { item in
             guard let metadata = item["metadata"] as? [String: Any],
                   let version = metadata["bundleShortVersionString"] as? String,
                   let dateString = metadata["releaseDate"] as? String,
                   let releaseDate = ISO8601DateFormatter().date(from: dateString)
             else { throw StoreDownloadError.invalidPackage }
-            return VersionMetadata(displayVersion: version, releaseDate: releaseDate)
+            return (VersionMetadata(displayVersion: version, releaseDate: releaseDate), versionExtra(from: metadata))
         }
+    }
+
+    /// Dung lượng + ghi chú cập nhật trong metadata tải của Apple. Các
+    /// khoá lấy theo tên thường gặp trong phản hồi MZFinance; không có
+    /// khoá nào thì trả extra rỗng (nil) — caller không được bịa số.
+    static func versionExtra(from metadata: [String: Any]) -> VersionExtra {
+        var fileSizeBytes: Int64?
+        for key in ["fileSizeBytes", "fileSize", "size", "packageSize"] {
+            if let number = metadata[key] as? NSNumber {
+                fileSizeBytes = number.int64Value
+                break
+            }
+            if let text = metadata[key] as? String, let value = Int64(text) {
+                fileSizeBytes = value
+                break
+            }
+        }
+        let releaseNotes = (metadata["releaseNotes"] as? String)
+            ?? (metadata["whatsNew"] as? String)
+        let notes = releaseNotes?.trimmingCharacters(in: .whitespacesAndNewlines)
+        return VersionExtra(
+            fileSizeBytes: fileSizeBytes,
+            releaseNotes: (notes?.isEmpty == false) ? notes : nil,
+        )
     }
 
     private static func product<Result>(account: inout Account, package: AppStore.AppPackage, version: String?, operation: String, region: String? = nil, parse: ([String: Any]) throws -> Result) async throws -> Result {

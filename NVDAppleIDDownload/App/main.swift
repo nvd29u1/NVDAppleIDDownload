@@ -87,16 +87,22 @@ private struct App: SwiftUI.App {
     var body: some Scene {
         #if os(macOS)
             WindowGroup(id: "main-window") {
-                MainView()
+                // Khoá app (đợt 3, build 8): bọc màn chính để khi khoá
+                // đang bật thì nội dung bị che bởi màn khoá.
+                AppLockGate {
+                    MainView()
+                }
             }
             .windowResizability(.contentSize)
             .commands { SidebarMenuCommands() }
         #else
             WindowGroup(id: "main-window") {
-                if #available(iOS 26.0, *) {
-                    NewMainView()
-                } else {
-                    MainView()
+                AppLockGate {
+                    if #available(iOS 26.0, *) {
+                        NewMainView()
+                    } else {
+                        MainView()
+                    }
                 }
             }
         #endif

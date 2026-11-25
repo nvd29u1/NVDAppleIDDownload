@@ -53,6 +53,34 @@
 >   số vùng). Nút vẫn bấm được khi lệch vùng (app có ở cả hai vùng thì vẫn
 >   nhập được); nếu Apple từ chối vì app không có trong cửa hàng vùng đó thì
 >   app báo rõ bằng tiếng Việt và gợi ý thêm tài khoản đúng vùng ở tab Tài khoản.
+> - **Đợt 3 (2.0 build 8):** Lịch sử phiên bản hiện dung lượng IPA + ghi chú
+>   cập nhật (khi Apple trả trong metadata tải; bản mới nhất tra thêm qua
+>   iTunes Lookup), bấm giữ 1 dòng để copy số version / version ID; app đã
+>   tải xong có nút "Giữ phiên bản này" (đã giữ thì tab Lượt tải không nhắc
+>   bản mới nữa). Màn "Đang theo dõi": theo dõi app ở màn chi tiết, xem giá
+>   hiện tại + lịch sử giá (tra qua iTunes Lookup công khai khi mở màn,
+>   không chạy nền). Mục "So giá các vùng" ở màn chi tiết: so giá app ở các
+>   vùng ưa thích đã chọn, xếp từ rẻ đến đắt, mỗi vùng hiện theo tiền tệ của
+>   vùng đó (chưa quy đổi sang VNĐ). Tab Lượt tải: app đã tải có bản mới trên
+>   Store thì hiện nhãn "Có bản mới" (chỉ tra khi mở tab). Chia sẻ IPA qua
+>   Wi-Fi: bật trong Cài đặt rồi mở màn chia sẻ, máy tính cùng Wi-Fi gõ địa
+>   chỉ IP:cổng để tải IPA đã tải xong; rời màn là máy chủ tắt. Màn chi tiết
+>   gói đã tải có nút "Xem nội dung IPA" (liệt kê file trong ZIP, xem trước
+>   file text nhỏ / ảnh, trích 1 file ra Share Sheet). Khoá app bằng Face ID /
+>   Touch ID / mật khẩu trong Cài đặt (LocalAuthentication, không lưu mật khẩu;
+>   mở app lên là khoá, rời app thì khoá lại). File `altstore-source.json` ở
+>   root repo để cài/cập nhật qua SideStore/AltStore/Feather (xem dưới).
+>   **Chưa làm được: tải PKG Mac** — thư viện ApplePackage (fork nvd29u1) chỉ
+>   có EntityType iPhone/iPad/AppleTV, không có endpoint tải PKG Mac App Store;
+>   muốn làm phải thêm giao thức mới vào fork rồi kiểm chứng, để đợt sau.
+> - **Cài qua AltStore source (từ build 8):** thêm URL
+>   `https://raw.githubusercontent.com/nvd29u1/NVDAppleIDDownload/main/altstore-source.json`
+>   vào SideStore / AltStore / Feather (Add Source), app sẽ hiện trong nguồn
+>   để cài và cập nhật. Mỗi lần phát hành bản mới (tag release) phải cập nhật
+>   `version`, `versionDate`, `versionDescription` và `downloadURL` trong
+>   `altstore-source.json` theo đúng tag/asset của release đó — hiện file đang
+>   trỏ tới asset `v2.0.8/NVDAppleIDDownload.ipa` (chưa có tag này thì link
+>   chưa tải được cho tới khi tag release).
 - Đăng nhập báo `authentication failed: HTTP 204`: máy chủ Apple trả về
   trống, chưa xét mật khẩu — không phải sai mật khẩu hay thiếu mã 2FA.
   Từ 06/11/2026 Apple yêu cầu xác minh thiết bị (Anisette/ADI) khi đăng

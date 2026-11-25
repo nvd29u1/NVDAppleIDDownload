@@ -44,6 +44,39 @@ struct SettingView: View {
 
     private var formContent: some View {
         Form {
+            // Chia sẻ IPA qua Wi-Fi (đợt 3, build 8): công tắc cho phép
+            // mở màn chia sẻ; máy chủ chỉ chạy khi đang ở màn đó, rời
+            // màn là tắt ngay, không chạy nền.
+            Section {
+                Toggle("Chia sẻ IPA qua Wi-Fi", isOn: $vm.wifiTransferEnabled)
+                NavigationLink {
+                    WiFiTransferView()
+                } label: {
+                    HStack {
+                        Text("Mở màn chia sẻ")
+                        Spacer()
+                        Text(vm.wifiTransferEnabled ? "Đã bật" : "Đang tắt")
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .disabled(!vm.wifiTransferEnabled)
+            } header: {
+                Text("Chia sẻ qua Wi-Fi")
+            } footer: {
+                Text("Bật rồi mở màn chia sẻ: máy tính cùng Wi-Fi gõ địa chỉ IP:cổng hiện trên màn để tải file IPA đã tải xong. Máy chủ tắt ngay khi rời màn.")
+            }
+
+            // Khoá app bằng Face ID / Touch ID / mật khẩu (đợt 3, build
+            // 8): dùng LocalAuthentication của hệ thống, app không lưu
+            // mật khẩu nào. Mở app lên là khoá; rời app thì khoá lại.
+            Section {
+                Toggle("Khoá app bằng Face ID / Touch ID / mật khẩu", isOn: $vm.appLockEnabled)
+            } header: {
+                Text("Khoá app")
+            } footer: {
+                Text("Bật thì mỗi lần mở app đều phải mở khoá bằng Face ID / Touch ID hoặc mật khẩu thiết bị. Rời app (sang nền / đa nhiệm) thì khoá lại ngay nên màn hình đa nhiệm cũng chỉ thấy màn khoá. Thiết bị chưa đặt mật khẩu thì không khoá được.")
+            }
+
             Section {
                 Toggle("Demo Mode", isOn: $vm.demoMode)
                 Button("Delete All Downloads", role: .destructive) {

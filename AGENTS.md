@@ -402,3 +402,68 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 7 (`CURRENT_PROJECT_VERSION` 6 → 7, chỉ trong
     `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả xcconfig và
     pbxproj).
+- Đợt 3 build 8 (25 Nov 2026, 2.0 build 8): lịch sử phiên bản giàu hơn
+  + theo dõi/so giá + nhắc bản mới + Wi-Fi transfer + xem nội dung IPA
+  + khoá app + altstore-source.json (mục 6, 9, 10 + "Đáng nhắc thêm"
+  `docs/IPADN-SO-SANH.md`). Học ý tưởng iPadn rồi viết lại sạch, KHÔNG
+  copy code iPadn (GPL-2.0), giữ MIT. Chưa kiểm chứng trên iPhone thật.
+  - Lịch sử phiên bản giàu hơn (`VersionExtra`,
+    `StoreDownloadService.versionMetadata` trả thêm extra,
+    `AppPackageArchive` lưu `versionExtras` theo version ID +
+    `enrichLatestExtraIfNeeded`): mỗi dòng hiện dung lượng IPA + ngày +
+    ghi chú cập nhật (đọc từ metadata tải của Apple — có thì hiện,
+    không có thì UI hiện "—", KHÔNG bịa số; riêng bản mới nhất tra thêm
+    qua iTunes Lookup công khai). Bấm giữ 1 dòng (contextMenu) để copy
+    số version / version ID. Icon đúng từng phiên bản (đọc PNG trong
+    IPA) CHƯA làm — tốn lượt tải range đầu IPA cho từng bản, để đợt sau.
+  - "Giữ phiên bản này": cờ `pinned` trong `PackageManifest`
+    (decodeIfPresent, manifest cũ mặc định false), bật/tắt ở màn chi
+    tiết gói đã tải + từng dòng tab Lượt tải (`Downloads.setPinned`,
+    lưu manifest ngay). Đã giữ thì `UpdateCheckStore.hasUpdate` không
+    nhắc bản mới nữa.
+  - Theo dõi app + so giá (`FollowStore`, `WatchlistView` tab "Đang
+    theo dõi" ở cả 3 main view, `PriceComparisonService`,
+    `PriceComparisonView` trong `ProductView`): bấm "Theo dõi app này"
+    ở màn chi tiết; màn Đang theo dõi hiện giá + phiên bản hiện tại +
+    lịch sử giá (ghi điểm khi giá đổi hoặc điểm cuối hơn 24 giờ, tối đa
+    60 điểm/app). So giá: tra `ApplePackage.Lookup` ở từng vùng ưa
+    thích (đợt 2), xếp rẻ → đắt, mỗi vùng hiện theo tiền tệ của vùng đó
+    (formattedPrice của Apple), KHÔNG quy đổi sang VNĐ (app không có tỉ
+    giá). Giá chỉ tra khi người dùng bấm / mở màn, không chạy nền.
+  - Nhắc bản mới (`UpdateCheckStore`): tab Lượt tải `onAppear` tra
+    phiên bản mới nhất qua Lookup cho app đã tải xong (bỏ qua nếu lần
+    tra trước chưa quá 10 phút), có bản mới thì dòng hiện nhãn cam "Có
+    bản mới: vX.Y". So sánh version theo từng đoạn số.
+  - Wi-Fi transfer (`WiFiTransferServer` tái dùng Vapor đã có,
+    `WiFiTransferView`, công tắc `AppStore.wifiTransferEnabled` trong
+    Cài đặt): trang "/" liệt kê IPA đã tải xong, "/ipa/<uuid>" cho PC
+    tải về; chỉ chạy khi đã bật trong Cài đặt VÀ đang ở màn chia sẻ,
+    rời màn là tắt ngay. Chỉ đọc file IPA đã tải xong, không có đường
+    ghi/xoá. Địa chỉ IP lấy qua getifaddrs (ưu tiên en0), cổng ngẫu
+    nhiên 4000–8000.
+  - Xem nội dung IPA: nút "Content Viewer" ở màn chi tiết gói đã tải
+    đổi tên thành "Xem nội dung IPA" (dùng sẵn `FileListView` liệt kê
+    ZIP + `FileAnalysisView`); `FileAnalysisView` giờ xem trước thật:
+    ảnh hiện 120px (trước đây `thumbnail` khai báo mà không bao giờ
+    gán nên ảnh không hiện), file text ≤ 64 KB hiện nội dung, vẫn trích
+    1 file ra Share Sheet.
+  - Khoá app (`AppLockService`, `AppLockGate` bọc gốc WindowGroup trong
+    `main.swift`, công tắc `AppStore.appLockEnabled` trong Cài đặt):
+    LocalAuthentication `.deviceOwnerAuthentication` (Face ID / Touch
+    ID / mật khẩu thiết bị, không lưu mật khẩu nào). Mở app lên là
+    khoá; `scenePhase != .active` thì khoá lại ngay nên ảnh đa nhiệm
+    cũng chỉ thấy màn khoá.
+  - `altstore-source.json` ở root repo (cài/cập nhật qua SideStore /
+    AltStore / Feather): `downloadURL` trỏ asset release
+    `v2.0.8/NVDAppleIDDownload.ipa`, icon lợn lấy từ
+    `PigLogo.imageset/PigLogo.png` trên raw.githubusercontent. CHƯA có
+    tag v2.0.8 nên link chưa tải được — mỗi lần tag release mới phải
+    cập nhật `version`/`versionDate`/`versionDescription`/`downloadURL`
+    trong file này theo đúng tag/asset.
+  - Mac PKG CHƯA làm được: fork ApplePackage chỉ có EntityType
+    iPhone/iPad/AppleTV, không có endpoint tải PKG Mac App Store — muốn
+    làm phải thêm giao thức mới vào fork rồi kiểm chứng, để đợt sau.
+    Không thêm nút giả.
+  - Version: 2.0 build 8 (`CURRENT_PROJECT_VERSION` 7 → 8, chỉ trong
+    `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả xcconfig và
+    pbxproj).

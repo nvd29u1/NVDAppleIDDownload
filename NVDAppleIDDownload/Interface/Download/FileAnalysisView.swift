@@ -30,6 +30,10 @@ struct FileAnalysisView: View {
     @State var message = ""
     @State var extractedFile: URL?
     @State var thumbnail: PlatformImage?
+    /// Nội dung text của file nhỏ (≤ 64 KB, đọc được UTF-8) — xem trước
+    /// ngay trong app (đợt 3, build 8). File nhị phân / file lớn thì
+    /// không hiện text, chỉ trích ra Share Sheet như trước.
+    @State var textPreview: String?
 
     var renderedThumbnail: Image? {
         guard let thumbnail else { return nil }
@@ -51,7 +55,7 @@ struct FileAnalysisView: View {
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fit)
-                                .frame(width: 32, height: 32)
+                                .frame(width: 120, height: 120)
                                 .frame(maxWidth: .infinity, alignment: .leading)
                         } else {
                             Image(systemName: "doc.text.fill")
@@ -70,6 +74,22 @@ struct FileAnalysisView: View {
                     Text(extractedFile.path)
                 }
                 .transition(.opacity)
+                if let textPreview {
+                    Section {
+                        ScrollView {
+                            Text(textPreview)
+                                .font(.system(.footnote, design: .monospaced))
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .textSelection(.enabled)
+                        }
+                        .frame(maxHeight: 320)
+                    } header: {
+                        Text("Nội dung file")
+                    } footer: {
+                        Text("Chỉ xem trước file text nhỏ (dưới 64 KB). File lớn hơn thì dùng nút Chia sẻ file bên dưới.")
+                    }
+                    .transition(.opacity)
+                }
                 Section {
                     Button("Share File") {
                         AirDrop(items: [extractedFile])
@@ -116,9 +136,26 @@ struct FileAnalysisView: View {
         }
         let destination = tempDir.appendingPathComponent(relativePath)
         _ = try archive.extract(file, to: destination)
+        // Xem trước: ảnh thì làm thumbnail, text nhỏ thì đọc nội dung.
+        // Đọc tối đa 64 KB để file log/binary lớn không nuốt bộ nhớ.
+        let data = (try? Data(contentsOf: destination)) ?? Data()
+        var previewText: String?
+        var previewImage: PlatformImage?
+        #if canImport(UIKit)
+            previewImage = UIImage(data: data)
+        #elseif canImport(AppKit) && !canImport(UIKit)
+            previewImage = NSImage(data: data)
+        #endif
+        if previewImage == nil, data.count <= 64 * 1024,
+           let text = String(data: data, encoding: .utf8), !text.isEmpty
+        {
+            previewText = text
+        }
         await MainActor.run {
             message = "Extracted File"
             extractedFile = destination
+            thumbnail = previewImage
+            textPreview = previewText
         }
     }
 }

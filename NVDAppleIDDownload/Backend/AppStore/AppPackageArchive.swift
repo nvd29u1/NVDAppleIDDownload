@@ -50,6 +50,29 @@ class AppPackageArchive {
         }
     }
 
+    /// Dung lượng IPA + ghi chú cập nhật theo từng version ID (đợt 3,
+    /// build 8 — ý tưởng iPadn mục 6). Lưu riêng với VersionMetadata
+    /// của ApplePackage (chỉ có số version + ngày) để không đụng tới
+    /// thư viện ngoài.
+    @ObservationIgnored
+    private var _versionExtras: Persist<[VersionIdentifier: VersionExtra]>
+
+    var versionExtras: [VersionIdentifier: VersionExtra] {
+        get {
+            access(keyPath: \.versionExtras)
+            return _versionExtras.wrappedValue
+        }
+        set {
+            withMutation(keyPath: \.versionExtras) {
+                _versionExtras.wrappedValue = newValue
+            }
+        }
+    }
+
+    func extra(for versionID: VersionIdentifier) -> VersionExtra? {
+        versionExtras[versionID]
+    }
+
     var isVersionItemsFullyLoaded: Bool {
         assert(versionItems.count <= versionIdentifiers.count)
         return versionItems.count == versionIdentifiers.count
@@ -69,6 +92,7 @@ class AppPackageArchive {
             .lowercased()
         _versionItems = Persist(key: "\(packageIdentifier).versions", defaultValue: [:])
         _versionIdentifiers = Persist(key: "\(packageIdentifier).versionNumbers", defaultValue: [])
+        _versionExtras = Persist(key: "\(packageIdentifier).versionExtras", defaultValue: [:])
     }
 
     func package(for externalVersion: String) -> AppStore.AppPackage? {
@@ -87,6 +111,7 @@ class AppPackageArchive {
         error = nil
         versionIdentifiers = []
         versionItems = [:]
+        versionExtras = [:]
     }
 
     /// Tài khoản đang đăng nhập dùng cho region này. Ưu tiên id tài khoản
@@ -155,7 +180,13 @@ class AppPackageArchive {
                     let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
                         try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: version, region: region)
                     }
-                    self.versionItems[version] = metadata
+                    self.versionItems[version] = metadata.metadata
+                    self.versionExtras[version] = metadata.extra
+                    // Phiên bản mới nhất (dòng đầu tiên) mà metadata tải
+                    // không có dung lượng/ghi chú thì tra thêm qua Lookup.
+                    if nextIdx == 0 {
+                        await self.enrichLatestExtraIfNeeded(versionID: version, displayVersion: metadata.metadata.displayVersion)
+                    }
                 }
             } catch {
                 self.error = error.localizedDescription
@@ -176,14 +207,45 @@ class AppPackageArchive {
         Task {
             do {
                 let requestedPackage = self.package
-                let metadata = try await AppStore.this.withAccount(id: accountID) { userAccount in
+                let result = try await AppStore.this.withAccount(id: accountID) { userAccount in
                     try await StoreDownloadService.versionMetadata(account: &userAccount.account, package: requestedPackage, versionID: versionID, region: region)
                 }
-                self.versionItems[versionID] = metadata
+                self.versionItems[versionID] = result.metadata
+                self.versionExtras[versionID] = result.extra
+                await self.enrichLatestExtraIfNeeded(versionID: versionID, displayVersion: result.metadata.displayVersion)
             } catch {
                 self.error = error.localizedDescription
             }
             self.loading = false
+        }
+    }
+    /// Phiên bản mới nhất: nếu metadata tải không có dung lượng/ghi chú
+    /// thì tra thêm qua iTunes Lookup công khai (chỉ bản hiện tại mới
+    /// có trong Lookup — Lookup không trả được bản cũ). Chỉ tra khi
+    /// versionID là dòng đầu tiên (mới nhất) và extra còn trống; lỗi
+    /// thì thôi, giữ extra cũ, UI hiện "—".
+    private func enrichLatestExtraIfNeeded(versionID: String, displayVersion: String) async {
+        guard versionID == versionIdentifiers.first,
+              versionExtras[versionID]?.isEmpty != false
+        else { return }
+        guard let software = try? await ApplePackage.Lookup.lookup(
+            bundleID: package.software.bundleID,
+            countryCode: region,
+        ), software.version == displayVersion
+        else { return }
+        var extra = versionExtras[versionID] ?? VersionExtra()
+        if extra.fileSizeBytes == nil,
+           let sizeText = software.fileSizeBytes, let size = Int64(sizeText)
+        {
+            extra.fileSizeBytes = size
+        }
+        if extra.releaseNotes == nil,
+           let notes = software.releaseNotes, !notes.isEmpty
+        {
+            extra.releaseNotes = notes
+        }
+        if !extra.isEmpty {
+            versionExtras[versionID] = extra
         }
     }
 }

@@ -13,10 +13,27 @@ struct ProductHistoryView: View {
     @State private var showErrorAlert = false
     @Environment(\.dismiss) var dismiss
 
+    /// Dung lượng IPA: metadata tải của Apple có thì hiện, không có thì
+    /// "—" (riêng bản mới nhất đã tra thêm qua Lookup, xem
+    /// AppPackageArchive.enrichLatestExtraIfNeeded).
+    private let sizeFormatter: ByteCountFormatter = {
+        let formatter = ByteCountFormatter()
+        formatter.countStyle = .file
+        formatter.allowedUnits = [.useKB, .useMB, .useGB]
+        return formatter
+    }()
+
+    private func formattedSize(for key: String) -> String? {
+        guard let size = vm.extra(for: key)?.fileSizeBytes else { return nil }
+        return sizeFormatter.string(fromByteCount: size)
+    }
+
     var body: some View {
         Form {
             ForEach(vm.versionIdentifiers, id: \.self) { key in
                 if let aid = vm.resolvedAccountID(), let pkg = vm.package(for: key) {
+                    let metadata = vm.versionItems[key]
+                    let extra = vm.extra(for: key)
                     Menu {
                         Button("Download \(pkg.software.version)") {
                             Task {
@@ -27,13 +44,52 @@ struct ProductHistoryView: View {
                                 }
                             }
                         }
+                        Button("Sao chép số version") {
+                            copyToClipboard(pkg.software.version)
+                        }
+                        Button("Sao chép version ID") {
+                            copyToClipboard(key)
+                        }
                     } label: {
-                        HStack {
-                            Text(pkg.software.version)
-                                .foregroundStyle(.accent)
-                            Spacer()
+                        VStack(alignment: .leading, spacing: 2) {
+                            HStack {
+                                Text(pkg.software.version)
+                                    .foregroundStyle(.accent)
+                                Spacer()
+                                if let size = formattedSize(for: key) {
+                                    Text(size)
+                                        .font(.caption)
+                                        .foregroundStyle(.secondary)
+                                }
+                            }
+                            HStack(spacing: 6) {
+                                if let date = metadata?.releaseDate {
+                                    Text(date.formatted(date: .abbreviated, time: .omitted))
+                                }
+                                Text("ID \(key)")
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                            }
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                            if let notes = extra?.releaseNotes, !notes.isEmpty {
+                                Text(notes)
+                                    .font(.caption)
+                                    .foregroundStyle(.secondary)
+                                    .lineLimit(3)
+                            }
                         }
                         .contentShape(Rectangle())
+                    }
+                    // Bấm giữ 1 dòng để copy số version / version ID
+                    // (đợt 3, build 8 — ý tưởng iPadn mục 6).
+                    .contextMenu {
+                        Button("Sao chép số version") {
+                            copyToClipboard(pkg.software.version)
+                        }
+                        Button("Sao chép version ID") {
+                            copyToClipboard(key)
+                        }
                     }
                 } else {
                     Button {
@@ -44,6 +100,11 @@ struct ProductHistoryView: View {
                             Spacer()
                         }
                         .contentShape(Rectangle())
+                    }
+                    .contextMenu {
+                        Button("Sao chép version ID") {
+                            copyToClipboard(key)
+                        }
                     }
                 }
             }

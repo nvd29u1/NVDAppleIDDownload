@@ -71,6 +71,11 @@ struct PackageView: View {
 
                     Section {
                         ExportIPAButton(manifest: pkg)
+                        // Giữ phiên bản này (đợt 3, build 8): đã giữ thì
+                        // tab Lượt tải không nhắc "Có bản mới" nữa.
+                        Button(pkg.pinned ? "Bỏ giữ phiên bản này" : "Giữ phiên bản này") {
+                            downloads.setPinned(pkg, !pkg.pinned)
+                        }
                     } header: {
                         Text("Control")
                     } footer: {
@@ -105,6 +110,12 @@ struct PackageView: View {
                         // lưu vào Tệp / AirDrop / chia sẻ qua app khác. File
                         // vẫn mã hoá FairPlay, chỉ xuất đúng file đã tải.
                         ExportIPAButton(manifest: pkg)
+
+                        // Giữ phiên bản này (đợt 3, build 8): đã giữ thì
+                        // tab Lượt tải không nhắc "Có bản mới" nữa.
+                        Button(pkg.pinned ? "Bỏ giữ phiên bản này" : "Giữ phiên bản này") {
+                            downloads.setPinned(pkg, !pkg.pinned)
+                        }
                     } header: {
                         Text("Control")
                     } footer: {
@@ -118,7 +129,10 @@ struct PackageView: View {
                 #endif
 
                 Section {
-                    NavigationLink("Content Viewer") {
+                    // Xem nội dung IPA (đợt 3, build 8): liệt kê file trong
+                    // ZIP, xem trước file text/ảnh nhỏ, trích 1 file ra
+                    // Share Sheet (xem FileListView / FileAnalysisView).
+                    NavigationLink("Xem nội dung IPA") {
                         FileListView(packageURL: pkg.targetLocation)
                     }
                     #if os(macOS)

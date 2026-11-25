@@ -29,6 +29,13 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
 
     var state: PackageState = .init()
 
+    /// "Giữ phiên bản này" (đợt 3, build 8 — ý tưởng iPadn mục 6): app
+    /// đã tải xong mà người dùng giữ phiên bản này thì tab Lượt tải
+    /// không nhắc "Có bản mới" nữa, kể cả khi Store đã có bản mới hơn.
+    /// Bật/tắt ở màn chi tiết gói đã tải và ở từng dòng trong tab Lượt
+    /// tải; lưu cùng manifest nên thoát app vẫn nhớ.
+    var pinned: Bool = false
+
     var targetLocation: URL {
         packagesDir
             .appendingPathComponent(package.software.bundleID)
@@ -82,6 +89,8 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
         iTunesMetadata = try container.decodeIfPresent(Data.self, forKey: .iTunesMetadata) ?? Data()
         creation = try container.decode(Date.self, forKey: .creation)
         state = try container.decode(PackageState.self, forKey: .runtime)
+        // Manifest cũ (trước build 8) chưa có cờ này — mặc định không giữ.
+        pinned = try container.decodeIfPresent(Bool.self, forKey: .pinned) ?? false
     }
 
     func encode(to encoder: Encoder) throws {
@@ -94,10 +103,11 @@ class PackageManifest: Identifiable, Codable, Hashable, Equatable {
         try container.encode(iTunesMetadata, forKey: .iTunesMetadata)
         try container.encode(creation, forKey: .creation)
         try container.encode(state, forKey: .runtime)
+        try container.encode(pinned, forKey: .pinned)
     }
 
     private enum CodingKeys: String, CodingKey {
-        case id, account, package, url, signatures, iTunesMetadata, creation, runtime
+        case id, account, package, url, signatures, iTunesMetadata, creation, runtime, pinned
     }
 
     /// Identity is the immutable UUID; hashing mutable fields like `state` would

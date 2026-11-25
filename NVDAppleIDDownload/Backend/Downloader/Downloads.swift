@@ -67,6 +67,13 @@ class Downloads {
         _manifests.save()
     }
 
+    /// Bật/tắt "Giữ phiên bản này" cho 1 gói đã tải xong (đợt 3, build 8)
+    /// rồi lưu manifest ngay để thoát app vẫn nhớ.
+    func setPinned(_ manifest: PackageManifest, _ pinned: Bool) {
+        manifest.pinned = pinned
+        saveManifests()
+    }
+
     func downloadRequest(forArchive archive: AppStore.AppPackage) -> PackageManifest? {
         manifests.first { $0.package.id == archive.id && $0.package.externalVersionID == archive.externalVersionID }
     }

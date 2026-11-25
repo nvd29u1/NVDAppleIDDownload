@@ -103,7 +103,7 @@ struct FileListView: View {
                     }
                 }
             }
-            .navigationTitle("Contents")
+            .navigationTitle("Xem nội dung IPA")
     }
 
     func loadContents() async throws {

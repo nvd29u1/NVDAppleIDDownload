@@ -25,6 +25,7 @@ struct ProductView: View {
 
     @State private var vm = AppStore.this
     @State private var dvm = Downloads.this
+    @State private var followStore = FollowStore.shared
 
     var eligibleAccounts: [AppStore.UserAccount] {
         vm.eligibleAccounts(for: region)
@@ -253,6 +254,8 @@ struct ProductView: View {
                 }
             }
             pricing
+            followSection
+            PriceComparisonView(bundleID: archive.package.software.bundleID)
         }
         .formStyle(.grouped)
         .onAppear {
@@ -520,6 +523,48 @@ struct ProductView: View {
             } else {
                 Text("Acquiring a license is not available for paid apps. Purchase from the App Store first, then download here. If you've already purchased it, this may fail.")
             }
+        }
+    }
+
+    /// Theo dõi app (đợt 3, build 8 — ý tưởng iPadn mục 9): bấm Theo dõi
+    /// thì app vào màn Đang theo dõi, giá + lịch sử giá được tra qua
+    /// iTunes Lookup công khai khi mở màn đó.
+    var followSection: some View {
+        let appID = archive.package.software.id
+        return Section {
+            if followStore.isFollowing(appID: appID) {
+                if let item = followStore.followed(appID: appID) {
+                    HStack {
+                        Text("Giá hiện tại")
+                        Spacer()
+                        Text(item.lastFormattedPrice ?? "Chưa có giá")
+                            .foregroundStyle(.secondary)
+                    }
+                    if let lastVersion = item.lastVersion {
+                        HStack {
+                            Text("Phiên bản hiện tại")
+                            Spacer()
+                            Text("v\(lastVersion)")
+                                .foregroundStyle(.secondary)
+                        }
+                    }
+                    Text("Đã theo dõi từ \(item.addedDate.formatted(date: .abbreviated, time: .omitted)) · \(item.priceHistory.count) lần ghi giá.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                Button("Bỏ theo dõi", role: .destructive) {
+                    followStore.unfollow(appID: appID)
+                }
+            } else {
+                Button("Theo dõi app này") {
+                    followStore.follow(package: archive.package, region: region)
+                }
+                .nvdBorderBeam(shape: .rounded(10))
+            }
+        } header: {
+            Text("Theo dõi")
+        } footer: {
+            Text("Theo dõi để xem giá hiện tại và lịch sử giá ở màn Đang theo dõi. Giá chỉ được kiểm tra khi bạn mở màn đó, không chạy nền.")
         }
     }
 
