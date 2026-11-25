@@ -644,3 +644,35 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 10 (`CURRENT_PROJECT_VERSION` 9 → 10,
     chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
     ở cả xcconfig và pbxproj).
+- Đợt 5 build 11 (25 Nov 2026, 2.0 build 11): TRẢ LẠI 3 tab
+  Tìm kiếm / Đã mua / Đang theo dõi theo quyết định của anh
+  (12:38 25/11 — "trả lại 3 tab rồi mới giao"; build 10 chưa
+  giao). Tab bar thành 7 tab theo đúng thứ tự build 9, chỉ bỏ
+  Trang chủ và thêm Ký IPA: Tài khoản, Tìm kiếm, Đã mua, Đang
+  theo dõi, Lượt tải, Ký IPA, Cài đặt. Khôi phục ở cả 3 biến
+  thể: LegacyTabMainView (.tabItem + .tag), NewMainView iOS 26+
+  (Tab value-based — KHÔNG dùng `Tab(role: .search)` như build
+  9 vì bản gộp dùng shared `MainTabSelection` binding; SearchView
+  đã có `.searchable` riêng nên ô tìm kiếm vẫn chạy), sidebar
+  macOS (`SidebarSection` + `detailView` + title/icon y hệt
+  build 9: magnifyingglass / bag / eye) + phím tắt ⌘F nhảy tới
+  tab Tìm kiếm (SearchFieldFocus). `MainTab` enum thêm lại 3
+  case search/purchased/watchlist. Tab Installed (chỉ macOS)
+  KHÔNG trả lại — anh chỉ chốt 3 tab trên. Trang chủ vẫn bỏ.
+  - Sửa chuỗi sót build 10: `rust/sayoidev/src/lib.rs:223`
+    "pair again in SayoSign" → "pair again in
+    NVDAppleIDDownload". Giữ nguyên tên client "SayoSign" ở
+    `lib.rs:218` (`RemotePairingClient::new(..., "SayoSign")`) —
+    đó là identifier trong handshake pairing, cùng loại với các
+    identifier hệ thống đã giữ có chủ ý ở NVDsign; đổi thì cần
+    quyết riêng. Chuỗi "SayoSign Desktop" giữ nguyên (tên sản
+    phẩm thật của tác giả); "SayoSign" trong comment code
+    vendored core/rust giữ nguyên (không phải chỗ người dùng
+    nhìn thấy).
+  - CI: run 45555338668 (commit `a7fe7d27`, workflow "Build App")
+    `success` cả build-ios + build-osx; IPA kiểm chứng độc lập
+    từ artifact (2.0 build 11, bundle đúng, đủ 7 tab ở source,
+    chuỗi pairing mới có trong binary, chuỗi cũ 0 hit).
+  - Version: 2.0 build 11 (`CURRENT_PROJECT_VERSION` 10 → 11,
+    chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
+    ở cả xcconfig và pbxproj).
