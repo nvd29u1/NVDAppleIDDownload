@@ -31,7 +31,8 @@ struct SearchView: View {
     @State private var searchType = EntityType.iPhone
 
     @State private var searching = false
-    let regionKeys = Array(ApplePackage.Configuration.storeFrontValues.keys.sorted())
+    /// Toàn bộ 177 mã vùng (bảng tự viết, xem StoreRegionCatalog).
+    let regionKeys = StoreRegionCatalog.all.map(\.code)
 
     @State private var searchError: String?
     #if DEBUG
@@ -44,9 +45,6 @@ struct SearchView: View {
     @State private var navigationPath = NavigationPath()
     @State private var vm = AppStore.this
     @Environment(\.horizontalSizeClass) var horizontalSizeClass
-    var possibleRegion: Set<String> {
-        vm.possibleRegions
-    }
 
     var body: some View {
         #if os(iOS)
@@ -77,24 +75,28 @@ struct SearchView: View {
         }
     }
 
-    var possibleRegionKeys: [String] {
-        regionKeys.filter { possibleRegion.contains($0) }
+    /// Vùng ưa thích của người dùng (đặt trong Cài đặt), hiện đầu menu
+    /// chọn vùng. Lọc mã lạ phòng khi bảng vùng đổi.
+    var favoriteRegionKeys: [String] {
+        vm.searchFavoriteRegions.filter { StoreRegionCatalog.region(for: $0) != nil }
     }
 
     func searchRegionView() -> some View {
         Menu {
-            if !possibleRegionKeys.isEmpty {
+            // Vùng ưa thích hiện riêng đầu menu (inline), rồi tới tất cả
+            // 177 vùng trong menu con — đỡ phải cuộn dài mỗi lần đổi vùng.
+            if !favoriteRegionKeys.isEmpty {
                 buildPickView(
-                    for: possibleRegionKeys,
+                    for: favoriteRegionKeys,
                 ) {
-                    Label("Available Regions", systemImage: "checkmark.seal")
+                    Label("Vùng ưa thích", systemImage: "star.fill")
                 }
                 .pickerStyle(.inline)
 
                 buildPickView(
                     for: regionKeys,
                 ) {
-                    Label("All Regions", systemImage: "globe")
+                    Label("Tất cả vùng", systemImage: "globe")
                 }
                 .pickerStyle(.menu)
             } else {
@@ -180,7 +182,7 @@ struct SearchView: View {
     func buildPickView(for keys: [String], @ViewBuilder label: () -> some View) -> some View {
         Picker(selection: $searchRegion) {
             ForEach(keys, id: \.self) { key in
-                Text("\(key) - \(ApplePackage.Configuration.storeFrontValues[key] ?? String(localized: "Unknown"))")
+                Text(StoreRegionCatalog.pickerLabel(for: key))
                     .tag(key)
             }
         } label: {

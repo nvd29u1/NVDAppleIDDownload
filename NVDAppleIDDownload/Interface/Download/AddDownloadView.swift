@@ -29,6 +29,11 @@ struct AddDownloadView: View {
     @State private var avm = AppStore.this
     @State private var dvm = Downloads.this
 
+    /// Vùng tìm kiếm đang chọn (đợt 2, build 7): tìm app / tra cứu ở đây
+    /// dùng vùng này thay vì vùng của tài khoản; việc tải vẫn theo vùng
+    /// của tài khoản đã chọn.
+    @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
+
     @Environment(\.dismiss) private var dismiss
 
     var account: AppStore.UserAccount? {
@@ -79,7 +84,7 @@ struct AddDownloadView: View {
             } header: {
                 Text("Tìm theo tên app")
             } footer: {
-                Text("Gõ tên app, bấm Tìm rồi bấm vào kết quả để điền Bundle ID vào ô bên dưới. App đã không còn trên App Store thì nhập Bundle ID tay ở dưới.")
+                Text("Gõ tên app, bấm Tìm rồi bấm vào kết quả để điền Bundle ID vào ô bên dưới. App đã không còn trên App Store thì nhập Bundle ID tay ở dưới. Đang tìm ở vùng \(searchRegion) (\(StoreRegionCatalog.displayName(for: searchRegion))) — đổi vùng trong Cài đặt.")
             }
 
             Section {
@@ -123,10 +128,13 @@ struct AddDownloadView: View {
                     guard let account else { return }
                     searchKeyFocused = false
                     do {
-                        guard let countryCode = ApplePackage.Configuration.countryCode(for: account.account.store) else { return }
-                        let software = try await ApplePackage.Lookup.lookup(bundleID: bundleID, countryCode: countryCode)
+                        // Tra cứu + tải theo vùng tìm kiếm đang chọn; tài
+                        // khoản vẫn là tài khoản đã chọn (vùng mua/tải
+                        // theo tài khoản, không theo vùng tìm kiếm).
+                        let region = searchRegion
+                        let software = try await ApplePackage.Lookup.lookup(bundleID: bundleID, countryCode: region)
                         let appPackage = AppStore.AppPackage(software: software)
-                        try await dvm.startDownload(for: appPackage, accountID: account.id, region: countryCode)
+                        try await dvm.startDownload(for: appPackage, accountID: account.id, region: region)
                         hint = String(localized: "Download Requested")
                         hintIsError = false
                     } catch {
@@ -154,14 +162,14 @@ struct AddDownloadView: View {
         .navigationTitle("Direct Download")
     }
 
-    /// Tìm app theo tên (hoặc Bundle ID) qua App Store, dùng kho của tài
-    /// khoản đã chọn — giống cách Request Download lấy countryCode.
+    /// Tìm app theo tên (hoặc Bundle ID) qua App Store, dùng vùng tìm
+    /// kiếm đang chọn — không theo vùng của tài khoản nữa.
     private func searchByName() {
-        guard let account else {
+        guard account != nil else {
             searchError = String(localized: "Hãy chọn tài khoản trước.")
             return
         }
-        guard let countryCode = ApplePackage.Configuration.countryCode(for: account.account.store) else { return }
+        let countryCode = searchRegion
         let term = searchTerm.trimmingCharacters(in: .whitespacesAndNewlines)
         guard !term.isEmpty else { return }
         searchKeyFocused = false

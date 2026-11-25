@@ -337,3 +337,68 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     chủ Anisette (xem báo cáo giao bản).
   - Version: 2.0 build 6 (`CURRENT_PROJECT_VERSION` 5 → 6, chỉ trong
     `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0).
+- Đợt 2 build 7 (25 Nov 2026, 2.0 build 7): màn Đã mua qua DMAP + tải
+  hàng loạt + xuất CSV + 177 vùng tìm kiếm (mục 3 + 4
+  `docs/IPADN-SO-SANH.md`). Học ý tưởng iPadn rồi viết lại sạch, KHÔNG
+  copy code iPadn (GPL-2.0), giữ MIT. Chưa kiểm chứng trên iPhone thật.
+  - Màn Đã mua (`PurchasedView`, tab "Đã mua" sau Search ở cả
+    `LegacyTabMainView` / `NewMainView` / sidebar macOS):
+    `PurchasedDMAPService` đọc danh sách app đã mua qua DMAP
+    (endpoint `pd.itunes.apple.com/.../MZPurchaseDaap.woa/purchase`,
+    POST /login body rỗng `Content-Length: 0` → mlid, POST /update ký
+    SAP → musr, POST /databases/{rev}/items body DMAP "adsr" ký SAP →
+    các mục mlit; 2 lượt cửa hàng "34" iPhone/iPad + "13" Mac, gộp +
+    khử trùng theo App ID, mới nhất lên đầu). Parser tag DMAP tự viết
+    (`DMAP`: 4 ký tự + 4 byte độ dài big-endian, ghép tay từng byte,
+    không `load(as:)`). Tag: aeSI App ID, aeBI Bundle ID, aeLN tên,
+    minm tên dự phòng, aePd phiên bản lúc mua, asdp ngày mua (Unix),
+    aeMk loại media, aeSS mặt nạ nền tảng. App đã gỡ khỏi App Store vẫn
+    hiện (tìm được bằng App ID) và tải được nếu Apple còn phục vụ.
+    `PurchasedStore` cache theo tài khoản
+    (`Persist<[String: [PurchasedApp]]>`, key `PurchasedAppsByAccount`),
+    đồng bộ lại qua `withAccount` (dùng chung phiên đã đăng nhập, retry
+    lỗi tạm thời tối đa 3 lần, phiên hết hạn 401/403 thì báo đăng nhập
+    lại), tra thêm icon/gói qua `Lookup` ở vùng tìm kiếm đang chọn
+    (thử `.iPhone` rồi `.iPad`; Lookup thường vẫn trả về app đã gỡ).
+    Bấm vào mục thì mở màn chi tiết `ProductView` với region = vùng
+    tìm kiếm; tra không ra thì báo đổi vùng tìm kiếm. Chọn nhiều app
+    (nút Chọn/Xong, không dùng `EditButton` vì xung đột editMode) rồi
+    "Tải các app đã chọn" đưa vào hàng đợi qua `Downloads.startDownload`
+    (báo số thành công/thất bại); xuất CSV (Tên, Bundle ID, Ngày mua)
+    qua Share Sheet (`AirDrop`, file tạm `Da-mua-<email>.csv`).
+    CHƯA làm bước `/commerce/account/purchases` — ghi rõ trong màn Đã
+    mua; một số app mua gần đây có thể chưa hiện, làm sau.
+  - Rủi ro chưa xác minh (xem ghi chú SAP trong
+    `PurchasedDMAPService.swift`): `SAPSigner.connect()` + `sign(_:)`
+    chưa xác minh là API public của fork ApplePackage (tài liệu
+    `SAPIntegration.md` của fork ghi "SAPSigner.connect() also exposes
+    fresh setup for clients needing only signing" nhưng không đọc được
+    source fork để chắc chắn). Nếu CI báo lỗi ở đây thì sửa fork thêm
+    ~10 dòng để public `SAPSigner` (cùng kiểu 2 lần thêm
+    `anisetteHeaders` trước đây) rồi nâng pin.
+  - 177 vùng (`StoreRegion` + `StoreRegionCatalog`, bảng tự viết):
+    175 storefront đã kiểm chứng theo dữ liệu công khai (Apple vận hành
+    175, khớp storeboard/countrymanager 11–12/11/2026) + AD (Andorra) +
+    MC (Monaco) chưa xác minh có cửa hàng riêng không — tìm ở 2 vùng
+    đó không có kết quả thì chỉ là không có app, không lỗi. Màn chọn
+    vùng trong Cài đặt (`SearchRegionSettingsView`): tìm theo tên Việt /
+    Anh / mã ISO-2 (không dấu), tick sao chọn vùng ưa thích, kéo sắp
+    xếp + swipe xoá (`onMove`/`onDelete`), nút "Khôi phục mặc định"
+    (ưa thích về mặc định VN/US/GB/JP/KR/CN/SG/HK/TW/IN + vùng tìm kiếm
+    về US), liệt kê vùng của tài khoản đã đăng nhập. Vùng ưa thích lưu
+    `Persist<[String]>` key `SearchFavoriteRegions` trong `AppStore`
+    (`searchFavoriteRegions` + `toggle/reset`, lọc mã lạ khi đọc); vùng
+    đang tìm vẫn ở `AppStorage("searchRegion")`. `SearchView` dùng
+    catalog: menu vùng có "Vùng ưa thích" inline trước rồi "Tất cả vùng"
+    (177), nhãn `VN — Việt Nam`. `ProductView` footer ghi rõ vùng đang
+    tìm + "tải và nhập vào Đã mua vẫn theo vùng tài khoản".
+    `AddDownloadView` tìm tên / Lookup / Request Download dùng vùng
+    tìm kiếm thay vì `countryCode` của tài khoản. Vùng tài khoản (mua/
+    tải) vẫn giữ theo tài khoản — không đổi.
+  - Chuỗi mới dùng `String(localized:)` với literal tiếng Việt nên
+    runtime hiển thị đúng, nhưng CHƯA thêm vào `Localizable.xcstrings`
+    (cần chạy String Catalog update ở Xcode sau để có bản dịch en/
+    zh-Hans).
+  - Version: 2.0 build 7 (`CURRENT_PROJECT_VERSION` 6 → 7, chỉ trong
+    `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0 ở cả xcconfig và
+    pbxproj).

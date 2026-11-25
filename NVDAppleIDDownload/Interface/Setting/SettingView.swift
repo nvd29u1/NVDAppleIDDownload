@@ -15,6 +15,7 @@ import SwiftUI
 struct SettingView: View {
     @Environment(\.openURL) private var openURL
     @State private var vm = AppStore.this
+    @AppStorage("searchRegion") private var searchRegion = StoreRegionCatalog.defaultSearchRegion
 
     @State private var showDeviceIdWarning = false
     @State private var editingDeviceId = false
@@ -103,6 +104,26 @@ struct SettingView: View {
                 Text("Máy chủ Anisette")
             } footer: {
                 Text("Từ tháng 11/2026 Apple yêu cầu đăng nhập App Store phải kèm header xác minh thiết bị (Anisette). Điền địa chỉ máy chủ Anisette của riêng bạn (máy tính trong mạng nhà, ví dụ http://192.168.1.10:6969) — app sẽ lấy header từ máy chủ đó trước mỗi lần đăng nhập. Để trống là tắt, đăng nhập như trước. Chỉ có địa chỉ máy chủ được lưu ở đây; mật khẩu Apple ID KHÔNG BAO GIỜ được gửi tới máy chủ này — máy chủ chỉ trả về header, không nhận mật khẩu.")
+            }
+
+            // Vùng tìm kiếm (đợt 2, build 7): độc lập với vùng tài khoản,
+            // chỉ dùng để tìm app / tra cứu catalog. Mở màn chọn vùng
+            // riêng để xem đủ 177 vùng, tick ưa thích, kéo sắp xếp.
+            Section {
+                NavigationLink {
+                    SearchRegionSettingsView()
+                } label: {
+                    HStack {
+                        Text("Chọn vùng tìm kiếm")
+                        Spacer()
+                        Text(StoreRegionCatalog.pickerLabel(for: searchRegion))
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } header: {
+                Text("Vùng tìm kiếm")
+            } footer: {
+                Text("Vùng này chỉ dùng để tìm app và tra cứu, không ảnh hưởng vùng của tài khoản (để mua và tải). Đổi vùng không làm mất tài khoản nào.")
             }
 
             Section {

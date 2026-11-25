@@ -536,7 +536,7 @@ struct ProductView: View {
         } header: {
             Text("Account")
         } footer: {
-            Text("You have searched this package with region \(region)")
+            Text("Đang xem gói ở vùng \(region) (\(StoreRegionCatalog.displayName(for: region))). Vùng tìm kiếm chỉ dùng để tìm app và tra cứu — việc tải và nhập vào Đã mua vẫn theo vùng của tài khoản đã chọn.")
         }
     }
 

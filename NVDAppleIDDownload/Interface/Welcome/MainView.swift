@@ -58,6 +58,8 @@ struct MainView: View {
                 AccountView()
             case .search:
                 SearchView()
+            case .purchased:
+                PurchasedView()
             case .downloads:
                 DownloadView()
             case .installed:
@@ -72,6 +74,7 @@ struct MainView: View {
         case home
         case accounts
         case search
+        case purchased
         case downloads
         case installed
         case settings
@@ -88,6 +91,8 @@ struct MainView: View {
                 "Accounts"
             case .search:
                 "Search"
+            case .purchased:
+                "Đã mua"
             case .downloads:
                 "Downloads"
             case .installed:
@@ -105,6 +110,8 @@ struct MainView: View {
                 "person"
             case .search:
                 "magnifyingglass"
+            case .purchased:
+                "bag"
             case .downloads:
                 "arrow.down.circle"
             case .installed:
@@ -184,6 +191,8 @@ struct MainView: View {
                     .tabItem { Label("Accounts", systemImage: "person") }
                 SearchView()
                     .tabItem { Label("Search", systemImage: "magnifyingglass") }
+                PurchasedView()
+                    .tabItem { Label("Đã mua", systemImage: "bag") }
                 DownloadView()
                     .tabItem {
                         Label("Downloads", systemImage: "arrow.down.circle")
@@ -206,6 +215,7 @@ struct MainView: View {
                 Tab(role: .search) {
                     SearchView()
                 }
+                Tab("Đã mua", systemImage: "bag") { PurchasedView() }
                 Tab("Downloads", systemImage: "arrow.down.circle") { DownloadView() }
                     .badge(dvm.runningTaskCount)
                 Tab("Settings", systemImage: "gear") { SettingView() }

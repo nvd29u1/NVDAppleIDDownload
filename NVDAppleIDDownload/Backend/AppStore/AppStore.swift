@@ -112,6 +112,46 @@ class AppStore {
         }
     }
 
+    /// Vùng App Store ưa thích để tìm kiếm (đợt 2, build 7 — ý tưởng
+    /// iPadn mục 4): danh sách mã vùng ISO-2 theo thứ tự người dùng sắp
+    /// xếp, lưu bằng Persist. Vùng tìm kiếm chỉ dùng để tìm app / tra
+    /// cứu catalog, độc lập với vùng của tài khoản. Vùng đang tìm thì
+    /// lưu ở AppStorage "searchRegion" (dùng chung với SearchView).
+    @ObservationIgnored
+    private var _searchFavoriteRegions = Persist<[String]>(
+        key: "SearchFavoriteRegions",
+        defaultValue: StoreRegionCatalog.defaultFavorites,
+    )
+
+    var searchFavoriteRegions: [String] {
+        get {
+            access(keyPath: \.searchFavoriteRegions)
+            return _searchFavoriteRegions.wrappedValue.filter { StoreRegionCatalog.region(for: $0) != nil }
+        }
+        set {
+            withMutation(keyPath: \.searchFavoriteRegions) {
+                _searchFavoriteRegions.wrappedValue = newValue.filter { StoreRegionCatalog.region(for: $0) != nil }
+            }
+        }
+    }
+
+    /// Thêm/bỏ một vùng khỏi danh sách ưa thích (giữ nguyên thứ tự còn
+    /// lại; vùng mới thêm vào cuối).
+    func toggleSearchFavoriteRegion(_ code: String) {
+        var favorites = searchFavoriteRegions
+        if let index = favorites.firstIndex(of: code) {
+            favorites.remove(at: index)
+        } else {
+            favorites.append(code)
+        }
+        searchFavoriteRegions = favorites
+    }
+
+    /// Đưa danh sách ưa thích về mặc định (VN + các cửa hàng lớn).
+    func resetSearchFavoriteRegions() {
+        searchFavoriteRegions = StoreRegionCatalog.defaultFavorites
+    }
+
     static let this = AppStore()
 
     static func normalizedDeviceIdentifier(_ value: String) -> String? {
