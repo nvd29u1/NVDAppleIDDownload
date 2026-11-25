@@ -65,8 +65,9 @@
 		<string>filza</string>
 		<string>santander</string>
 	</array>
-	<key>LSSupportsOpeningDocumentsInPlace</key>
-	<false/>
+	<!-- LSSupportsOpeningDocumentsInPlace removed (build 10 fix): the
+	     value NO is not supported on macOS and the shared Info.plist is
+	     used by both targets; on iOS the absence already means NO. -->
 	<key>NSBonjourServices</key>
 	<array>
 		<string>_remotepairing-pairable-host._tcp</string>
