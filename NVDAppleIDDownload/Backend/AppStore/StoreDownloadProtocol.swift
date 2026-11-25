@@ -32,10 +32,12 @@ enum StoreDownloadError: LocalizedError {
             // không có trong cửa hàng vùng của tài khoản. Dịch sang tiếng
             // Việt kèm hướng dẫn đổi tài khoản thay vì để nguyên mã số —
             // màn Lịch sử phiên bản hiện lỗi này qua alert "Oops".
-            if ["2059", "1010", "-128"].contains(code) {
-                return String(localized: "Apple từ chối vì lệch vùng (mã \(code)). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại.")
-            }
-            return message.isEmpty ? String(localized: "Apple rejected the download (code: \(code)).") : message
+            // Giữ nguyên dạng 1 biểu thức: getter này dùng switch làm biểu
+            // thức trả về, thêm `return`/`if` ở đây sẽ làm các nhánh khác
+            // mất giá trị trả về ("missing return in getter").
+            ["2059", "1010", "-128"].contains(code)
+                ? String(localized: "Apple từ chối vì lệch vùng (mã \(code)). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại.")
+                : (message.isEmpty ? String(localized: "Apple rejected the download (code: \(code)).") : message)
         }
     }
 }
