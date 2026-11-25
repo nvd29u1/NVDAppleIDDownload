@@ -619,6 +619,13 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     tính năng ký chưa kiểm chứng trên iPhone thật (lần đầu dùng
     Apple ID phụ); app ký PHẢI cài trực tiếp qua SideStore,
     không chạy trong LiveContainer (đã chứng minh 24/11).
+  - Sửa lỗi link "no rule to process file ... of type
+    'sourcecode.c'" (18 file C không biên dịch, symbol sayo_*
+    thiếu): `lastKnownFileType` của file `.c` phải là
+    `sourcecode.c.c` (type cụ thể có rule CompileC), không phải
+    `sourcecode.c` (type cha trừu tượng, không có rule) — lỗi do
+    script sửa pbxproj ghi sai type; đã sửa 18 entry (17 file
+    core + SayoHook.c), header vẫn `sourcecode.c.h`.
   - Sửa lỗi CI của build 9 (runner giờ dùng Xcode 26.6 — code
     biên dịch được ngày 24/11 giờ lỗi): 7 chỗ
     `UIApplication.shared.open(...)` thiếu `await` (SDK mới chỉ
