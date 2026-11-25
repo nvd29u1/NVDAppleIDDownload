@@ -278,7 +278,7 @@ enum PurchasedDMAPService {
     /// (aetl).
     private static func itemsRequestBody(sessionID: UInt32, revision: UInt32) -> Data {
         var inner = Data()
-        inner.append(DMAP.encodeUInt32(code: "mstc", value: UInt32(truncatingIfNeeded: Date().timeIntervalSince1970)))
+        inner.append(DMAP.encodeUInt32(code: "mstc", value: UInt32(truncatingIfNeeded: UInt64(Date().timeIntervalSince1970))))
         inner.append(DMAP.encodeUInt32(code: "mlid", value: sessionID))
         inner.append(DMAP.encodeUInt8(code: "mikd", value: 2))
         inner.append(DMAP.encodeUInt32(code: "musr", value: revision))
