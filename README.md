@@ -133,7 +133,12 @@ _`ipatool-ios` and `localhost.direct` are no longer used in the project._
 
 ## 📄 License
 
-MIT License. See [LICENSE](./LICENSE) for details.
+App này trộn 3 giấy phép — mỗi phần code giữ giấy phép gốc của nó
+(xem chi tiết ở [LICENSES.md](./LICENSES.md)):
+
+- **MIT** — app gốc Asspp (Lakr233). Xem [LICENSE](./LICENSE).
+- **GPL-3.0** — phần Ký IPA, port từ SayoSign (murk-sus). Xem [LICENSE-SayoSign-GPL-3.0](./LICENSE-SayoSign-GPL-3.0).
+- **GPL-2.0-or-later** — phần Đăng nhập, port từ iPadn (mengangs). Xem [LICENSE-iPadn-GPL-2.0](./LICENSE-iPadn-GPL-2.0).
 
 ---
 

@@ -1558,3 +1558,141 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0). BẢN CUỐI
     dãy 2.0 — sau 19 sang 2.1 (MARKETING_VERSION 2.0 → 2.1, đổi ở cả
     xcconfig và pbxproj).
+  - Fork: `nvd29u1/ApplePackage` `cdf46aa2` (parent 585aae70) —
+    attempt "1", requestUserAgent, safeURL, trailing slash. Pin app
+    đổi ở cả `Package.resolved` và pbxproj. ĐÃ GIAO (chỉ báo lại,
+    chưa giao cho anh): remote app `e9e1e535` (local `ddd2391`),
+    CI Build App 45647748708 SUCCESS (build-ios 139323253791 +
+    build-osx 139323253082) + Store download checks 45647748693
+    SUCCESS. IPA `deliver/NVDAppleIDDownload.ipa` 25.646.092 byte,
+    SHA256 `e06314da200fbda8716bc7174e81ab93bf1844f462ba25948069d7252ff9739b`
+    (ký ad-hoc zsign `-a -z 9` từ artifact CI 25.109.656 byte).
+    Kiểm chứng độc lập: Info.plist 2.0 build 19, MinimumOSVersion
+    16.0, bundle com.NVD.appleiddownload; superblob hợp lệ (cấu trúc
+    y hệt bản 18 đã cài được); bundle có đủ 20/20 key vi mới
+    (đã parse binary plist vi.lproj, không dùng grep thô vì file
+    này là bplist); binary có "jkcoxson (Mac)" + "Configurator/2.21",
+    không còn "No Downloads"/"No Accounts", Twemoji 0 hit, đủ 7 tab.
+    Backup bản 18: `deliver/NVDAppleIDDownload-2.0-build18-backup.ipa`
+    (SHA256 `3802c1ff…`, 25.644.174 byte).
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) ĐĂNG NHẬP
+    lại bằng tài khoản phụ (kumit.95bt@gmail.com): lần này request
+    KHÔNG gắn header Anisette, attempt "1", UA Configurator/2.21 —
+    chụp Nhật ký quanh `>>> POST` + `<<<` để đối chiếu (UA phải hiện
+    2.21, URL có dấu "/"); (2) màn Lượt tải + Tài khoản trống đã
+    tiếng Việt chưa; (3) picker Anisette vẫn "jkcoxson (Mac)";
+    (4) Đồng bộ Đã mua (DMAP) vẫn chạy (đường rotate giữ nguyên
+    bản 18 — nếu sync lỗi thì báo ngay, vì attempt đã đổi "1" cho
+    cả rotate). Nếu đăng nhập VẪN lỗi thì điểm khác còn lại duy
+    nhất là HTTP stack (AsyncHTTPClient vs URLSession) — cần anh
+    chốt hướng mới, không sửa mò trong bản 19.
+
+## Đợt 5 build 20 — PORT HỆ ĐĂNG NHẬP iPadn (2.1 build 20, BẢN ĐẦU dãy 2.1)
+  (Anh test bản 19 trên máy thật 23:12 25/11: đăng nhập VẪN LỖI, lần này
+  "authentication failed: HTTP 404" (kumit.95bt@gmail.com). Log 16:12:09Z:
+  `>>> POST .../wa/authenticate/` UA 2.21, chỉ Content-Type +
+  X-Apple-ActionSignature, `<<< 404 (146 bytes)`. 3 điểm bản 19 đã vào
+  request thật nhưng vẫn lỗi. Anh chốt 23:24 25/11: "giờ cho lẫn lộn luôn
+  đi" — lấy thẳng code đăng nhập iPadn, chấp nhận trộn giấy phép; quy tắc
+  "chỉ học ý tưởng, không copy code GPL-2.0" ở bản 18 ĐÃ BỊ HỦY. Anh chốt
+  thêm 23:26: ghi rõ 3 giấy phép vào repo.)
+
+  ### 0. Kết luận điều tra trước khi port (soi thêm trong bản 20, rồi dừng
+  theo lệnh anh — ưu tiên tốc độ, đi thẳng vào port)
+  - Curl ma trận (request dummy, không chữ ký thật): cùng một hình dạng
+    request cho mã khác nhau giữa các lần chạy (204/301/302/403/404) —
+    mã HTTP KHÔNG mang thông tin chẩn đoán cho request bị từ chối; HTTP/2
+    vs HTTP/1.1 cũng không quyết định mã. → Không kết luận được "chữ ký
+    sai" hay "tầng HTTP sai" từ mã lỗi.
+  - Fork CÓ sẵn test live-probe (SAPLiveProbeTests: signed phải về 200 +
+    BadLogin plist, unsigned/corrupted phải 403) — là thí nghiệm quyết
+    định cho chữ ký fork, nhưng đã DỪNG giữa chừng theo quyết định port
+    23:24 (build probe trên Linux đã chạy `swift package resolve` rồi bị
+    kill; thư mục thử `~/workspace/sap-probe-build` còn sót, không dùng nữa).
+  - So sánh iPadn vs fork (đã soi): iPadn ký SAP bằng runtime WASM
+    (sapWasmPrepareSetup NHẬN guid; chạy libCoreADI.so của Apple qua
+    Unicorn) + request qua URLSession; fork ký bằng Swift tự viết
+    (handshake không dùng guid) + AsyncHTTPClient HTTP/1.1. Chưa chứng
+    minh điểm nào là thủ phạm — port nguyên hệ iPadn là cách chắc chắn
+    nhất, không cần xác định thủ phạm trước.
+
+  ### 1. Port hệ đăng nhập iPadn v2.3.5 (commit c7be403, GPL-2.0-or-later)
+  - File port (copy nguyên, chỉ đổi tên tiền tố IPadn/ipadn + dịch chuỗi
+    tiếng Trung sang tiếng Việt + bỏ AppText/InstallLog): 
+    `NVDAppleIDDownload/Backend/IPadnLogin/IPadnHTTPClient.swift` (URLSession,
+    ephemeral, không cookie, redirect thủ công, retry tạm thời),
+    `IPadnAppleAuthentication.swift` (bag, endpoint "/", authenticate,
+    withStoreProof), `IPadnSAPSigner.swift` (WKWebView headless + runtime
+    WASM, cache chữ ký theo guid+SHA256 body), `IPadnLoopbackServer.swift`
+    (máy chủ 127.0.0.1: phục vụ runtime + proxy setupCert/fpinit qua
+    IPadnHTTPClient), `IPadnApplePropertyList.swift`,
+    `IPadnLoginSupport.swift` (kiểu nhỏ: IPadnToolError,
+    IPadnHTTPStatusError, ipadnPlistString, IPadnLockedValue,
+    IPadnStoreProofRecord/StoreProofStore Keychain, ipadnNormalizedDeviceGUID,
+    ipadnStorefrontIdentifier, ipadnPodFromHost),
+    `IPadnLoginService.swift` (MỚI: luồng performLogin của iPadn, trả về
+    ApplePackage.Account của fork để DMAP/tải/mua dùng tiếp).
+  - Runtime SAP: `NVDAppleIDDownload/SAPRuntime/` (index.html, sap-signer.js,
+    sap.wasm ~50MB, wasm_exec.js, unicorn_x86.js, libCoreADI.so,
+    libstoreservicescore.so, Go-BSD-3-Clause.txt, LGPL-2.0.txt,
+    PROVENANCE.json, manifest.json) — copy nguyên từ
+    `iPadn-iOS/vendor/SAPRuntime/files/`. IPA sẽ nặng thêm ~53MB.
+    **sap.wasm lưu dạng chia nhỏ** `sap.wasm.part00..05` (8 MB/mảnh) vì
+    Git Data API từ chối blob ~50 MB (HTTP 422 "input was too large");
+    `Resources/Scripts/compile.release.mobile.ci.sh` ghép lại thành
+    sap.wasm trước xcodebuild và kiểm tra SHA-256
+    (b7150bb4…, khớp manifest.json; đã kiểm chứng ghép lại khớp SHA gốc).
+  - Mapping kết quả đăng nhập → fork Account: appleId/store/firstName/
+    lastName/passwordToken/dsPersonId từ plist (store = phần đầu của
+    X-Set-Apple-Store-Front, vd "143467-1" → "143467"; pod = header `pod`
+    hoặc host p<digits>-buy); cookie HTTPCookie → ApplePackage.Cookie
+    (name/value/path/domain/expiresAt/httpOnly/secure); dsid dự phòng qua
+    X-Dsid rồi tên cookie mz_at0-/mz_at_ssl- (đúng như iPadn).
+  - Phạm vi hẹp: CHỈ đăng nhập. Rotate/DMAP/mua license giữ fork
+    (AsyncHTTPClient + SAP fork) vì đang chạy được. Store-proof
+    (X-Apple-AMD) chỉ dùng khi mua (buyProduct) nên đường đăng nhập
+    không chạm tới — code port giữ nguyên để biên dịch, không gọi.
+  - Chỉ iOS: toàn bộ file IPadnLogin bọc `#if os(iOS)` (SAPSigner dùng
+    UIKit/WKWebView); macOS giữ đường fork cũ.
+  - Nối dây: `AuthenticationService.authenticateIPadn(email:password:code:)`
+    (mới, iOS-only; retry 3 lần cho lỗi cửa, 2FA đổi sang
+    ApplePackage.AuthenticationError.verificationCodeRequired để UI hiện
+    ô nhập mã); `AddAccountView` trên iOS gọi thẳng hàm này, KHÔNG tạo
+    ApplePackage.Authenticator nữa; macOS giữ luồng cũ.
+  - Kiểm chứng code-level: `swiftc -parse` pass cả 7 file IPadnLogin +
+    2 file sửa (parse only, không type-check). CI là cửa kiểm chứng cuối
+    (đặc biệt: SAPRuntime có vào bundle dưới dạng thư mục SAPRuntime
+    không — LoopbackServer tìm bằng
+    `Bundle.main.url(forResource: "SAPRuntime", withExtension: nil)`).
+
+  ### 2. Giấy phép — tổng hợp 3 giấy phép vào repo (anh chốt 23:26)
+  - File mới `LICENSES.md` ở root + mục License trong README.md: MIT
+    (Asspp gốc, Lakr233 — app gốc trừ 2 phần dưới), GPL-3.0 (SayoSign,
+    murk-sus — tab Ký IPA: Interface/Sign/, core/, rust/, hook/),
+    GPL-2.0-or-later (iPadn, mengangs — phần Đăng nhập mới port:
+    Backend/IPadnLogin/ + SAPRuntime/).
+  - Kiểm tra header giấy phép iPadn: repo LICENSE là text GPL-2.0
+    (tháng 6/1991); các file Swift gốc KHÔNG mang header giấy phép
+    riêng; README iPadn dòng 216 + 404 ghi rõ "GPL-2.0-or-later" →
+    kết luận: **GPL-2.0-or-later, KHÔNG phải v2-only**. Tác giả
+    mengangs, repo https://github.com/mengangs/ipadn.
+  - File `LICENSE-iPadn-GPL-2.0` mới ở root (copy text GPL-2.0 từ repo
+    iPadn; "or later" theo tuyên bố trong README iPadn). Đã có sẵn
+    `LICENSE` (MIT) + `LICENSE-SayoSign-GPL-3.0`.
+  - Lưu ý SAPRuntime (ghi đúng theo PROVENANCE.json gốc iPadn): sap.wasm
+    và các file .so lấy nguyên từ IPA-Tool-3.0.scripting (tác giả 小白脸);
+    libCoreADI.so + libstoreservicescore.so từ gói Apple Music for
+    Android x86_64 chính thức; iPadn tự ghi "complete license grant
+    for all components not established" — ghi lại đúng như vậy trong
+    LICENSES.md, không khẳng định thêm.
+
+  ### 3. Version + CI/IPA
+  - Version: 2.1 build 20 (`MARKETING_VERSION` 2.0 → 2.1 ở CẢ
+    `Configuration/Version.xcconfig` LẪN `Asspp.xcodeproj/project.pbxproj`
+    dòng 522 + 565; `CURRENT_PROJECT_VERSION` 19 → 20, chỉ trong
+    xcconfig). BẢN ĐẦU dãy 2.1 (2.0 dừng ở build 19).
+  - CI + IPA: (điền sau khi CI chạy xong)
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: đăng nhập bằng
+    tài khoản phụ (kumit.95bt@gmail.com) xem vào được không; nếu vẫn lỗi
+    thì chụp Nhật ký quanh dòng "ipadn login: ..." (stage + mã HTTP, không
+    có mật khẩu/token trong log).

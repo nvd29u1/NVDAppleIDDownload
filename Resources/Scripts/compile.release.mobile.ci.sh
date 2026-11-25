@@ -45,6 +45,20 @@ if [ ! -f "$SRCROOT/rust/sayoidev/target/aarch64-apple-ios/release/libsayoidev.a
 fi
 echo "[+] libsayoidev.a built"
 
+# Reassemble the SAP runtime WASM (iPadn login, 2.1 build 20).
+# sap.wasm is ~50 MB, too large for a single Git Data API blob, so the repo
+# stores it split as NVDAppleIDDownload/SAPRuntime/sap.wasm.part00..05
+# (8 MB each); reassemble it here, after `git clean`/`git reset` above,
+# and verify the SHA-256 from vendor/SAPRuntime/manifest.json before the build.
+if [ ! -f "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm" ]; then
+    cat "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm.part"* > "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm"
+fi
+if [ "$(shasum -a 256 "$SRCROOT/NVDAppleIDDownload/SAPRuntime/sap.wasm" | awk '{print $1}')" != "b7150bb4d31a03c1a813d310c0b5d7211be2510f7ee970b273f4fce7ea134015" ]; then
+    echo "[-] sap.wasm SHA-256 mismatch after reassembly (expected b7150bb4...)"
+    exit 1
+fi
+echo "[+] sap.wasm reassembled and verified"
+
 xcodebuild -workspace "$WORKSPACE" \
     -scheme "$SCHEME" \
     -configuration Release \

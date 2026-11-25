@@ -84,6 +84,11 @@ struct AddAccountView: View {
                     defer { isAuthenticating = false }
                     logger.info("starting authentication for user")
                     do {
+#if os(iOS)
+                        // 2.1 build 20: đăng nhập bằng hệ iPadn (runtime SAP
+                        // trên máy + URLSession), không tạo session fork nữa.
+                        _ = try await vm.authenticateIPadn(email: email, password: password, code: code)
+#else
                         let session: ApplePackage.Authenticator
                         if let authenticator {
                             session = authenticator
@@ -92,6 +97,7 @@ struct AddAccountView: View {
                             authenticator = session
                         }
                         _ = try await vm.authenticate(email: email, password: password, code: code, using: session)
+#endif
                         logger.info("authentication successful for user")
                         dismiss()
                     } catch {

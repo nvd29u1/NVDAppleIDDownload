@@ -152,6 +152,68 @@ extension AppStore {
         return message.contains("failed to retrieve redirect location") || message.contains("redirect limit exceeded")
     }
 
+    /// Đăng nhập bằng hệ iPadn (2.1 build 20, chỉ iOS): ký SAP bằng runtime
+    /// WASM trên máy + request qua URLSession, đúng hình dạng iPadn đã đăng
+    /// nhập được (không header Anisette, attempt "1"/"2", UA 2.21). Thay
+    /// đường fork (AsyncHTTPClient) ở sign-in; rotate/DMAP/mua giữ fork.
+    /// Lỗi cần mã 2FA được đổi sang lỗi của fork để UI hiện ô nhập mã.
+#if os(iOS)
+    @MainActor
+    func authenticateIPadn(email: String, password: String, code: String) async throws -> UserAccount {
+        logger.info("starting iPadn authentication for user")
+        var lastError: Error?
+        for attempt in 1...3 {
+            do {
+                let appleAccount = try await IPadnLoginService().login(email: email, password: password, code: code)
+                let userAccount = try save(email: email, account: appleAccount)
+                logger.info("iPadn authentication successful for user")
+                return userAccount
+            } catch {
+                lastError = error
+                if let loginError = error as? IPadnAppleLoginError {
+                    if loginError == .verificationRequired {
+                        throw ApplePackage.AuthenticationError.verificationCodeRequired
+                    }
+                    throw error
+                }
+                if case ApplePackage.AuthenticationError.verificationCodeRequired = error {
+                    throw error
+                }
+                guard Self.isTransientIPadnAuthError(error), attempt < 3 else { break }
+                logger.info("transient iPadn authentication failure (attempt \(attempt)/3): \(error.localizedDescription) — retrying")
+                try? await Task.sleep(nanoseconds: 2_000_000_000)
+            }
+        }
+        if let error = lastError, Self.isEmptyAppleResponse(error) {
+            logger.error("iPadn authentication failed for user: \(error.localizedDescription)")
+            throw AuthenticationGateError.appleEmptyResponse
+        }
+        if let error = lastError, Self.isRedirectRefused(error) {
+            logger.error("iPadn authentication failed for user: \(error.localizedDescription)")
+            throw AuthenticationGateError.appleRedirectRefused
+        }
+        logger.error("iPadn authentication failed for user: \(lastError?.localizedDescription ?? "?")")
+        throw lastError ?? AuthenticationError.accountNotFound
+    }
+
+    /// Lỗi cửa Apple ở đường iPadn (đáng thử lại): mã HTTP 204/403/404/5xx
+    /// hoặc câu lỗi cửa chung. Phán quyết tài khoản thật (sai mật khẩu,
+    /// tài khoản bị vô hiệu, mã 2FA sai — qua IPadnAppleLoginError hoặc
+    /// IPadnToolError của appleFailure) thì KHÔNG thử lại.
+    private static func isTransientIPadnAuthError(_ error: Error) -> Bool {
+        if let status = error as? IPadnHTTPStatusError {
+            return [204, 403, 404, 500, 502, 503, 504].contains(status.code)
+        }
+        if let tool = error as? IPadnToolError, case .message(let text) = tool {
+            return text.contains("chưa trả về dữ liệu đăng nhập")
+                || text.contains("Đăng nhập Apple tạm thời không dùng được")
+                || text.contains("Máy chủ trả về bất thường")
+                || text.contains("Tạm thời chưa xác minh được")
+        }
+        return Self.isTransientAuthError(error)
+    }
+#endif
+
     /// Anisette headers cho một lệnh store (mua license / rotate token /
     /// DMAP). Nếu đã đặt URL máy chủ Anisette thì lấy header mới trước;
     /// lấy không được thì dừng lại với giải thích tiếng Việt thay vì gọi
