@@ -57,8 +57,10 @@ struct PurchasedApp: Codable, Identifiable, Hashable {
 }
 
 enum PurchasedDMAPError: LocalizedError {
-    /// Phiên đăng nhập hết hạn (Apple trả 401/403).
-    case sessionExpired
+    /// Phiên đăng nhập hết hạn (Apple trả 401/403). Ghi kèm bước +
+    /// mã HTTP để lần sau chẩn đoán chính xác thay vì chỉ thấy
+    /// "hết hạn" chung chung.
+    case sessionExpired(step: String, status: Int)
     /// Apple từ chối yêu cầu (mã HTTP).
     case appleRefused(Int)
     /// Apple trả về dữ liệu DMAP không đọc được / thiếu trường bắt buộc.
@@ -68,8 +70,8 @@ enum PurchasedDMAPError: LocalizedError {
 
     var errorDescription: String? {
         switch self {
-        case .sessionExpired:
-            String(localized: "Phiên đăng nhập đã hết hạn. Hãy đăng nhập lại tài khoản rồi bấm Đồng bộ lại.")
+        case let .sessionExpired(step, status):
+            String(localized: "Phiên đăng nhập đã hết hạn (bước \(step), HTTP \(status)). Hãy đăng nhập lại tài khoản rồi bấm Đồng bộ lại.")
         case let .appleRefused(status):
             String(localized: "Apple đã từ chối yêu cầu xem mục Đã mua (HTTP \(status)). Thử đồng bộ lại sau.")
         case .badResponse:
@@ -203,6 +205,11 @@ enum PurchasedDMAPService {
         // lưu / tạo ngẫu nhiên vào Configuration, nên chạm vào nó trước
         // khi SAPSigner.connect() mở HTTP client đầu tiên.
         await MainActor.run { _ = AppStore.this }
+        // Anisette: cùng chính sách như đăng nhập / mua license — nếu đã
+        // đặt URL máy chủ thì lấy header mới gắn vào mọi request DMAP;
+        // lấy không được thì dừng với lỗi đó thay vì gọi thiếu header.
+        // URL trống nghĩa là không dùng header (hành vi cũ).
+        let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
         let signer: ApplePackage.SAPSigner
         do {
             signer = try await ApplePackage.SAPSigner.connect()
@@ -211,7 +218,7 @@ enum PurchasedDMAPService {
         }
         var all: [PurchasedApp] = []
         for storefrontSuffix in ["34", "13"] {
-            let apps = try await fetchStorefront(account: account, signer: signer, storefrontSuffix: storefrontSuffix)
+            let apps = try await fetchStorefront(account: account, signer: signer, storefrontSuffix: storefrontSuffix, anisetteHeaders: anisetteHeaders)
             all.append(contentsOf: apps)
         }
         return merge(all)
@@ -222,7 +229,8 @@ enum PurchasedDMAPService {
     private static func fetchStorefront(
         account: ApplePackage.Account,
         signer: ApplePackage.SAPSigner,
-        storefrontSuffix: String
+        storefrontSuffix: String,
+        anisetteHeaders: [String: String]
     ) async throws -> [PurchasedApp] {
         let session = URLSession(configuration: ephemeralConfiguration(), delegate: nil, delegateQueue: nil)
         defer { session.invalidateAndCancel() }
@@ -233,7 +241,7 @@ enum PurchasedDMAPService {
         loginRequest.httpMethod = "POST"
         loginRequest.httpBody = Data()
         loginRequest.setValue("0", forHTTPHeaderField: "Content-Length")
-        applyHeaders(&loginRequest, account: account, storefrontSuffix: storefrontSuffix)
+        applyHeaders(&loginRequest, account: account, storefrontSuffix: storefrontSuffix, anisetteHeaders: anisetteHeaders)
         let (loginData, loginResponse) = try await session.data(for: loginRequest)
         try checkHTTP(loginResponse, label: "login")
         try DMAP.requireOK(loginData)
@@ -255,7 +263,7 @@ enum PurchasedDMAPService {
         updateRequest.httpBody = updateBody
         updateRequest.setValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         updateRequest.setValue(updateSignature, forHTTPHeaderField: "x-apple-actionsignature")
-        applyHeaders(&updateRequest, account: account, storefrontSuffix: storefrontSuffix)
+        applyHeaders(&updateRequest, account: account, storefrontSuffix: storefrontSuffix, anisetteHeaders: anisetteHeaders)
         let (updateData, updateResponse) = try await session.data(for: updateRequest)
         try checkHTTP(updateResponse, label: "update")
         try DMAP.requireOK(updateData)
@@ -275,7 +283,7 @@ enum PurchasedDMAPService {
         itemsRequest.httpBody = itemsBody
         itemsRequest.setValue("application/x-dmap-tagged", forHTTPHeaderField: "Content-Type")
         itemsRequest.setValue(itemsSignature, forHTTPHeaderField: "x-apple-actionsignature")
-        applyHeaders(&itemsRequest, account: account, storefrontSuffix: storefrontSuffix)
+        applyHeaders(&itemsRequest, account: account, storefrontSuffix: storefrontSuffix, anisetteHeaders: anisetteHeaders)
         let (itemsData, itemsResponse) = try await session.data(for: itemsRequest)
         try checkHTTP(itemsResponse, label: "items")
         try DMAP.requireOK(itemsData)
@@ -461,7 +469,7 @@ enum PurchasedDMAPService {
         }
         logger.info("Purchased DMAP: \(label) HTTP=\(http.statusCode)")
         if http.statusCode == 401 || http.statusCode == 403 {
-            throw PurchasedDMAPError.sessionExpired
+            throw PurchasedDMAPError.sessionExpired(step: label, status: http.statusCode)
         }
         guard http.statusCode == 200 else {
             throw PurchasedDMAPError.appleRefused(http.statusCode)
@@ -470,9 +478,12 @@ enum PurchasedDMAPService {
 
     /// Header xác thực cho DAAP: token + DSID của tài khoản, storefront
     /// của tài khoản kèm hậu tố cửa hàng ("34" / "13"), GUID máy.
-    /// Không gửi cookie — DAAP xác thực bằng token, không dùng cookie
-    /// như các lệnh tải.
-    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, storefrontSuffix: String) {
+    /// Cookie của phiên đã đăng nhập cũng gửi kèm (iTunes thật gửi
+    /// cookie trên request DAAP; đường tải dùng cookie để xác thực và
+    /// vẫn chạy được trong khi DMAP trước đây chỉ gửi X-Token). Header
+    /// Anisette/ADI gắn thêm khi đã cấu hình máy chủ (cùng chính sách
+    /// như đăng nhập / mua license).
+    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, storefrontSuffix: String, anisetteHeaders: [String: String] = [:]) {
         let now = Date()
         request.setValue("*/*", forHTTPHeaderField: "Accept")
         request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
@@ -490,6 +501,14 @@ enum PurchasedDMAPService {
         request.setValue(ApplePackage.Configuration.deviceIdentifier, forHTTPHeaderField: "X-GUID")
         request.setValue(account.passwordToken, forHTTPHeaderField: "X-Token")
         request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
+        if let url = request.url {
+            for (name, value) in account.cookie.buildCookieHeader(url) {
+                request.setValue(value, forHTTPHeaderField: name)
+            }
+        }
+        for (name, value) in anisetteHeaders {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
     }
 
     private static func httpDate(_ date: Date) -> String {

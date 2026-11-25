@@ -85,9 +85,10 @@ final class PurchasedStore {
     }
 
     /// Đồng bộ lại danh sách từ Apple qua DMAP. Dùng chung phiên đã đăng
-    /// nhập (cookie + token đã lưu), không tạo authenticator mới. Lỗi
-    /// tạm thời (máy chủ trả trống / 5xx) thì thử lại tối đa 3 lần như
-    /// đăng nhập; lỗi phiên hết hạn thì báo đăng nhập lại, không retry.
+    /// nhập (cookie + token đã lưu). Lỗi tạm thời (máy chủ trả trống /
+    /// 5xx) thì thử lại tối đa 3 lần như đăng nhập; gặp 401/403 thì làm
+    /// mới token lặng lẽ 1 lần rồi thử lại — chỉ khi làm mới cũng thất
+    /// bại mới báo đăng nhập lại (xem fetchDMAPWithTokenRefresh).
     func sync() async {
         guard !accountID.isEmpty, !isSyncing else { return }
         let accountID = self.accountID
@@ -97,9 +98,7 @@ final class PurchasedStore {
         var lastFailure: Error?
         for attempt in 1 ... 3 {
             do {
-                let apps = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                    try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
-                }
+                let apps = try await fetchDMAPWithTokenRefresh(accountID: accountID)
                 items = apps
                 var cached = _cachedByAccount.wrappedValue
                 cached[accountID] = apps
@@ -120,6 +119,41 @@ final class PurchasedStore {
         if let lastFailure {
             lastError = lastFailure.localizedDescription
             logger.error("Purchased sync failed: \(StoreDiagnostics.errorSummary(lastFailure))")
+        }
+    }
+
+    /// Lấy danh sách qua DMAP; gặp 401/403 thì làm mới token 1 lần rồi
+    /// thử lại. Đường tải dùng cookie để xác thực nên vẫn chạy được
+    /// trong khi X-Token đã cũ — làm mới lặng lẽ là đủ, chỉ sau khi
+    /// làm mới cũng thất bại mới coi là phiên hết hạn thật và bắt
+    /// đăng nhập lại. Dùng chung cho sync thường + bước DMAP của
+    /// đồng bộ toàn bộ lịch sử.
+    private func fetchDMAPWithTokenRefresh(accountID: String) async throws -> [PurchasedApp] {
+        do {
+            return try await AppStore.this.withAccount(id: accountID) { userAccount in
+                try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
+            }
+        } catch let error as PurchasedDMAPError {
+            guard case .sessionExpired = error else { throw error }
+            let expiredError = error
+            logger.info("Purchased sync: session expired, rotating token once and retrying")
+            do {
+                let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
+                try await AppStore.this.withAccount(id: accountID) { userAccount in
+                    try await ApplePackage.Authenticator.rotatePasswordToken(for: &userAccount.account, anisetteHeaders: anisetteHeaders)
+                }
+            } catch {
+                // Lỗi lấy header Anisette thì báo đúng lỗi đó (người dùng
+                // cần sửa máy chủ Anisette, đăng nhập lại không giúp).
+                // Lỗi khác (kể cả Apple đòi mã 2FA khi làm mới) thì giữ
+                // nguyên lỗi hết hạn ban đầu — đăng nhập lại mới xong.
+                if error is AnisetteService.AnisetteError { throw error }
+                logger.error("Purchased sync: token rotation failed: \(StoreDiagnostics.errorSummary(error))")
+                throw expiredError
+            }
+            return try await AppStore.this.withAccount(id: accountID) { userAccount in
+                try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
+            }
         }
     }
 
@@ -150,14 +184,14 @@ final class PurchasedStore {
             logger.error("Purchased full sync: commerce step failed: \(StoreDiagnostics.errorSummary(error))")
         }
 
-        // 2. Bước DMAP (như sync thường, retry tối đa 3 lần).
+        // 2. Bước DMAP (như sync thường, retry tối đa 3 lần, gặp 401/403
+        // thì làm mới token 1 lần rồi thử lại — xem
+        // fetchDMAPWithTokenRefresh).
         var dmapApps: [PurchasedApp] = []
         var dmapFailure: Error?
         for attempt in 1 ... 3 {
             do {
-                dmapApps = try await AppStore.this.withAccount(id: accountID) { userAccount in
-                    try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
-                }
+                dmapApps = try await fetchDMAPWithTokenRefresh(accountID: accountID)
                 dmapFailure = nil
                 break
             } catch {
