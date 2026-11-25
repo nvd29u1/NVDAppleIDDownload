@@ -1292,8 +1292,15 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - SỬA (fork nvd29u1/ApplePackage, commit `78eb66f7`, từ pin
     `541c43a`): `createInitialRequestEndpoint` chuẩn hoá path có dấu
     "/" cuối trước khi gắn `?guid=` (chỉ đúng chỗ này; redirect vẫn
-    theo Location của Apple như cũ). App nâng SPM pin
-    (Package.resolved) lên `78eb66f7`. Commit fork bằng GitHub API
+    theo Location của Apple như cũ). App nâng pin fork lên `78eb66f7`
+    ở CẢ HAI chỗ: `Package.resolved` VÀ `project.pbxproj`
+    (XCRemoteSwiftPackageReference requirement, kind=revision).
+    BÀI HỌC QUAN TRỌNG: pbxproj mới là nguồn quyết định — lần đẩy
+    đầu chỉ sửa Package.resolved thì xcodebuild resolve lại về
+    revision cũ trong pbxproj (bằng chứng: CI run 45627727410 checkout
+    ApplePackage @ 541c43a dù Package.resolved đã là 78eb66f7, cả 2
+    job success nhưng IPA đó KHÔNG có fix trailing-slash; phải sửa
+    pbxproj rồi đẩy lại, build lại IPA). Commit fork bằng GitHub API
     (Git Data API: blob → tree → commit → ref) vì clone bằng chứng
     không được chạy git bên trong.
   - Nếu sau bản này đăng nhập vẫn lỗi: chụp Cài đặt → Nhật ký quanh
@@ -1353,8 +1360,13 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     AGENTS.md (lỗi thời từ build 17) → iOS 16.0.
   - Version: 2.0 build 18 (`CURRENT_PROJECT_VERSION` 17 → 18, chỉ
     trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0).
-  - CI + IPA: (điền sau khi push — remote head + run "Build App" +
-    size/SHA256 + kết quả kiểm chứng).
+  - CI + IPA: lần đẩy đầu (remote `7dfcad0b`) CI "Build App" run
+    45627727410 success cả 2 job NHƯNG build nhầm fork cũ (xem bài
+    học pin ở mục 1 — chỉ sửa Package.resolved); IPA ký từ run đó
+    (SHA256 `2e74c013…`, 25.644.058 byte) KHÔNG có fix trailing-slash
+    nên KHÔNG giao, đã bỏ. Lần đẩy 2 (sửa pbxproj): (điền sau khi push
+    — remote head + run "Build App" + size/SHA256 + kết quả kiểm
+    chứng, kèm xác nhận log CI checkout ApplePackage @ 78eb66f7).
   - Chưa kiểm chứng trên iPhone thật — cần anh test: (1) đăng nhập lại
     bằng tài khoản phụ (kumit.95bt@gmail.com) xem còn lỗi 204 không;
     nếu vẫn lỗi thì chụp Nhật ký quanh dòng `>>> POST` + `<<<` để soi
