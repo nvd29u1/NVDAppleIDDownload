@@ -265,18 +265,50 @@ extension SearchView {
                 }
                 .safeAreaBar(edge: .top) {
                     if navigationBarVisibility == .hidden {
-                        HStack {
-                            Menu {
-                                searchTypePicker
-                            } label: {
-                                Label(searchType.rawValue, systemImage: searchType.iconName)
+                        VStack(spacing: 8) {
+                            // Ô TÌM KIẾM THẬT trên iPhone compact (build 13):
+                            // `.searchable` với placement automatic chỉ hiện
+                            // trong navigation bar — mà nav bar đang ẩn trên
+                            // compact nên không còn chỗ nào để gõ (bản 12
+                            // trống trơn, chỉ còn 2 pill loại/vùng). Ô này
+                            // bind thẳng `$searchKey`, Enter/bấm Tìm là chạy
+                            // `search()` như `.searchable` trước đây.
+                            HStack(spacing: 8) {
+                                Image(systemName: "magnifyingglass")
+                                    .foregroundStyle(.secondary)
+                                TextField("Tìm tên app hoặc Bundle ID", text: $searchKey)
+                                    .focused($searchKeyFocused)
+                                    .submitLabel(.search)
+                                    .autocorrectionDisabled()
+                                    .textInputAutocapitalization(.never)
+                                    .onSubmit { search() }
+                                if !searchKey.isEmpty {
+                                    Button {
+                                        searchKey = ""
+                                    } label: {
+                                        Image(systemName: "xmark.circle.fill")
+                                            .foregroundStyle(.secondary)
+                                    }
+                                }
+                                Button("Tìm") { search() }
+                                    .buttonStyle(.borderedProminent)
+                                    .controlSize(.small)
                             }
-                            .buttonStyle(.glass)
-
-                            Spacer()
-
-                            searchRegionView()
+                            .padding(8)
+                            .background(.bar, in: RoundedRectangle(cornerRadius: 10))
+                            HStack {
+                                Menu {
+                                    searchTypePicker
+                                } label: {
+                                    Label(searchType.rawValue, systemImage: searchType.iconName)
+                                }
                                 .buttonStyle(.glass)
+
+                                Spacer()
+
+                                searchRegionView()
+                                    .buttonStyle(.glass)
+                            }
                         }
                         .padding([.bottom, .horizontal])
                     }

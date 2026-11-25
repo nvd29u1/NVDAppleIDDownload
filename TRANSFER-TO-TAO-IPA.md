@@ -45,6 +45,7 @@ Nguồn: iPadn mengangs/ipadn v2.3.5, GPL-2.0 — CHỈ học ý tưởng, KHÔN
 - **Bỏ hẳn tab Trang chủ** (trang chủ cũ chỉ có logo + lời chào, trống trơn). Tổng hợp hết logo, lời chào, version, ghi chú vào mục Giới thiệu trong Cài đặt.
 - Tab bar sau gộp còn 4 tab: **Tài khoản, Lượt tải, Ký IPA, Cài đặt**.
 - **Giao 1 bản lớn duy nhất** (anh dặn ~10:26 25/11: không giao lẻ từng đợt nữa) — gồm toàn bộ tối ưu iPadn (build 6–9) + gộp NVDsign + bỏ tab Trang chủ.
+- **Nguyên tắc gộp (anh dặn 12:38 25/11): gộp là thêm tab chứ không xoá bớt.** Build 10 gộp xong chỉ còn 4 tab (mất Tìm kiếm + Đã mua + Đang theo dõi) nên chưa giao; anh chốt trả lại 3 tab rồi mới giao — làm build 11 với đủ 7 tab: Tài khoản, Tìm kiếm, Đã mua, Đang theo dõi, Lượt tải, Ký IPA, Cài đặt.
 - Trạng thái lúc chuyển (10:35 25/11): **code gộp CHƯA bắt đầu** — trong working copy chưa có code NVDsign nào; bản chạy trong chat gốc (coordinator bắt đầu ~07:20 25/11) đã làm xong build 6–9 và đang tiếp tục phần gộp. File IPA mới nhất đã build là 2.0 build 8.
 
 ## 4. Việc còn lại
@@ -52,3 +53,11 @@ Nguồn: iPadn mengangs/ipadn v2.3.5, GPL-2.0 — CHỈ học ý tưởng, KHÔN
 1. Quyết: bản gộp tiếp tục chạy ở chat gốc cho tới khi xong, hay dừng bên đó để chat "tạo ipa" này tiếp quản (tránh 2 bên cùng sửa 1 repo/nhánh).
 2. Làm phần gộp NVDsign + bỏ tab Trang chủ, build CI, kiểm chứng, giao 1 bản lớn duy nhất cho anh (cài qua SideStore).
 3. Mục Anisette trên máy (mục 10) vẫn là việc lớn riêng, chưa làm.
+
+## Bản gộp 2.0 build 11 — ĐÃ GIAO 13:00 25/11
+- File: `deliver/NVDAppleIDDownload.ipa` (25.354.783 byte, SHA256 `1514fe660237a86d8f299701b15b2f3aa59fcd5c6f6d9031db8668b4a25868e7`); remote head `194e01e4` (commit code `a7fe7d27`, CI run 45555338668 success cả build-ios + build-osx). Backup build 10: `deliver/NVDAppleIDDownload-2.0-build10-backup.ipa`.
+- Đủ 7 tab ở cả 3 biến thể (Legacy TabView, New iOS 26+, sidebar macOS), đúng thứ tự: Tài khoản, Tìm kiếm, Đã mua, Đang theo dõi, Lượt tải, Ký IPA, Cài đặt. Trang chủ vẫn bỏ (gộp vào Giới thiệu trong Cài đặt).
+- Sửa chuỗi sót `"pair again in SayoSign"` → `"pair again in NVDAppleIDDownload"` (binary: chuỗi cũ 0 hit, chuỗi mới 1 hit). Còn sót có chủ ý: tên client `"SayoSign"` ở `lib.rs:218` (identifier trong handshake pairing) + `"SayoSign Desktop"` + comment code.
+- Kiểm chứng độc lập trước khi giao: version 2.0 build 11, bundle đúng, binary có SearchView/PurchasedView/WatchlistView/SignRootView, framework CydiaSubstrate đã embed, symbol sayo_idev có mặt.
+- Chưa kiểm chứng trên iPhone thật (ký + pairing + 7 tab cần test bằng Apple ID phụ). Keychain/cert của NVDsign 1.4 KHÔNG mang sang — phải nhập lại .p12 / đăng nhập lại Apple ID trong app mới. IPA tải từ App Store vẫn mã hoá FairPlay nên đưa vào tab Ký sẽ báo encrypted (không phải lỗi gộp).
+- Gom xong: anh có thể xóa chat ipatool — mọi thông tin + kết quả đã sang chat "tạo ipa" này; luồng hoàn tiền Oracle đã chuyển sang đây (nhắn 11:43 25/11, đã ghi MEMORY.md); danh sách lịch hẹn hiện tại không còn job nào trỏ vào chat ipatool.

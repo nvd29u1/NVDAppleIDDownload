@@ -14,6 +14,10 @@ import SwiftUI
 /// Shared tab selection for iOS (LegacyTabMainView + NewMainView), so a
 /// button deep in Downloads can jump to the "Ký IPA" tab after importing
 /// a downloaded IPA for signing.
+/// Thứ tự tab (anh chốt 16:01 25/11, build 13): Ký IPA, Tìm kiếm,
+/// Lượt tải, Tài khoản hiện trực tiếp; Đã mua, Đang theo dõi, Cài đặt
+/// ở menu Thêm (iPhone chỉ hiện 4 tab). Tab mặc định khi mở app vẫn
+/// là Lượt tải (`MainTabSelection.tab`).
 enum MainTab: Hashable {
     case accounts
     case search
@@ -109,10 +113,10 @@ struct MainView: View {
     }
 
     enum SidebarSection: Hashable, CaseIterable, Identifiable {
-        case accounts
+        case sign
         case search
         case downloads
-        case sign
+        case accounts
         case purchased
         case watchlist
         case settings
@@ -224,9 +228,9 @@ struct MainView: View {
 
         var body: some View {
             TabView(selection: $selection.tab) {
-                AccountView()
-                    .tabItem { Label("Accounts", systemImage: "person") }
-                    .tag(MainTab.accounts)
+                SignRootView()
+                    .tabItem { Label("Ký IPA", systemImage: "signature") }
+                    .tag(MainTab.sign)
                 SearchView()
                     .tabItem { Label("Search", systemImage: "magnifyingglass") }
                     .tag(MainTab.search)
@@ -236,9 +240,9 @@ struct MainView: View {
                     }
                     .badge(dvm.runningTaskCount) // putting badge inside will not work on iOS versions before 18
                     .tag(MainTab.downloads)
-                SignRootView()
-                    .tabItem { Label("Ký IPA", systemImage: "signature") }
-                    .tag(MainTab.sign)
+                AccountView()
+                    .tabItem { Label("Accounts", systemImage: "person") }
+                    .tag(MainTab.accounts)
                 PurchasedView()
                     .tabItem { Label("Đã mua", systemImage: "bag") }
                     .tag(MainTab.purchased)
@@ -259,11 +263,11 @@ struct MainView: View {
 
         var body: some View {
             TabView(selection: $selection.tab) {
-                Tab("Accounts", systemImage: "person", value: .accounts) { AccountView() }
+                Tab("Ký IPA", systemImage: "signature", value: .sign) { SignRootView() }
                 Tab("Search", systemImage: "magnifyingglass", value: .search) { SearchView() }
                 Tab("Downloads", systemImage: "arrow.down.circle", value: .downloads) { DownloadView() }
                     .badge(dvm.runningTaskCount)
-                Tab("Ký IPA", systemImage: "signature", value: .sign) { SignRootView() }
+                Tab("Accounts", systemImage: "person", value: .accounts) { AccountView() }
                 Tab("Đã mua", systemImage: "bag", value: .purchased) { PurchasedView() }
                 Tab("Đang theo dõi", systemImage: "eye", value: .watchlist) { WatchlistView() }
                 Tab("Settings", systemImage: "gear", value: .settings) { SettingView() }

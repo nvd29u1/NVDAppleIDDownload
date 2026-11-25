@@ -169,8 +169,39 @@ final class BackgroundDownloadService: NSObject, URLSessionDownloadDelegate, @un
             tasksByManifest.removeValue(forKey: manifestID)
             lastProgressUpdates.removeValue(forKey: manifestID)
         }
+        // DỜI FILE TẠM VỀ STAGING NGAY TẠI ĐÂY, ĐỒNG BỘ (build 13):
+        // file ở `location` là file tạm của URLSession — hệ thống được
+        // phép dọn nó ngay khi delegate này trả về. Bản 12 chỉ chuyển
+        // tiếp location qua Task @MainActor + Task.detached rồi mới
+        // finalize() ở Downloads: tới lúc đó file tạm đã bị dọn là
+        // moveItem trong finalize ném đúng lỗi anh thấy trên máy thật —
+        // "Không có tệp hay thư mục nào như vậy" (ENOENT) — rồi gói
+        // rơi vào trạng thái failed / "Gói chưa đầy đủ". File đã về
+        // staging trong Documents thì không ai dọn nữa, finalize làm
+        // việc với nó như file thường.
+        let stagedLocation = Self.stageDownloadedFile(manifestID: manifestID, from: location)
         Task { @MainActor in
-            Downloads.this.backgroundDownloadFinished(manifestID: manifestID, location: location)
+            Downloads.this.backgroundDownloadFinished(manifestID: manifestID, location: stagedLocation ?? location)
+        }
+    }
+
+    /// Dời file tạm vừa tải xong về thư mục staging của app
+    /// (`Documents/NVDAppleIDDownload/Packages/.staging/<uuid>.ipa`).
+    /// Trả nil khi dời không được — caller giữ nguyên location cũ và
+    /// finalize sẽ báo lỗi tiếng Việt rõ ràng thay vì văng/lỗi thô.
+    private static func stageDownloadedFile(manifestID: UUID, from location: URL) -> URL? {
+        let stagingDir = documentsDirectory
+            .appendingPathComponent("Packages")
+            .appendingPathComponent(".staging")
+        do {
+            try FileManager.default.createDirectory(at: stagingDir, withIntermediateDirectories: true)
+            let staged = stagingDir.appendingPathComponent("\(manifestID.uuidString).ipa")
+            try? FileManager.default.removeItem(at: staged)
+            try FileManager.default.moveItem(at: location, to: staged)
+            return staged
+        } catch {
+            logger.error("Background download: không dời được file tạm về staging cho manifest \(manifestID): \(StoreDiagnostics.errorSummary(error))")
+            return nil
         }
     }
 

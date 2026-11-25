@@ -742,3 +742,76 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     Quy tắc version dòng 2.0 (dừng ở build 19, xong đến 2.1)
     đã ghi ở mục Build Configuration, giữ nguyên khi ghi chú
     bản này.
+- Đợt 5 build 13 (25 Nov 2026, 2.0 build 13): sửa 3 lỗi anh báo
+  trên iPhone thật 15:43–15:58 25/11 (bản 12) + 2 việc anh chốt
+  thêm 16:01–16:03 cùng ngày. Chưa kiểm chứng trên iPhone thật.
+  - LỖI 1 — Tìm kiếm mất ô nhập (ảnh 15:43): nguyên nhân đúng như
+    đã chẩn đoán — `SearchView.modernContent` (iOS 26+) ẩn nav bar
+    trên iPhone compact, `.searchable` placement automatic chỉ hiện
+    trong nav bar nên không còn chỗ gõ; 2 pill "iPhone"/"IN" trong
+    ảnh là `safeAreaBar`. Hướng đã chọn: (c) thêm TextField tìm kiếm
+    THẬT trong `safeAreaBar` cho compact (bind `$searchKey`,
+    Enter/bấm "Tìm" gọi `search()`, nút xoá khi có chữ) — hiển thị
+    được bất kể nav bar / placement, giữ nguyên shared binding +
+    thứ tự tab; KHÔNG đổi sang `Tab(role: .search)` (API đó bắt
+    buộc bỏ shared binding / đổi cấu trúc tab, rủi ro hơn mà không
+    chắc hơn). `.searchable` cũ vẫn giữ cho regular size class.
+  - LỖI 2 — Lượt tải lỗi "Không có tệp hay thư mục nào như vậy"
+    dù đúng vùng (Facebook 588.1, tài khoản IN, ảnh 15:40–15:47):
+    nguyên nhân là file tạm của URLSession background — hệ thống
+    được phép dọn file ở `location` ngay khi delegate
+    `didFinishDownloadingTo` trả về, mà bản 12 chỉ chuyển tiếp
+    location qua `Task @MainActor` + `Task.detached` rồi mới
+    `finalize()` ở `Downloads`: tới lúc đó file đã bị dọn nên
+    `moveItem` trong finalize ném đúng lỗi ENOENT anh thấy, gói
+    rơi failed / "Gói chưa đầy đủ". Sửa:
+    `BackgroundDownloadService.didFinishDownloadingTo` dời file về
+    staging `Documents/NVDAppleIDDownload/Packages/.staging/<uuid>.ipa`
+    ĐỒNG BỘ ngay trong delegate, rồi mới giao staging URL cho
+    Downloads; `Downloads.finalize` chặn thêm: file nguồn không còn
+    thì ném lỗi tiếng Việt rõ ("File tải về đã bị hệ thống dọn...
+    Hãy bấm Tải lại") thay vì lỗi hệ thống thô, và dọn file staging
+    còn sót khi finalize lỗi giữa chừng. KHÔNG đổi vùng tài khoản,
+    KHÔNG động logic vùng. Nút "Tải lại" (restart) vẫn tải mới từ
+    đầu như cũ.
+  - LỖI 3 — Đã mua VẪN văng (build 12 chặn sai chỗ, đã chứng minh
+    bằng CRASH LOG THẬT): file
+    `~/workspace/user/files/NVDAppleIDDownload-2026-11-25-155927.ips`
+    (app 2.0 build 12, iPhone16,1 iOS 27.0, crash 15:59:27 25/11,
+    EXC_BREAKPOINT / SIGTRAP). Thread gây văng (id 17721883):
+    `Data._Representation.subscript.getter` → `specialized static
+    DMAP.children(of:)` → `static DMAP.first(_:code:)` ×2 (ngoài +
+    đệ quy) → `PurchasedDMAPService.fetchStorefront` →
+    `fetchPurchasedApps` → `AppStore.withAccount` →
+    `PurchasedStore.sync()`. Nguyên nhân chính xác:
+    `DMAP.children(of:)` subscript Data bằng chỉ số bắt đầu từ 0
+    (`data[offset ..< offset+4]`, `data[offset+4]`...), nhưng
+    payload mà `first()` truyền vào khi đệ quy là Data slice
+    (`data[a..<b]`) — slice của Swift Data GIỮ NGUYÊN chỉ số gốc,
+    `startIndex` = a ≠ 0 — nên `data[0..<4]` trên slice là vượt
+    giới hạn → trap ngay tag container đầu tiên trong response,
+    100% mỗi lần đồng bộ. Mấy chỗ chặn ép kiểu UInt32/Int64 ở
+    build 12 KHÔNG phải thủ phạm (chúng nằm sau điểm văng, chưa bao
+    giờ chạy tới). Sửa: `children(of:)` cộng thêm `data.startIndex`
+    vào mọi lần truy cập (`base + offset`); các guard build 12 giữ
+    nguyên. Đã rà các chỗ subscript Data bằng chỉ số nguyên khác
+    trong PurchasedDMAPService + PurchasedCommerceService: không
+    còn chỗ nào (chỉ còn `data[...]` kiểu dictionary key trong
+    Commerce). Fork ApplePackage pin 541c43a đã đọc source để đối
+    chiếu: `SAPSigner.connect()`/`sign()` là public thật,
+    `Lookup.lookup` có 2 ensure trước `.first!`, `withAccount`
+    của app không có force unwrap — đều không phải thủ phạm.
+  - ĐỔI THỨ TỰ TAB (anh chốt 16:01–16:02 25/11): hiện trực tiếp
+    thành Ký IPA, Tìm kiếm, Lượt tải, Tài khoản; Đã mua, Đang theo
+    dõi, Cài đặt vẫn ở menu Thêm. Áp dụng cả 3 biến thể
+    (LegacyTabMainView, NewMainView iOS 26+, sidebar macOS).
+    Tab mặc định khi mở app vẫn là Lượt tải.
+  - BỎ HEADER CARD Ở CÀI ĐẶT KÝ (anh chốt 16:03 25/11):
+    xoá đúng card header (logo lợn + "NVDAppleIDDownload" +
+    "Trình ký IPA trên thiết bị" + version) khỏi
+    `SignSettingsView`, cùng thuộc tính `version` chỉ dùng cho card
+    đó. Giữ nguyên tiêu đề "Cài đặt" + toàn bộ mục bên dưới.
+    Header ở Cài đặt chính của app (mục Giới thiệu) KHÔNG động vào.
+  - Version: 2.0 build 13 (`CURRENT_PROJECT_VERSION` 12 → 13,
+    chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
+    ở cả xcconfig và pbxproj).

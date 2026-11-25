@@ -94,22 +94,32 @@ enum DMAP {
 
     /// Đọc các tag con trực tiếp trong một khối dữ liệu (không đệ quy).
     /// Tag hỏng (thiếu byte) thì dừng và trả về những tag đã đọc được.
+    ///
+    /// ⚠️ BẪY ĐÃ GÂY VĂNG APP (crash log 15:59:27 25/11, build 12):
+    /// `first()` đệ quy truyền payload vào đây, mà payload là Data
+    /// slice (`data[a..<b]`) — slice của Swift Data GIỮ NGUYÊN chỉ số
+    /// gốc nên `startIndex` của nó là `a`, không phải 0. Bản cũ subscript
+    /// bằng chỉ số bắt đầu từ 0 (`data[offset ..< offset+4]`) nên chạm
+    /// vào slice là vượt giới hạn → Swift runtime trap (EXC_BREAKPOINT /
+    /// SIGTRAP) ngay tag container đầu tiên, 100% mỗi lần đồng bộ Đã
+    /// mua. Sửa: mọi lần truy cập đều cộng thêm `data.startIndex`.
     static func children(of data: Data) -> [(code: String, payload: Data)] {
         var result: [(code: String, payload: Data)] = []
         var offset = 0
+        let base = data.startIndex
         while offset + 8 <= data.count {
-            let codeData = data[offset ..< offset + 4]
+            let codeData = data[base + offset ..< base + offset + 4]
             guard let code = String(data: codeData, encoding: .ascii) else { break }
             // Độ dài big-endian, ghép tay từng byte (không dùng load(as:)
             // để khỏi phụ thuộc căn chỉnh bộ nhớ).
-            let length = UInt32(data[offset + 4]) << 24
-                | UInt32(data[offset + 5]) << 16
-                | UInt32(data[offset + 6]) << 8
-                | UInt32(data[offset + 7])
+            let length = UInt32(data[base + offset + 4]) << 24
+                | UInt32(data[base + offset + 5]) << 16
+                | UInt32(data[base + offset + 6]) << 8
+                | UInt32(data[base + offset + 7])
             let payloadStart = offset + 8
             let payloadEnd = payloadStart + Int(length)
             guard payloadEnd <= data.count else { break }
-            result.append((code, data[payloadStart ..< payloadEnd]))
+            result.append((code, data[base + payloadStart ..< base + payloadEnd]))
             offset = payloadEnd
         }
         return result

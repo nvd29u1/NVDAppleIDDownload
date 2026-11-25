@@ -49,28 +49,9 @@ struct SignSettingsView: View {
         }
     }
 
-    var version: String {
-        let v = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0"
-        let b = Bundle.main.infoDictionary?["CFBundleVersion"] as? String ?? "1"
-        return "\(v) (\(b))"
-    }
-
     var body: some View {
         NavigationView {
             Form {
-                Section {
-                    HStack(spacing: 14) {
-                        Image(.pigLogo).resizable().frame(width: 64, height: 64)
-                            .clipShape(RoundedRectangle(cornerRadius: 15, style: .continuous))
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text("NVDAppleIDDownload").font(.title2.weight(.heavy)).foregroundStyle(SignTheme.gradient)
-                            Text(L("On-device IPA signer")).font(.subheadline).foregroundColor(.secondary)
-                            Text("v" + version).font(.caption).foregroundColor(.secondary)
-                        }
-                    }
-                    .padding(.vertical, 6)
-                }
-
                 Section(header: Text(L("Install method")),
                         footer: Text(L("Free Apple ID apps can only be installed through pairing (like SideStore): iOS 27, Developer Mode and LocalDevVPN. Certificates (.p12) install over the air."))) {
                     Picker(L("Method"), selection: $state.settings.installMethod) {

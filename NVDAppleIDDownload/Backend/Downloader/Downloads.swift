@@ -417,6 +417,29 @@ class Downloads {
     }
 
     private func finalize(manifest: PackageManifest, preparedContentAt downloadedFile: URL) async throws {
+        // File nguồn phải còn tồn tại lúc finalize chạy (build 13): nếu
+        // file tạm đã bị hệ thống dọn trước đó thì báo rõ bằng tiếng
+        // Việt + để trạng thái failed để bấm "Tải lại", thay vì để lỗi
+        // hệ thống thô ("Không có tệp hay thư mục nào như vậy") hiện ra
+        // như bản 12. Đường background từ build 13 đã dời file về
+        // staging đồng bộ trong delegate nên trường hợp này không còn
+        // xảy ra với đường đó nữa; chốt này giữ cho đường Digger dự phòng.
+        guard FileManager.default.fileExists(atPath: downloadedFile.path) else {
+            throw NSError(
+                domain: "NVDAppleIDDownload.Download",
+                code: 3,
+                userInfo: [NSLocalizedDescriptionKey: String(localized: "File tải về đã bị hệ thống dọn trước khi xử lý xong. Hãy bấm Tải lại để tải lại từ đầu.")],
+            )
+        }
+        // Dọn file staging còn sót khi finalize lỗi giữa chừng (vd
+        // validate fail): file đã move sang tempFile thì không còn gì
+        // để dọn, removeItem chỉ là no-op. Chỉ dọn trong .staging để
+        // không đụng vào file của đường Digger dự phòng.
+        defer {
+            if downloadedFile.path.contains("/.staging/") {
+                try? FileManager.default.removeItem(at: downloadedFile)
+            }
+        }
         // Verify the main bundle identity and platform before signature injection.
         try StorePackageValidator.validate(at: downloadedFile, package: manifest.package)
         try? FileManager.default.createDirectory(
