@@ -11,6 +11,23 @@ import SwiftUI
     import AppKit
 #endif
 
+/// Shared tab selection for iOS (LegacyTabMainView + NewMainView), so a
+/// button deep in Downloads can jump to the "Ký IPA" tab after importing
+/// a downloaded IPA for signing.
+enum MainTab: Hashable {
+    case accounts
+    case downloads
+    case sign
+    case settings
+}
+
+@MainActor
+@Observable
+final class MainTabSelection {
+    static let shared = MainTabSelection()
+    var tab = MainTab.downloads
+}
+
 struct MainView: View {
     var body: some View {
         #if os(macOS)
@@ -23,7 +40,7 @@ struct MainView: View {
 
 #if os(macOS)
     private struct MacSidebarMainView: View {
-        @State private var selection: SidebarSection? = .home
+        @State private var selection: SidebarSection? = .accounts
         @State private var downloads = Downloads.this
 
         var body: some View {
@@ -39,47 +56,53 @@ struct MainView: View {
                     if let selection {
                         detailView(for: selection)
                     } else {
-                        detailView(for: .home)
+                        detailView(for: .accounts)
                     }
                 }
                 .frame(minHeight: 250)
                 .navigationSplitViewColumnWidth(min: 480, ideal: 500)
             }
-            // Expose the selection so menu commands (⌘F, ⌘,) can drive it.
+            // Expose the selection so menu commands (⌘,) can drive it.
             .focusedSceneValue(\.sidebarSelection, $selection)
         }
 
         @ViewBuilder
         private func detailView(for section: SidebarSection) -> some View {
             switch section {
-            case .home:
-                WelcomeView()
             case .accounts:
                 AccountView()
-            case .search:
-                SearchView()
-            case .purchased:
-                PurchasedView()
-            case .watchlist:
-                WatchlistView()
             case .downloads:
                 DownloadView()
-            case .installed:
-                InstalledListView()
+            case .sign:
+                SignUnavailableView()
             case .settings:
                 SettingView()
             }
         }
     }
 
+    /// The signing feature is iOS-only (UIKit UI + on-device installer),
+    /// so on macOS this section only explains that.
+    private struct SignUnavailableView: View {
+        var body: some View {
+            VStack(spacing: 12) {
+                Image(systemName: "signature").font(.largeTitle)
+                Text("Ký IPA chỉ có trên iPhone")
+                    .font(.headline)
+                Text("Tính năng ký IPA (chứng chỉ .p12 / Apple ID, chèn tweak, cài offline) chỉ chạy trên iOS. Trên Mac, tải IPA về rồi ký trên iPhone.")
+                    .font(.callout)
+                    .foregroundColor(.secondary)
+                    .multilineTextAlignment(.center)
+            }
+            .padding(32)
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+        }
+    }
+
     enum SidebarSection: Hashable, CaseIterable, Identifiable {
-        case home
         case accounts
-        case search
-        case purchased
-        case watchlist
         case downloads
-        case installed
+        case sign
         case settings
 
         var id: Self {
@@ -88,20 +111,12 @@ struct MainView: View {
 
         var title: LocalizedStringKey {
             switch self {
-            case .home:
-                "Home"
             case .accounts:
                 "Accounts"
-            case .search:
-                "Search"
-            case .purchased:
-                "Đã mua"
-            case .watchlist:
-                "Đang theo dõi"
             case .downloads:
                 "Downloads"
-            case .installed:
-                "Installed"
+            case .sign:
+                "Ký IPA"
             case .settings:
                 "Settings"
             }
@@ -109,20 +124,12 @@ struct MainView: View {
 
         var systemImage: String {
             switch self {
-            case .home:
-                "house"
             case .accounts:
                 "person"
-            case .search:
-                "magnifyingglass"
-            case .purchased:
-                "bag"
-            case .watchlist:
-                "eye"
             case .downloads:
                 "arrow.down.circle"
-            case .installed:
-                "square.stack.3d.up.badge.automatic.fill"
+            case .sign:
+                "signature"
             case .settings:
                 "gear"
             }
@@ -171,14 +178,6 @@ struct MainView: View {
                     .keyboardShortcut(",", modifiers: .command)
                     .disabled(selection == nil)
             }
-            CommandGroup(after: .sidebar) {
-                Button("Search") {
-                    selection?.wrappedValue = .search
-                    SearchFieldFocus.shared.requestFocus()
-                }
-                .keyboardShortcut("f", modifiers: .command)
-                .disabled(selection == nil)
-            }
             CommandGroup(replacing: .help) {
                 Button("NVDAppleIDDownload Help", systemImage: "") {
                     NSWorkspace.shared.open(URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!)
@@ -188,50 +187,44 @@ struct MainView: View {
     }
 #else
     private struct LegacyTabMainView: View {
+        @State private var selection = MainTabSelection.shared
         @State var dvm = Downloads.this
 
         var body: some View {
-            TabView {
-                WelcomeView()
-                    .tabItem { Label("Home", systemImage: "house") }
+            TabView(selection: $selection.tab) {
                 AccountView()
                     .tabItem { Label("Accounts", systemImage: "person") }
-                SearchView()
-                    .tabItem { Label("Search", systemImage: "magnifyingglass") }
-                PurchasedView()
-                    .tabItem { Label("Đã mua", systemImage: "bag") }
-                WatchlistView()
-                    .tabItem { Label("Đang theo dõi", systemImage: "eye") }
+                    .tag(MainTab.accounts)
                 DownloadView()
                     .tabItem {
                         Label("Downloads", systemImage: "arrow.down.circle")
                     }
                     .badge(dvm.runningTaskCount) // putting badge inside will not work on iOS versions before 18
+                    .tag(MainTab.downloads)
+                SignRootView()
+                    .tabItem { Label("Ký IPA", systemImage: "signature") }
+                    .tag(MainTab.sign)
                 SettingView()
                     .tabItem { Label("Settings", systemImage: "gear") }
+                    .tag(MainTab.settings)
             }
         }
     }
 
     @available(iOS 18.0, *)
     struct NewMainView: View {
+        @State private var selection = MainTabSelection.shared
         @State var dvm = Downloads.this
 
         var body: some View {
-            TabView {
-                Tab("Home", systemImage: "house") { WelcomeView() }
-                Tab("Accounts", systemImage: "person") { AccountView() }
-                Tab(role: .search) {
-                    SearchView()
-                }
-                Tab("Đã mua", systemImage: "bag") { PurchasedView() }
-                Tab("Đang theo dõi", systemImage: "eye") { WatchlistView() }
-                Tab("Downloads", systemImage: "arrow.down.circle") { DownloadView() }
+            TabView(selection: $selection.tab) {
+                Tab("Accounts", systemImage: "person", value: .accounts) { AccountView() }
+                Tab("Downloads", systemImage: "arrow.down.circle", value: .downloads) { DownloadView() }
                     .badge(dvm.runningTaskCount)
-                Tab("Settings", systemImage: "gear") { SettingView() }
+                Tab("Ký IPA", systemImage: "signature", value: .sign) { SignRootView() }
+                Tab("Settings", systemImage: "gear", value: .settings) { SettingView() }
             }
             .neverMinimizeTab()
-            .activateSearchWhenSearchTabSelected()
             .sidebarAdaptableTabView()
         }
     }

@@ -23,11 +23,76 @@
 		50E28B812C40BA52007891E0 /* ColorfulX in Frameworks */ = {isa = PBXBuildFile; productRef = 50E28B802C40BA52007891E0 /* ColorfulX */; };
 		80CD64ED2C42AA2C0073E206 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 80CD64EC2C42AA2C0073E206 /* KeychainAccess */; };
 		E20AB0982C78DD66AF202F7C /* LookInsideServer in Frameworks */ = {isa = PBXBuildFile; productRef = A57ACB25387C8C8F3E31EC36 /* LookInsideServer */; };
+		79142A97A07856776C787E79 /* applecerts.c in Sources */ = {isa = PBXBuildFile; fileRef = E551AA817DF909CAFCCC9CC8 /* applecerts.c */; };
+		04600FF198D4ECFA165434DD /* buf.c in Sources */ = {isa = PBXBuildFile; fileRef = 367F3B2F7D19A495393E0883 /* buf.c */; };
+		02C49F1170E32AD36F74FE22 /* cms.c in Sources */ = {isa = PBXBuildFile; fileRef = 1805B20891493D53523121E4 /* cms.c */; };
+		0C7E7480D9B68F0B6F576F4F /* container.c in Sources */ = {isa = PBXBuildFile; fileRef = 2F0DE3791A70F2D87E44B1B9 /* container.c */; };
+		6561207E479C85E78E243980 /* crypto.c in Sources */ = {isa = PBXBuildFile; fileRef = E2CC25F4D6C9BEDBB73D85E5 /* crypto.c */; };
+		4D832E5CFF601FBF563502AD /* deb.c in Sources */ = {isa = PBXBuildFile; fileRef = 806793F3E074A427B7E22435 /* deb.c */; };
+		BD0276CBB4DAAC2B9E13E927 /* der.c in Sources */ = {isa = PBXBuildFile; fileRef = A9C75F76765917C171842FA0 /* der.c */; };
+		A3D9C0C743C2F3BA5C8891D4 /* fs.c in Sources */ = {isa = PBXBuildFile; fileRef = BDD74F4C32CE9A5F6243094C /* fs.c */; };
+		584EEE525F1C236A1C1515AC /* macho.c in Sources */ = {isa = PBXBuildFile; fileRef = A46DB03E39F8772BAB7EB82C /* macho.c */; };
+		D10F7D4C404D80F2F9916D1E /* p12.c in Sources */ = {isa = PBXBuildFile; fileRef = 3B94126CD84D9BF1A4FF9867 /* p12.c */; };
+		8C7774F78D0A80C18B480882 /* plist.c in Sources */ = {isa = PBXBuildFile; fileRef = 02358808C06E4BDBB254AFC8 /* plist.c */; };
+		4E7F088B302F5142F1A78195 /* resources.c in Sources */ = {isa = PBXBuildFile; fileRef = 3FE228DD961BCCAC5C8CF9A9 /* resources.c */; };
+		EBED2ACA42B716519082877C /* sha.c in Sources */ = {isa = PBXBuildFile; fileRef = 53DBEAB04C4B9579365EE28F /* sha.c */; };
+		9966FD0917CEAA4286688D4D /* sign.c in Sources */ = {isa = PBXBuildFile; fileRef = 89825363F70AC1ED232819D1 /* sign.c */; };
+		B583086730480483E1007957 /* x509.c in Sources */ = {isa = PBXBuildFile; fileRef = E93C9BE8000EB80D3362DA2B /* x509.c */; };
+		4E00131FC90AF9E0A65EB6FF /* zip.c in Sources */ = {isa = PBXBuildFile; fileRef = B729F66D5313CEBF5372DC1C /* zip.c */; };
+		E2DF58C8EC119E5800542C63 /* zstd.c in Sources */ = {isa = PBXBuildFile; fileRef = 5DE54CA81301791AD05684A4 /* zstd.c */; };
+		27F1BC35AE3A4859F92E1B6D /* SayoHook.c in Sources */ = {isa = PBXBuildFile; fileRef = 0CC573F0367C6031C6C656FE /* SayoHook.c */; };
+		9EA56088A6B66CE7F1BF0586 /* CydiaSubstrate.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B69A5DFD6F7FB5097518B335 /* CydiaSubstrate.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B128CF09A78A9819F2D8C670 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 50D44CFA2C3F91F700CF6A69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 1BDAD3B1F01F326BC511EA3A;
+			remoteInfo = CydiaSubstrate;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		362AEAB94960B6A06CBAF3AA /* Embed Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				9EA56088A6B66CE7F1BF0586 /* CydiaSubstrate.framework in Embed Frameworks */,
+			);
+			name = "Embed Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = NVDAppleIDDownload.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		50DCBD772F346DFE007100D2 /* Certificates */ = {isa = PBXFileReference; lastKnownFileType = folder; path = Certificates; sourceTree = "<group>"; };
+		E551AA817DF909CAFCCC9CC8 /* applecerts.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = applecerts.c; sourceTree = "<group>"; };
+		367F3B2F7D19A495393E0883 /* buf.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = buf.c; sourceTree = "<group>"; };
+		1805B20891493D53523121E4 /* cms.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = cms.c; sourceTree = "<group>"; };
+		2F0DE3791A70F2D87E44B1B9 /* container.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = container.c; sourceTree = "<group>"; };
+		E2CC25F4D6C9BEDBB73D85E5 /* crypto.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = crypto.c; sourceTree = "<group>"; };
+		806793F3E074A427B7E22435 /* deb.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = deb.c; sourceTree = "<group>"; };
+		A9C75F76765917C171842FA0 /* der.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = der.c; sourceTree = "<group>"; };
+		BDD74F4C32CE9A5F6243094C /* fs.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = fs.c; sourceTree = "<group>"; };
+		A46DB03E39F8772BAB7EB82C /* macho.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = macho.c; sourceTree = "<group>"; };
+		3B94126CD84D9BF1A4FF9867 /* p12.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = p12.c; sourceTree = "<group>"; };
+		02358808C06E4BDBB254AFC8 /* plist.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = plist.c; sourceTree = "<group>"; };
+		3FE228DD961BCCAC5C8CF9A9 /* resources.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = resources.c; sourceTree = "<group>"; };
+		53DBEAB04C4B9579365EE28F /* sha.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = sha.c; sourceTree = "<group>"; };
+		89825363F70AC1ED232819D1 /* sign.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = sign.c; sourceTree = "<group>"; };
+		E93C9BE8000EB80D3362DA2B /* x509.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = x509.c; sourceTree = "<group>"; };
+		B729F66D5313CEBF5372DC1C /* zip.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = zip.c; sourceTree = "<group>"; };
+		5DE54CA81301791AD05684A4 /* zstd.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = zstd.c; sourceTree = "<group>"; };
+		A3BFEE2B23888FF47C595A78 /* compat.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = compat.h; sourceTree = "<group>"; };
+		A945B980DEFAFE72A0D79A3B /* internal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = internal.h; sourceTree = "<group>"; };
+		0CC573F0367C6031C6C656FE /* SayoHook.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c; path = SayoHook.c; sourceTree = "<group>"; };
+		E30C3B53FA4F2C927526C7DB /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B69A5DFD6F7FB5097518B335 /* CydiaSubstrate.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = CydiaSubstrate.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -73,6 +138,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A40ECF830A879770608A99EB /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -81,6 +153,8 @@
 			children = (
 				50DCBBF92F346C6F007100D2 /* NVDAppleIDDownload */,
 				50DCBD772F346DFE007100D2 /* Certificates */,
+				8BAA23D945A91A49256D0197 /* core */,
+				C2F433C0C055638176160827 /* hook */,
 				50DCBBB42F346C57007100D2 /* Configuration */,
 				50D44D032C3F91F700CF6A69 /* Products */,
 				50D44D172C3F92A100CF6A69 /* Frameworks */,
@@ -90,6 +164,7 @@
 		50D44D032C3F91F700CF6A69 /* Products */ = {
 			isa = PBXGroup;
 			children = (
+				B69A5DFD6F7FB5097518B335 /* CydiaSubstrate.framework */,
 				50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */,
 			);
 			name = Products;
@@ -102,6 +177,49 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		14DCA5E2E24D673447498B2C /* src */ = {
+			isa = PBXGroup;
+			children = (
+				E551AA817DF909CAFCCC9CC8 /* applecerts.c */,
+				367F3B2F7D19A495393E0883 /* buf.c */,
+				1805B20891493D53523121E4 /* cms.c */,
+				2F0DE3791A70F2D87E44B1B9 /* container.c */,
+				E2CC25F4D6C9BEDBB73D85E5 /* crypto.c */,
+				806793F3E074A427B7E22435 /* deb.c */,
+				A9C75F76765917C171842FA0 /* der.c */,
+				BDD74F4C32CE9A5F6243094C /* fs.c */,
+				A46DB03E39F8772BAB7EB82C /* macho.c */,
+				3B94126CD84D9BF1A4FF9867 /* p12.c */,
+				02358808C06E4BDBB254AFC8 /* plist.c */,
+				3FE228DD961BCCAC5C8CF9A9 /* resources.c */,
+				53DBEAB04C4B9579365EE28F /* sha.c */,
+				89825363F70AC1ED232819D1 /* sign.c */,
+				E93C9BE8000EB80D3362DA2B /* x509.c */,
+				B729F66D5313CEBF5372DC1C /* zip.c */,
+				5DE54CA81301791AD05684A4 /* zstd.c */,
+				A3BFEE2B23888FF47C595A78 /* compat.h */,
+				A945B980DEFAFE72A0D79A3B /* internal.h */,
+			);
+			path = src;
+			sourceTree = "<group>";
+		};
+		8BAA23D945A91A49256D0197 /* core */ = {
+			isa = PBXGroup;
+			children = (
+				14DCA5E2E24D673447498B2C /* src */,
+			);
+			path = core;
+			sourceTree = "<group>";
+		};
+		C2F433C0C055638176160827 /* hook */ = {
+			isa = PBXGroup;
+			children = (
+				0CC573F0367C6031C6C656FE /* SayoHook.c */,
+				E30C3B53FA4F2C927526C7DB /* Info.plist */,
+			);
+			path = hook;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -111,12 +229,14 @@
 			buildPhases = (
 				C0NF1G001000000000000006 /* Check Developer.xcconfig */,
 				50D44CFE2C3F91F700CF6A69 /* Sources */,
+				362AEAB94960B6A06CBAF3AA /* Embed Frameworks */,
 				50D44CFF2C3F91F700CF6A69 /* Frameworks */,
 				50D44D002C3F91F700CF6A69 /* Resources */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				A9A672EB15BCC483EA97C117 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				50DCBBF92F346C6F007100D2 /* NVDAppleIDDownload */,
@@ -143,6 +263,22 @@
 			productReference = 50D44D022C3F91F700CF6A69 /* NVDAppleIDDownload.app */;
 			productType = "com.apple.product-type.application";
 		};
+		1BDAD3B1F01F326BC511EA3A /* CydiaSubstrate */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CE0FE2D62DB9DAC7A543AA16 /* Build configuration list for PBXNativeTarget "CydiaSubstrate" */;
+			buildPhases = (
+				4158D6BC061DE561D4F549C5 /* Sources */,
+				A40ECF830A879770608A99EB /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = CydiaSubstrate;
+			productName = CydiaSubstrate;
+			productReference = B69A5DFD6F7FB5097518B335 /* CydiaSubstrate.framework */;
+			productType = "com.apple.product-type.framework";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -154,6 +290,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					50D44D012C3F91F700CF6A69 = {
+						CreatedOnToolsVersion = 15.4;
+					};
+					1BDAD3B1F01F326BC511EA3A = {
 						CreatedOnToolsVersion = 15.4;
 					};
 				};
@@ -187,6 +326,7 @@
 			projectRoot = "";
 			targets = (
 				50D44D012C3F91F700CF6A69 /* NVDAppleIDDownload */,
+				1BDAD3B1F01F326BC511EA3A /* CydiaSubstrate */,
 			);
 		};
 /* End PBXProject section */
@@ -229,10 +369,43 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				79142A97A07856776C787E79 /* applecerts.c in Sources */,
+				04600FF198D4ECFA165434DD /* buf.c in Sources */,
+				02C49F1170E32AD36F74FE22 /* cms.c in Sources */,
+				0C7E7480D9B68F0B6F576F4F /* container.c in Sources */,
+				6561207E479C85E78E243980 /* crypto.c in Sources */,
+				4D832E5CFF601FBF563502AD /* deb.c in Sources */,
+				BD0276CBB4DAAC2B9E13E927 /* der.c in Sources */,
+				A3D9C0C743C2F3BA5C8891D4 /* fs.c in Sources */,
+				584EEE525F1C236A1C1515AC /* macho.c in Sources */,
+				D10F7D4C404D80F2F9916D1E /* p12.c in Sources */,
+				8C7774F78D0A80C18B480882 /* plist.c in Sources */,
+				4E7F088B302F5142F1A78195 /* resources.c in Sources */,
+				EBED2ACA42B716519082877C /* sha.c in Sources */,
+				9966FD0917CEAA4286688D4D /* sign.c in Sources */,
+				B583086730480483E1007957 /* x509.c in Sources */,
+				4E00131FC90AF9E0A65EB6FF /* zip.c in Sources */,
+				E2DF58C8EC119E5800542C63 /* zstd.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		4158D6BC061DE561D4F549C5 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				27F1BC35AE3A4859F92E1B6D /* SayoHook.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A9A672EB15BCC483EA97C117 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 1BDAD3B1F01F326BC511EA3A /* CydiaSubstrate */;
+			targetProxy = B128CF09A78A9819F2D8C670 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		50D44D0E2C3F91F800CF6A69 /* Debug */ = {
@@ -355,6 +528,27 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				MARKETING_VERSION = 2.0;
+				SWIFT_OBJC_BRIDGING_HEADER = NVDAppleIDDownload/App/SignBridgingHeader.h;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/core/include",
+					"$(SRCROOT)/core/src",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+					"-lcompression",
+					"-framework",
+					Security,
+				);
+				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"-lsayoidev",
+				);
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"$(SRCROOT)/rust/sayoidev/target/aarch64-apple-ios/release",
+				);
 			};
 			name = Debug;
 		};
@@ -377,6 +571,81 @@
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				MARKETING_VERSION = 2.0;
+				SWIFT_OBJC_BRIDGING_HEADER = NVDAppleIDDownload/App/SignBridgingHeader.h;
+				HEADER_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(SRCROOT)/core/include",
+					"$(SRCROOT)/core/src",
+				);
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lz",
+					"-lcompression",
+					"-framework",
+					Security,
+				);
+				"OTHER_LDFLAGS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"-lsayoidev",
+				);
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = (
+					"$(inherited)",
+					"$(SRCROOT)/rust/sayoidev/target/aarch64-apple-ios/release",
+				);
+			};
+			name = Release;
+		};
+		C80B6DC448DE1E279EAC8A51 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = NO;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				INFOPLIST_FILE = hook/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_DYLIB_INSTALL_NAME = "@rpath/CydiaSubstrate.framework/CydiaSubstrate";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lobjc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.NVD.appleiddownload.hook;
+				PRODUCT_NAME = CydiaSubstrate;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = (
+					iphoneos,
+					macosx,
+				);
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		1417ACDC89E2746DE4E6324D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CURRENT_PROJECT_VERSION = 1;
+				DEFINES_MODULE = NO;
+				DYLIB_INSTALL_NAME_BASE = "@rpath";
+				GCC_SYMBOLS_PRIVATE_EXTERN = YES;
+				INFOPLIST_FILE = hook/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 12.0;
+				LD_DYLIB_INSTALL_NAME = "@rpath/CydiaSubstrate.framework/CydiaSubstrate";
+				MACOSX_DEPLOYMENT_TARGET = 10.13;
+				MARKETING_VERSION = 1.0;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"-lobjc",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.NVD.appleiddownload.hook;
+				PRODUCT_NAME = CydiaSubstrate;
+				SKIP_INSTALL = YES;
+				SUPPORTED_PLATFORMS = (
+					iphoneos,
+					macosx,
+				);
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
@@ -397,6 +666,15 @@
 			buildConfigurations = (
 				50D44D112C3F91F800CF6A69 /* Debug */,
 				50D44D122C3F91F800CF6A69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CE0FE2D62DB9DAC7A543AA16 /* Build configuration list for PBXNativeTarget "CydiaSubstrate" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C80B6DC448DE1E279EAC8A51 /* Debug */,
+				1417ACDC89E2746DE4E6324D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

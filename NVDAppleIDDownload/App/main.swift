@@ -10,6 +10,13 @@ import Digger
 import Logging
 import SwiftUI
 
+#if os(iOS)
+    // Chạy app trong NVDAppleIDDownload (tính năng ký "Run inside", kiểu
+    // LiveContainer, gộp từ NVDsign): có yêu cầu chạy app khách thì nhảy
+    // vào app đó và không bao giờ trở lại đây.
+    _ = Container.launchIfRequested()
+#endif
+
 LoggingSystem.bootstrap { label in
     LogManagerHandler(label: label)
 }
@@ -98,10 +105,20 @@ private struct App: SwiftUI.App {
         #else
             WindowGroup(id: "main-window") {
                 AppLockGate {
-                    if #available(iOS 26.0, *) {
-                        NewMainView()
-                    } else {
-                        MainView()
+                    Group {
+                        if #available(iOS 26.0, *) {
+                            NewMainView()
+                        } else {
+                            MainView()
+                        }
+                    }
+                    // Tính năng ký (gộp từ NVDsign, build 10): trạng thái ký
+                    // dùng chung cả app; file mở bằng app (.ipa/.p12/...)
+                    // đi vào thư viện ký.
+                    .environmentObject(SignAppState.shared)
+                    .environmentObject(CertificateImportCoordinator.shared)
+                    .onOpenURL { url in
+                        Task { @MainActor in SignAppState.shared.handleOpen(url) }
                     }
                 }
             }

@@ -4472,420 +4472,5796 @@
         }
       }
     },
-    "Tên app hoặc Bundle ID" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "App name or Bundle ID"
+    "Tên app hoặc Bundle ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App name or Bundle ID"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "应用名称或 Bundle ID"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "应用名称或 Bundle ID"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tên app hoặc Bundle ID"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên app hoặc Bundle ID"
           }
         }
       }
     },
-    "Đang tìm…" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Searching…"
+    "Đang tìm…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Searching…"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "正在搜索…"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "正在搜索…"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Đang tìm…"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tìm…"
           }
         }
       }
     },
-    "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No apps found. Try a different name, or enter the Bundle ID manually below."
+    "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No apps found. Try a different name, or enter the Bundle ID manually below."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "未找到应用。请尝试其他名称，或在下方手动输入 Bundle ID。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "未找到应用。请尝试其他名称，或在下方手动输入 Bundle ID。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy app nào. Thử tên khác, hoặc nhập Bundle ID tay ở dưới."
           }
         }
       }
     },
-    "Hãy chọn tài khoản trước." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please select an account first."
+    "Hãy chọn tài khoản trước.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please select an account first."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请先选择账号。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请先选择账号。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hãy chọn tài khoản trước."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy chọn tài khoản trước."
           }
         }
       }
     },
-    "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "This account is for region %@, but this package is for region %@ — the download may fail. Add an account for region %@ or change the search region."
+    "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This account is for region %@, but this package is for region %@ — the download may fail. Add an account for region %@ or change the search region."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "此账号属于 %@ 区，而该应用属于 %@ 区——可能无法下载。请添加 %@ 区的账号或更改搜索区域。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "此账号属于 %@ 区，而该应用属于 %@ 区——可能无法下载。请添加 %@ 区的账号或更改搜索区域。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tài khoản này vùng %@, gói đang xem vùng %@ — có thể tải không được, hãy thêm tài khoản vùng %@ hoặc đổi vùng tìm kiếm."
           }
         }
       }
     },
-    "khác vùng" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "different region"
+    "khác vùng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "different region"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "不同区域"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "不同区域"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "khác vùng"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "khác vùng"
           }
         }
       }
     },
-    "Cảnh báo vùng" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Region warning"
+    "Cảnh báo vùng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Region warning"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "区域提醒"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "区域提醒"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Cảnh báo vùng"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cảnh báo vùng"
           }
         }
       }
     },
-    "Không có tài khoản nào đăng nhập." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No account is signed in."
+    "Không có tài khoản nào đăng nhập.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No account is signed in."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚未登录任何账号。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未登录任何账号。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Không có tài khoản nào đăng nhập."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có tài khoản nào đăng nhập."
           }
         }
       }
     },
-    "Hãy thêm tài khoản trong trang Tài khoản." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Please add an account in the Accounts page."
+    "Hãy thêm tài khoản trong trang Tài khoản.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Please add an account in the Accounts page."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "请在“账号”页面添加账号。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "请在“账号”页面添加账号。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Hãy thêm tài khoản trong trang Tài khoản."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hãy thêm tài khoản trong trang Tài khoản."
           }
         }
       }
     },
-    "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "The selected account is for region %@, but this app is for region %@. Apple only allows adding to Purchased in the account's own region — if Apple reports an error, add an account for region %@ in the Accounts tab and select it."
+    "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The selected account is for region %@, but this app is for region %@. Apple only allows adding to Purchased in the account's own region — if Apple reports an error, add an account for region %@ in the Accounts tab and select it."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "所选账号属于 %@ 区，而该应用属于 %@ 区。Apple 仅允许在账号所属区域加入已购项目——如果 Apple 报错，请在“账号”页添加 %@ 区的账号并重新选择。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "所选账号属于 %@ 区，而该应用属于 %@ 区。Apple 仅允许在账号所属区域加入已购项目——如果 Apple 报错，请在“账号”页添加 %@ 区的账号并重新选择。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
           }
         }
       }
     },
-    "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple refused: this app is not in the store for the account's region %@. Add an account for region %@ in the Accounts tab, select it, then add to Purchased."
+    "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple refused: this app is not in the store for the account's region %@. Add an account for region %@ in the Accounts tab, select it, then add to Purchased."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple 拒绝：该应用不在此账号所属 %@ 区商店中。请在“账号”页添加 %@ 区的账号并选中，再加入已购项目。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 拒绝：该应用不在此账号所属 %@ 区商店中。请在“账号”页添加 %@ 区的账号并选中，再加入已购项目。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple từ chối: app này không có trong cửa hàng vùng %@ của tài khoản. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn tài khoản đó để nhập vào Đã mua."
           }
         }
       }
     },
-    "Lỗi do lệch vùng" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Region mismatch"
+    "Lỗi do lệch vùng": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Region mismatch"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "区域不匹配"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "区域不匹配"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lỗi do lệch vùng"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lỗi do lệch vùng"
           }
         }
       }
     },
-    "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Region mismatch: the account is in region %@, this package is in region %@ — Apple only allows downloads and Add to Purchased in the account's own region. Switch to an account in region %@ and try again, or add an account for region %@ in the Accounts tab."
+    "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Region mismatch: the account is in region %@, this package is in region %@ — Apple only allows downloads and Add to Purchased in the account's own region. Switch to an account in region %@ and try again, or add an account for region %@ in the Accounts tab."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "区域不匹配：账号在 %@ 区，该安装包在 %@ 区——Apple 只允许在账号所属区域下载和加入已购项目。请切换到 %@ 区的账号后重试，或在“账号”页添加 %@ 区的账号。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "区域不匹配：账号在 %@ 区，该安装包在 %@ 区——Apple 只允许在账号所属区域下载和加入已购项目。请切换到 %@ 区的账号后重试，或在“账号”页添加 %@ 区的账号。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lỗi do lệch vùng: tài khoản vùng %@, gói vùng %@ — Apple chỉ cho tải và nhập vào Đã mua ở đúng vùng của tài khoản. Đổi sang tài khoản vùng %@ rồi thử lại, hoặc thêm tài khoản vùng %@ ở tab Tài khoản."
           }
         }
       }
     },
-    "Đổi sang tài khoản vùng %@ và thử lại" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Switch to a %@ account and try again"
+    "Đổi sang tài khoản vùng %@ và thử lại": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch to a %@ account and try again"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "切换到 %@ 区账号后重试"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换到 %@ 区账号后重试"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Đổi sang tài khoản vùng %@ và thử lại"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi sang tài khoản vùng %@ và thử lại"
           }
         }
       }
     },
-    "Đổi tài khoản" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Switch account"
+    "Đổi tài khoản": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Switch account"
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "切换账号"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "切换账号"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Đổi tài khoản"
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi tài khoản"
           }
         }
       }
     },
-    "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "No account for region %@ is signed in. Add an account for region %@ in the Accounts tab, then select it."
+    "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No account for region %@ is signed in. Add an account for region %@ in the Accounts tab, then select it."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "尚未登录 %@ 区的账号。请在“账号”页添加 %@ 区的账号，然后重新选择。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "尚未登录 %@ 区的账号。请在“账号”页添加 %@ 区的账号，然后重新选择。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có tài khoản vùng %@ đăng nhập. Hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."
           }
         }
       }
     },
-    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple refused the Add to Purchased request (the server returned an empty response — HTTP 204). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
+    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple refused the Add to Purchased request (the server returned an empty response — HTTP 204). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple 拒绝了加入已购项目的请求（服务器返回了空响应——HTTP 204）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 拒绝了加入已购项目的请求（服务器返回了空响应——HTTP 204）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
           }
         }
       }
     },
-    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple refused the Add to Purchased request (the server returned a redirect with no destination). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
+    "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple refused the Add to Purchased request (the server returned a redirect with no destination). This is not a wrong-account error: try again later or on another network, check the Anisette server in Settings, or use ipatool 2.8.1 on a computer."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple 拒绝了加入已购项目的请求（服务器返回了重定向，但没有目标地址）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 拒绝了加入已购项目的请求（服务器返回了重定向，但没有目标地址）。这不是账号错误：请稍后或换个网络重试，检查“设置”中的 Anisette 服务器，或在电脑上使用 ipatool 2.8.1。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính."
           }
         }
       }
     },
-    "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại." : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple refused because of a region mismatch (code %@). The app is not in the store for the account's region — switch to an account in the right region and try again."
+    "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple refused because of a region mismatch (code %@). The app is not in the store for the account's region — switch to an account in the right region and try again."
           }
         },
-        "zh-Hans" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple 因区域不匹配而拒绝（代码 %@）。该应用不在此账号所属区域的商店中——请切换到对应区域的账号后重试。"
+        "zh-Hans": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple 因区域不匹配而拒绝（代码 %@）。该应用不在此账号所属区域的商店中——请切换到对应区域的账号后重试。"
           }
         },
-        "vi" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại."
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple từ chối vì lệch vùng (mã %@). App không có trong cửa hàng vùng của tài khoản — hãy đổi sang tài khoản đúng vùng rồi thử lại."
+          }
+        }
+      }
+    },
+    "%@ is signed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is signed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ đã được ký"
+          }
+        }
+      }
+    },
+    "%d days left": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d days left"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Còn %d ngày"
+          }
+        }
+      }
+    },
+    "%d tweaks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d tweaks"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%d tweak"
+          }
+        }
+      }
+    },
+    "A code was sent by SMS.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "A code was sent by SMS."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã gửi mã qua SMS."
+          }
+        }
+      }
+    },
+    "Add": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm"
+          }
+        }
+      }
+    },
+    "Add a .p12 or sign in with Apple ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a .p12 or sign in with Apple ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm file .p12 hoặc đăng nhập bằng Apple ID"
+          }
+        }
+      }
+    },
+    "Add a certificate first": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add a certificate first"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm chứng chỉ trước"
+          }
+        }
+      }
+    },
+    "Add an AltStore, SideStore, Feather or ESign repository URL to browse apps.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add an AltStore, SideStore, Feather or ESign repository URL to browse apps."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm URL kho AltStore, SideStore, Feather hoặc ESign để duyệt app."
+          }
+        }
+      }
+    },
+    "Add certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm chứng chỉ"
+          }
+        }
+      }
+    },
+    "Add saved tweak": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add saved tweak"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm tweak đã lưu"
+          }
+        }
+      }
+    },
+    "Add source": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add source"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm nguồn"
+          }
+        }
+      }
+    },
+    "Add tweak from Files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add tweak from Files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm tweak từ Tệp"
+          }
+        }
+      }
+    },
+    "Added %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Added %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thêm %@"
+          }
+        }
+      }
+    },
+    "All": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tất cả"
+          }
+        }
+      }
+    },
+    "All (enterprise)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All (enterprise)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tất cả (doanh nghiệp)"
+          }
+        }
+      }
+    },
+    "All set!": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "All set!"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xong!"
+          }
+        }
+      }
+    },
+    "Anisette data is needed to talk to Apple servers like a Mac would. You can host your own server.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette data is needed to talk to Apple servers like a Mac would. You can host your own server."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cần dữ liệu anisette để giao tiếp với máy chủ Apple như một máy Mac. Bạn có thể tự host máy chủ của mình."
+          }
+        }
+      }
+    },
+    "Anisette server": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette server"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy chủ anisette"
+          }
+        }
+      }
+    },
+    "App": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App"
+          }
+        }
+      }
+    },
+    "App ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App ID"
+          }
+        }
+      }
+    },
+    "Apple ID certificate is ready": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID certificate is ready"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ Apple ID đã sẵn sàng"
+          }
+        }
+      }
+    },
+    "Apple did not accept the login request": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not accept the login request"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không chấp nhận yêu cầu đăng nhập"
+          }
+        }
+      }
+    },
+    "Apple did not return a provisioning profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not return a provisioning profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không trả về hồ sơ cấp phép"
+          }
+        }
+      }
+    },
+    "Apple did not return an app token": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not return an app token"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không trả về app token"
+          }
+        }
+      }
+    },
+    "Apple did not return the certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not return the certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không trả về chứng chỉ"
+          }
+        }
+      }
+    },
+    "Apple did not send session data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not send session data"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không gửi dữ liệu phiên"
+          }
+        }
+      }
+    },
+    "Apple server proof mismatch": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple server proof mismatch"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bằng chứng máy chủ Apple không khớp"
+          }
+        }
+      }
+    },
+    "Balanced": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Balanced"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cân bằng"
+          }
+        }
+      }
+    },
+    "Cannot create CSR": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot create CSR"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tạo được CSR"
+          }
+        }
+      }
+    },
+    "Cannot create key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot create key"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tạo được khoá"
+          }
+        }
+      }
+    },
+    "Cannot create local certificate authority": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot create local certificate authority"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tạo được cơ quan chứng chỉ cục bộ"
+          }
+        }
+      }
+    },
+    "Cannot create localhost certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot create localhost certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tạo được chứng chỉ localhost"
+          }
+        }
+      }
+    },
+    "Cannot read Apple session": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read Apple session"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được phiên Apple"
+          }
+        }
+      }
+    },
+    "Cannot read CA key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read CA key"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được khoá CA"
+          }
+        }
+      }
+    },
+    "Cannot read the .p12 file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read the .p12 file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được file .p12"
+          }
+        }
+      }
+    },
+    "Cannot read the Xcode token": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read the Xcode token"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được token Xcode"
+          }
+        }
+      }
+    },
+    "Cannot read the selected files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot read the selected files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đọc được các file đã chọn"
+          }
+        }
+      }
+    },
+    "Cannot register the App ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot register the App ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không đăng ký được App ID"
+          }
+        }
+      }
+    },
+    "Cannot sign CSR": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot sign CSR"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không ký được CSR"
+          }
+        }
+      }
+    },
+    "Certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ"
+          }
+        }
+      }
+    },
+    "Certificate (.p12)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate (.p12)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ (.p12)"
+          }
+        }
+      }
+    },
+    "Certificate added": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate added"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thêm chứng chỉ"
+          }
+        }
+      }
+    },
+    "Certificate created": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate created"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã tạo chứng chỉ"
+          }
+        }
+      }
+    },
+    "Certificate expires": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate expires"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ hết hạn"
+          }
+        }
+      }
+    },
+    "Certificate files are missing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate files are missing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiếu file chứng chỉ"
+          }
+        }
+      }
+    },
+    "Certificate status updated": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate status updated"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã cập nhật trạng thái chứng chỉ"
+          }
+        }
+      }
+    },
+    "Certificates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificates"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ"
+          }
+        }
+      }
+    },
+    "Change": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Change"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đổi"
+          }
+        }
+      }
+    },
+    "Check again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check again"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra lại"
+          }
+        }
+      }
+    },
+    "Check now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check now"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra ngay"
+          }
+        }
+      }
+    },
+    "Check your other Apple device for the code.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check your other Apple device for the code."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra mã trên thiết bị Apple khác của bạn."
+          }
+        }
+      }
+    },
+    "Checked": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checked"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã kiểm tra"
+          }
+        }
+      }
+    },
+    "Checking…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Checking…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang kiểm tra…"
+          }
+        }
+      }
+    },
+    "Choose": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn"
+          }
+        }
+      }
+    },
+    "Choose a certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn chứng chỉ"
+          }
+        }
+      }
+    },
+    "Choose a team": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Choose a team"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chọn nhóm"
+          }
+        }
+      }
+    },
+    "Clear temporary files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Clear temporary files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xoá file tạm"
+          }
+        }
+      }
+    },
+    "Cleared": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cleared"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã xoá"
+          }
+        }
+      }
+    },
+    "Close": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Close"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đóng"
+          }
+        }
+      }
+    },
+    "Code accepted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code accepted"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhận mã"
+          }
+        }
+      }
+    },
+    "Compression": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Compression"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nén"
+          }
+        }
+      }
+    },
+    "Confirm the install prompt, keep NVDAppleIDDownload open until the icon finishes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Confirm the install prompt, keep NVDAppleIDDownload open until the icon finishes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xác nhận hộp thoại cài đặt, giữ NVDAppleIDDownload mở cho tới khi icon cài xong"
+          }
+        }
+      }
+    },
+    "Copy link": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy link"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sao chép liên kết"
+          }
+        }
+      }
+    },
+    "Debuggable": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Debuggable"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ lỗi được"
+          }
+        }
+      }
+    },
+    "Delete this certificate?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Delete this certificate?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xoá chứng chỉ này?"
+          }
+        }
+      }
+    },
+    "Device registered": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device registered"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đăng ký thiết bị"
+          }
+        }
+      }
+    },
+    "Devices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Devices"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết bị"
+          }
+        }
+      }
+    },
+    "Done": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Done"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xong"
+          }
+        }
+      }
+    },
+    "Download from URL": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download from URL"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải về từ URL"
+          }
+        }
+      }
+    },
+    "Download profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải hồ sơ cấp phép"
+          }
+        }
+      }
+    },
+    "Download the profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Download the profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải hồ sơ cấp phép"
+          }
+        }
+      }
+    },
+    "Downloading": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloading"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tải về"
+          }
+        }
+      }
+    },
+    "Downloading %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Downloading %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tải về %@"
+          }
+        }
+      }
+    },
+    "Enable file sharing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable file sharing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật chia sẻ file"
+          }
+        }
+      }
+    },
+    "Enable full trust": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Enable full trust"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật tin cậy hoàn toàn"
+          }
+        }
+      }
+    },
+    "Encrypted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Encrypted"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã mã hoá"
+          }
+        }
+      }
+    },
+    "Entitlements": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entitlements"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entitlements"
+          }
+        }
+      }
+    },
+    "Expired": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expired"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã hết hạn"
+          }
+        }
+      }
+    },
+    "Explicit ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Explicit ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID tường minh"
+          }
+        }
+      }
+    },
+    "Extra entitlements": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Extra entitlements"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Entitlements bổ sung"
+          }
+        }
+      }
+    },
+    "Fast": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Fast"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhanh"
+          }
+        }
+      }
+    },
+    "Files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tệp"
+          }
+        }
+      }
+    },
+    "Get": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lấy"
+          }
+        }
+      }
+    },
+    "Got anisette data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Got anisette data"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã lấy được dữ liệu anisette"
+          }
+        }
+      }
+    },
+    "Import": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập"
+          }
+        }
+      }
+    },
+    "Import .p12": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import .p12"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập .p12"
+          }
+        }
+      }
+    },
+    "Import a .p12 with its .mobileprovision, or sign in with a free Apple ID.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import a .p12 with its .mobileprovision, or sign in with a free Apple ID."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập file .p12 kèm .mobileprovision, hoặc đăng nhập bằng Apple ID miễn phí."
+          }
+        }
+      }
+    },
+    "Import an .ipa from Files, open one with NVDAppleIDDownload, or grab apps from a source.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import an .ipa from Files, open one with NVDAppleIDDownload, or grab apps from a source."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập file .ipa từ Tệp, mở một file bằng NVDAppleIDDownload, hoặc lấy app từ một nguồn."
+          }
+        }
+      }
+    },
+    "Import from Files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import from Files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập từ Tệp"
+          }
+        }
+      }
+    },
+    "Imported": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhập"
+          }
+        }
+      }
+    },
+    "Imported %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Imported %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhập %@"
+          }
+        }
+      }
+    },
+    "Importing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Importing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang nhập"
+          }
+        }
+      }
+    },
+    "Injecting tweaks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Injecting tweaks"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chèn tweak"
+          }
+        }
+      }
+    },
+    "Install it": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install it"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt"
+          }
+        }
+      }
+    },
+    "Install now": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install now"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt ngay"
+          }
+        }
+      }
+    },
+    "Invalid URL": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid URL"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "URL không hợp lệ"
+          }
+        }
+      }
+    },
+    "Invalid anisette server": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid anisette server"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy chủ anisette không hợp lệ"
+          }
+        }
+      }
+    },
+    "Invalid certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ không hợp lệ"
+          }
+        }
+      }
+    },
+    "Invalid provisioning profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Invalid provisioning profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ cấp phép không hợp lệ"
+          }
+        }
+      }
+    },
+    "Issuer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Issuer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhà phát hành"
+          }
+        }
+      }
+    },
+    "Library": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Library"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thư viện"
+          }
+        }
+      }
+    },
+    "Loading source": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Loading source"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tải nguồn"
+          }
+        }
+      }
+    },
+    "Local certificate is missing, reset the installer in Settings": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local certificate is missing, reset the installer in Settings"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiếu chứng chỉ cục bộ, hãy đặt lại trình cài đặt trong Cài đặt"
+          }
+        }
+      }
+    },
+    "Local installer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local installer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình cài đặt cục bộ"
+          }
+        }
+      }
+    },
+    "Local installer reset. Remove the old profile in Settings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local installer reset. Remove the old profile in Settings."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đặt lại trình cài đặt cục bộ. Xoá hồ sơ cũ trong Cài đặt."
+          }
+        }
+      }
+    },
+    "Local installer setup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Local installer setup"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết lập trình cài đặt cục bộ"
+          }
+        }
+      }
+    },
+    "Made with 🎀 by murk. Licensed under GPL-3.0. Icon uses Twemoji (CC-BY 4.0).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Made with 🎀 by murk. Licensed under GPL-3.0. Icon uses Twemoji (CC-BY 4.0)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Được làm với 🎀 bởi tác giả gốc. Giấy phép GPL-3.0. Icon dùng Twemoji (CC-BY 4.0)."
+          }
+        }
+      }
+    },
+    "Minimum iOS": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Minimum iOS"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS tối thiểu"
+          }
+        }
+      }
+    },
+    "Name": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Name"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tên"
+          }
+        }
+      }
+    },
+    "Nickname (optional)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nickname (optional)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Biệt danh (không bắt buộc)"
+          }
+        }
+      }
+    },
+    "No": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không"
+          }
+        }
+      }
+    },
+    "No apps yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No apps yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có app nào"
+          }
+        }
+      }
+    },
+    "No certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có chứng chỉ"
+          }
+        }
+      }
+    },
+    "No certificates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No certificates"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có chứng chỉ nào"
+          }
+        }
+      }
+    },
+    "No sources": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No sources"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có nguồn nào"
+          }
+        }
+      }
+    },
+    "None": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không có"
+          }
+        }
+      }
+    },
+    "None (fastest)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "None (fastest)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không nén (nhanh nhất)"
+          }
+        }
+      }
+    },
+    "Nothing found": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing found"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không tìm thấy gì"
+          }
+        }
+      }
+    },
+    "Nothing signed yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nothing signed yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa ký app nào"
+          }
+        }
+      }
+    },
+    "On-device IPA signer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "On-device IPA signer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình ký IPA trên thiết bị"
+          }
+        }
+      }
+    },
+    "One-time setup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "One-time setup"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thiết lập một lần"
+          }
+        }
+      }
+    },
+    "Options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Options"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuỳ chọn"
+          }
+        }
+      }
+    },
+    "Packing IPA": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Packing IPA"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang đóng gói IPA"
+          }
+        }
+      }
+    },
+    "Password accepted": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Password accepted"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhận mật khẩu"
+          }
+        }
+      }
+    },
+    "Paste a repository link": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paste a repository link"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dán liên kết kho"
+          }
+        }
+      }
+    },
+    "Patching Info.plist": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Patching Info.plist"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang vá Info.plist"
+          }
+        }
+      }
+    },
+    "Preparing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Preparing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang chuẩn bị"
+          }
+        }
+      }
+    },
+    "Profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ cấp phép"
+          }
+        }
+      }
+    },
+    "Profile (.mobileprovision)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile (.mobileprovision)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ cấp phép (.mobileprovision)"
+          }
+        }
+      }
+    },
+    "Profile expires": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Profile expires"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ hết hạn"
+          }
+        }
+      }
+    },
+    "Progress": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Progress"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tiến độ"
+          }
+        }
+      }
+    },
+    "Remove": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ"
+          }
+        }
+      }
+    },
+    "Remove Apple Watch app": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove Apple Watch app"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ app Apple Watch"
+          }
+        }
+      }
+    },
+    "Remove URL schemes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove URL schemes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ URL scheme"
+          }
+        }
+      }
+    },
+    "Remove Watch apps by default": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove Watch apps by default"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặc định gỡ app Watch"
+          }
+        }
+      }
+    },
+    "Remove app extensions": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove app extensions"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ phần mở rộng của app"
+          }
+        }
+      }
+    },
+    "Remove app extensions by default": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove app extensions by default"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mặc định gỡ phần mở rộng của app"
+          }
+        }
+      }
+    },
+    "Requesting profile from Apple": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Requesting profile from Apple"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang yêu cầu hồ sơ từ Apple"
+          }
+        }
+      }
+    },
+    "Reset local installer": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset local installer"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại trình cài đặt cục bộ"
+          }
+        }
+      }
+    },
+    "Reset local installer?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset local installer?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại trình cài đặt cục bộ?"
+          }
+        }
+      }
+    },
+    "Revoked": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoked"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thu hồi"
+          }
+        }
+      }
+    },
+    "Revoked on %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoked on %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thu hồi ngày %@"
+          }
+        }
+      }
+    },
+    "Save profile to Files instead": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Save profile to Files instead"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lưu hồ sơ vào Tệp thay vì cài đặt"
+          }
+        }
+      }
+    },
+    "Saved tweak %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Saved tweak %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweak đã lưu %@"
+          }
+        }
+      }
+    },
+    "NVDAppleIDDownload installs apps through a tiny HTTPS server running on this iPhone. It uses a certificate authority created on this device only.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload installs apps through a tiny HTTPS server running on this iPhone. It uses a certificate authority created on this device only."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload cài đặt app qua một máy chủ HTTPS nhỏ chạy trên iPhone này. Máy chủ dùng một cơ quan chứng chỉ được tạo riêng trên thiết bị này."
+          }
+        }
+      }
+    },
+    "Search apps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Search apps"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tìm app"
+          }
+        }
+      }
+    },
+    "Send SMS instead": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Send SMS instead"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gửi SMS thay thế"
+          }
+        }
+      }
+    },
+    "Serial": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Serial"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Số sê-ri"
+          }
+        }
+      }
+    },
+    "Server port": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server port"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cổng máy chủ"
+          }
+        }
+      }
+    },
+    "Settings → General → About → Certificate Trust Settings → turn on NVDAppleIDDownload Local CA.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings → General → About → Certificate Trust Settings → turn on NVDAppleIDDownload Local CA."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt → Cài đặt chung → Giới thiệu → Cài đặt tin cậy chứng chỉ → bật NVDAppleIDDownload Local CA."
+          }
+        }
+      }
+    },
+    "Settings → General → VPN & Device Management → NVDAppleIDDownload Local Installer → Install.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Settings → General → VPN & Device Management → NVDAppleIDDownload Local Installer → Install."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt → Cài đặt chung → VPN & Quản lý thiết bị → NVDAppleIDDownload Local Installer → Cài đặt."
+          }
+        }
+      }
+    },
+    "Share IPA": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Share IPA"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chia sẻ IPA"
+          }
+        }
+      }
+    },
+    "Sign": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ký"
+          }
+        }
+      }
+    },
+    "Sign in": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đăng nhập"
+          }
+        }
+      }
+    },
+    "Sign in to your Apple ID again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sign in to your Apple ID again"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đăng nhập lại Apple ID của bạn"
+          }
+        }
+      }
+    },
+    "Signed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã ký"
+          }
+        }
+      }
+    },
+    "Signed apps appear here, ready to install or share.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed apps appear here, ready to install or share."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App đã ký sẽ hiện ở đây, sẵn sàng để cài đặt hoặc chia sẻ."
+          }
+        }
+      }
+    },
+    "Signed in to developer services": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed in to developer services"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đăng nhập dịch vụ nhà phát triển"
+          }
+        }
+      }
+    },
+    "Signing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang ký"
+          }
+        }
+      }
+    },
+    "Signing binaries": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing binaries"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang ký file nhị phân"
+          }
+        }
+      }
+    },
+    "Signing…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signing…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang ký…"
+          }
+        }
+      }
+    },
+    "Smallest": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Smallest"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhỏ nhất"
+          }
+        }
+      }
+    },
+    "Source already added": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Source already added"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nguồn đã được thêm"
+          }
+        }
+      }
+    },
+    "Sources": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sources"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nguồn"
+          }
+        }
+      }
+    },
+    "Stay alive while installing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Stay alive while installing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giữ chạy nền khi đang cài đặt"
+          }
+        }
+      }
+    },
+    "Storage": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Storage"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dung lượng"
+          }
+        }
+      }
+    },
+    "Supports .dylib, .deb and .framework. Substrate, ElleKit and libhooker tweaks are wired to SayoHook automatically.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Supports .dylib, .deb and .framework. Substrate, ElleKit and libhooker tweaks are wired to SayoHook automatically."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hỗ trợ .dylib, .deb và .framework. Tweak Substrate, ElleKit và libhooker được nối với SayoHook tự động."
+          }
+        }
+      }
+    },
+    "Tap the button and allow the download in Safari.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap the button and allow the download in Safari."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạm vào nút và cho phép tải về trong Safari."
+          }
+        }
+      }
+    },
+    "Team": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Team"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhóm"
+          }
+        }
+      }
+    },
+    "Temporary files": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Temporary files"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File tạm"
+          }
+        }
+      }
+    },
+    "The .p12 has no private key": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The .p12 has no private key"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File .p12 không có khoá riêng"
+          }
+        }
+      }
+    },
+    "The anisette server did not return headers. Use a v1/v3 compatible server.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The anisette server did not return headers. Use a v1/v3 compatible server."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy chủ anisette không trả về header. Hãy dùng máy chủ tương thích v1/v3."
+          }
+        }
+      }
+    },
+    "The anisette server response is missing machine data": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The anisette server response is missing machine data"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phản hồi của máy chủ anisette thiếu dữ liệu máy"
+          }
+        }
+      }
+    },
+    "The local installer needs a one-time setup": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The local installer needs a one-time setup"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trình cài đặt cục bộ cần thiết lập một lần"
+          }
+        }
+      }
+    },
+    "This Apple ID has no developer team": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Apple ID has no developer team"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID này không có nhóm nhà phát triển"
+          }
+        }
+      }
+    },
+    "This IPA is encrypted and will not run. Use a decrypted IPA.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This IPA is encrypted and will not run. Use a decrypted IPA."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPA này đã mã hoá và sẽ không chạy được. Hãy dùng IPA đã giải mã."
+          }
+        }
+      }
+    },
+    "This file is not a valid IPA": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This file is not a valid IPA"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File này không phải IPA hợp lệ"
+          }
+        }
+      }
+    },
+    "This profile only allows %@, the bundle ID will be replaced and app extensions removed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This profile only allows %@, the bundle ID will be replaced and app extensions removed."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ này chỉ cho phép %@, bundle ID sẽ bị thay thế và phần mở rộng của app sẽ bị gỡ."
+          }
+        }
+      }
+    },
+    "This profile was not made for this certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This profile was not made for this certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ này không được tạo cho chứng chỉ này"
+          }
+        }
+      }
+    },
+    "This source is not valid JSON": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This source is not valid JSON"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nguồn này không phải JSON hợp lệ"
+          }
+        }
+      }
+    },
+    "Try another search or refresh your sources.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Try another search or refresh your sources."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thử tìm kiếm khác hoặc làm mới các nguồn của bạn."
+          }
+        }
+      }
+    },
+    "Tweaks": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweaks"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tweak"
+          }
+        }
+      }
+    },
+    "Two-factor code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Two-factor code"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã xác thực hai yếu tố"
+          }
+        }
+      }
+    },
+    "Unexpected developer services response": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unexpected developer services response"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phản hồi bất ngờ từ dịch vụ nhà phát triển"
+          }
+        }
+      }
+    },
+    "Unexpected response from Apple": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unexpected response from Apple"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phản hồi bất ngờ từ Apple"
+          }
+        }
+      }
+    },
+    "Unsupported file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Unsupported file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File không được hỗ trợ"
+          }
+        }
+      }
+    },
+    "Use": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Use"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dùng"
+          }
+        }
+      }
+    },
+    "Verify": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Verify"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Xác minh"
+          }
+        }
+      }
+    },
+    "Website": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Website"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trang web"
+          }
+        }
+      }
+    },
+    "Wildcard": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wildcard"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wildcard"
+          }
+        }
+      }
+    },
+    "Wildcard profile": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wildcard profile"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ wildcard"
+          }
+        }
+      }
+    },
+    "Wrong Apple ID or password": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wrong Apple ID or password"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sai Apple ID hoặc mật khẩu"
+          }
+        }
+      }
+    },
+    "Wrong certificate password": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wrong certificate password"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sai mật khẩu chứng chỉ"
+          }
+        }
+      }
+    },
+    "Wrong code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Wrong code"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sai mã"
+          }
+        }
+      }
+    },
+    "Yes": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Yes"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Có"
+          }
+        }
+      }
+    },
+    "Your Apple ID session expired, sign in again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your Apple ID session expired, sign in again"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Phiên Apple ID của bạn đã hết hạn, hãy đăng nhập lại"
+          }
+        }
+      }
+    },
+    "Your iPhone UDID is needed to register it with Apple. Find it in Finder/iTunes or on a UDID website.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your iPhone UDID is needed to register it with Apple. Find it in Finder/iTunes or on a UDID website."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cần UDID của iPhone để đăng ký với Apple. Tìm UDID trong Finder/iTunes hoặc trên một trang web UDID."
+          }
+        }
+      }
+    },
+    "Your password is sent only to Apple. Free accounts get 7-day certificates and up to 3 apps at a time.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Your password is sent only to Apple. Free accounts get 7-day certificates and up to 3 apps at a time."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mật khẩu của bạn chỉ được gửi tới Apple. Tài khoản miễn phí nhận chứng chỉ 7 ngày và tối đa 3 app cùng lúc."
+          }
+        }
+      }
+    },
+    "iOS only installs apps over HTTPS. NVDAppleIDDownload made a private certificate authority on this iPhone, its key never leaves the device. Trust it once and installs work offline forever.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS only installs apps over HTTPS. NVDAppleIDDownload made a private certificate authority on this iPhone, its key never leaves the device. Trust it once and installs work offline forever."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iOS chỉ cài đặt app qua HTTPS. NVDAppleIDDownload đã tạo một cơ quan chứng chỉ riêng trên iPhone này, khoá của nó không bao giờ rời khỏi thiết bị. Tin cậy một lần là cài đặt ngoại tuyến mãi mãi."
+          }
+        }
+      }
+    },
+    "Signed apps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Signed apps"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App đã ký"
+          }
+        }
+      }
+    },
+    "Anisette is not provisioned for this server. Reset anisette and try again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette is not provisioned for this server. Reset anisette and try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette chưa được cấp phép cho máy chủ này. Đặt lại anisette và thử lại."
+          }
+        }
+      }
+    },
+    "Anisette provisioning failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette provisioning failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cấp phép anisette thất bại"
+          }
+        }
+      }
+    },
+    "Anisette server error": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette server error"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Lỗi máy chủ anisette"
+          }
+        }
+      }
+    },
+    "Anisette server set": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette server set"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đặt máy chủ anisette"
+          }
+        }
+      }
+    },
+    "Anisette was reset": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Anisette was reset"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã đặt lại anisette"
+          }
+        }
+      }
+    },
+    "Appearance": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Appearance"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giao diện"
+          }
+        }
+      }
+    },
+    "Apple asks for an extra step. Finish it on appleid.apple.com and try again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple asks for an extra step. Finish it on appleid.apple.com and try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple yêu cầu thêm một bước. Hoàn tất trên appleid.apple.com rồi thử lại."
+          }
+        }
+      }
+    },
+    "Apple is limiting sign-ins right now. Try again later.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple is limiting sign-ins right now. Try again later."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple đang hạn chế đăng nhập lúc này. Hãy thử lại sau."
+          }
+        }
+      }
+    },
+    "Apple may reject this server. Prefer a Mac-based one.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple may reject this server. Prefer a Mac-based one."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple có thể từ chối máy chủ này. Nên dùng máy chủ chạy trên Mac."
+          }
+        }
+      }
+    },
+    "Apple only accepts Mac-based anisette servers since October 2026.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple only accepts Mac-based anisette servers since October 2026."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Từ tháng 10/2026 Apple chỉ chấp nhận máy chủ anisette chạy trên Mac."
+          }
+        }
+      }
+    },
+    "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or the one SayoSign Desktop runs on your computer (scan its QR code).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or the one SayoSign Desktop runs on your computer (scan its QR code)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Từ tháng 10/2026 Apple chỉ chấp nhận máy chủ anisette chạy trên Mac. Hãy dùng một trong các máy chủ này, máy chủ của riêng bạn, hoặc máy chủ mà SayoSign Desktop chạy trên máy tính của bạn (quét mã QR của nó)."
+          }
+        }
+      }
+    },
+    "Apple rejected the anisette data. Choose a Mac-based anisette server and reset anisette.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple rejected the anisette data. Choose a Mac-based anisette server and reset anisette."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple đã từ chối dữ liệu anisette. Hãy chọn máy chủ anisette chạy trên Mac và đặt lại anisette."
+          }
+        }
+      }
+    },
+    "Apple rejected this anisette server. Choose a Mac-based server like ani.iloader.app.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple rejected this anisette server. Choose a Mac-based server like ani.iloader.app."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple đã từ chối máy chủ anisette này. Hãy chọn máy chủ chạy trên Mac như ani.iloader.app."
+          }
+        }
+      }
+    },
+    "Black": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Black"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đen"
+          }
+        }
+      }
+    },
+    "Check server": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check server"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra máy chủ"
+          }
+        }
+      }
+    },
+    "Client": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Client"
+          }
+        }
+      }
+    },
+    "Custom": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Custom"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tuỳ chỉnh"
+          }
+        }
+      }
+    },
+    "Device ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "ID thiết bị"
+          }
+        }
+      }
+    },
+    "Legacy (rejected by Apple)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Legacy (rejected by Apple)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cũ (bị Apple từ chối)"
+          }
+        }
+      }
+    },
+    "Light": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Light"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sáng"
+          }
+        }
+      }
+    },
+    "Non-Mac": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Non-Mac"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không phải Mac"
+          }
+        }
+      }
+    },
+    "Not provisioned": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not provisioned"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa được cấp phép"
+          }
+        }
+      }
+    },
+    "Protocol": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Protocol"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giao thức"
+          }
+        }
+      }
+    },
+    "Provisioned": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Provisioned"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã được cấp phép"
+          }
+        }
+      }
+    },
+    "Reset anisette": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Reset anisette"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt lại anisette"
+          }
+        }
+      }
+    },
+    "Server": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Server"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Máy chủ"
+          }
+        }
+      }
+    },
+    "Status": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Status"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Trạng thái"
+          }
+        }
+      }
+    },
+    "System": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "System"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hệ thống"
+          }
+        }
+      }
+    },
+    "Theme": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Theme"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chủ đề"
+          }
+        }
+      }
+    },
+    "This Apple ID is locked. Unlock it at iforgot.apple.com": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Apple ID is locked. Unlock it at iforgot.apple.com"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID này đã bị khoá. Mở khoá tại iforgot.apple.com"
+          }
+        }
+      }
+    },
+    "This is not a .p12 or .mobileprovision file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is not a .p12 or .mobileprovision file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đây không phải file .p12 hay .mobileprovision"
+          }
+        }
+      }
+    },
+    "This is not an anisette server, or it is down.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is not an anisette server, or it is down."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đây không phải máy chủ anisette, hoặc máy chủ đang ngừng hoạt động."
+          }
+        }
+      }
+    },
+    "Tip: you can select the .p12 and the .mobileprovision together.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tip: you can select the .p12 and the .mobileprovision together."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mẹo: bạn có thể chọn cả .p12 và .mobileprovision cùng lúc."
+          }
+        }
+      }
+    },
+    "Too many attempts. Wait a few minutes and try again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Too many attempts. Wait a few minutes and try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quá nhiều lần thử. Hãy đợi vài phút rồi thử lại."
+          }
+        }
+      }
+    },
+    "Warning": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Warning"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cảnh báo"
+          }
+        }
+      }
+    },
+    "Apple could not send the code to your devices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple could not send the code to your devices"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không gửi được mã tới các thiết bị của bạn"
+          }
+        }
+      }
+    },
+    "Apple could not send the SMS code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple could not send the SMS code"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không gửi được mã SMS"
+          }
+        }
+      }
+    },
+    "Apple developer services refused the session. Sign in again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple developer services refused the session. Sign in again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dịch vụ nhà phát triển của Apple đã từ chối phiên. Hãy đăng nhập lại."
+          }
+        }
+      }
+    },
+    "Apple still asks for a code. Try signing in again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple still asks for a code. Try signing in again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple vẫn yêu cầu mã. Hãy thử đăng nhập lại."
+          }
+        }
+      }
+    },
+    "With a manifest service, iOS just asks to install the app; nothing to set up. Leave it empty to use the local HTTPS installer and its one-time profile.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "With a manifest service, iOS just asks to install the app; nothing to set up. Leave it empty to use the local HTTPS installer and its one-time profile."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Với dịch vụ manifest, iOS chỉ hỏi để cài đặt app; không cần thiết lập gì. Để trống để dùng trình cài đặt HTTPS cục bộ và hồ sơ dùng một lần của nó."
+          }
+        }
+      }
+    },
+    "Manifest service (https://…workers.dev)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manifest service (https://…workers.dev)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Dịch vụ manifest (https://…workers.dev)"
+          }
+        }
+      }
+    },
+    "Install log": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install log"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhật ký cài đặt"
+          }
+        }
+      }
+    },
+    "What iOS requested during the last install. Send a screenshot if an install fails.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "What iOS requested during the last install. Send a screenshot if an install fails."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Những gì iOS đã yêu cầu trong lần cài đặt gần nhất. Gửi ảnh chụp màn hình nếu cài đặt thất bại."
+          }
+        }
+      }
+    },
+    "No install yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No install yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa cài đặt lần nào"
+          }
+        }
+      }
+    },
+    "Free accounts can have only two development certificates. A revoked certificate stops working for every app signed with it.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free accounts can have only two development certificates. A revoked certificate stops working for every app signed with it."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tài khoản miễn phí chỉ có tối đa hai chứng chỉ phát triển. Chứng chỉ đã thu hồi sẽ ngừng hoạt động với mọi app đã ký bằng nó."
+          }
+        }
+      }
+    },
+    "Expires %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Expires %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hết hạn %@"
+          }
+        }
+      }
+    },
+    "Used by this NVDAppleIDDownload certificate": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Used by this NVDAppleIDDownload certificate"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Được dùng bởi chứng chỉ NVDAppleIDDownload này"
+          }
+        }
+      }
+    },
+    "Revoke": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu hồi"
+          }
+        }
+      }
+    },
+    "Apps signed with this account install only on these devices.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps signed with this account install only on these devices."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App ký bằng tài khoản này chỉ cài đặt được trên các thiết bị này."
+          }
+        }
+      }
+    },
+    "No devices": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "No devices"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa có thiết bị nào"
+          }
+        }
+      }
+    },
+    "This iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone này"
+          }
+        }
+      }
+    },
+    "Add device": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Add device"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thêm thiết bị"
+          }
+        }
+      }
+    },
+    "Apple ID account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID account"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tài khoản Apple ID"
+          }
+        }
+      }
+    },
+    "Revoke this certificate?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke this certificate?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu hồi chứng chỉ này?"
+          }
+        }
+      }
+    },
+    "NVDAppleIDDownload signs with this certificate. After revoking, sign in to your Apple ID again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload signs with this certificate. After revoking, sign in to your Apple ID again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload ký bằng chứng chỉ này. Sau khi thu hồi, hãy đăng nhập lại Apple ID của bạn."
+          }
+        }
+      }
+    },
+    "Apps signed with it will stop opening.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apps signed with it will stop opening."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App đã ký bằng nó sẽ không mở được nữa."
+          }
+        }
+      }
+    },
+    "Remove this device?": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Remove this device?"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Gỡ thiết bị này?"
+          }
+        }
+      }
+    },
+    "Certificate revoked": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate revoked"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thu hồi chứng chỉ"
+          }
+        }
+      }
+    },
+    "Apple did not send this device's ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple did not send this device's ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple không gửi ID của thiết bị này"
+          }
+        }
+      }
+    },
+    "Device removed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device removed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã gỡ thiết bị"
+          }
+        }
+      }
+    },
+    "Device added": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Device added"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thêm thiết bị"
+          }
+        }
+      }
+    },
+    "Hide UDIDs": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hide UDIDs"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ẩn UDID"
+          }
+        }
+      }
+    },
+    "Show UDIDs": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Show UDIDs"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hiện UDID"
+          }
+        }
+      }
+    },
+    "Manage Apple ID account": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Manage Apple ID account"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quản lý tài khoản Apple ID"
+          }
+        }
+      }
+    },
+    "Install without re-signing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install without re-signing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt không cần ký lại"
+          }
+        }
+      }
+    },
+    "Original signature": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Original signature"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chữ ký gốc"
+          }
+        }
+      }
+    },
+    "Ready to install, see Signed apps": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ready to install, see Signed apps"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sẵn sàng cài đặt, xem mục App đã ký"
+          }
+        }
+      }
+    },
+    "This app got NVDAppleIDDownload's own bundle ID (%@), so installing it would replace NVDAppleIDDownload and iOS refuses. Sign NVDAppleIDDownload with another certificate, or use an Apple ID or a wildcard certificate for this app.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This app got NVDAppleIDDownload's own bundle ID (%@), so installing it would replace NVDAppleIDDownload and iOS refuses. Sign NVDAppleIDDownload with another certificate, or use an Apple ID or a wildcard certificate for this app."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App này mang bundle ID của chính NVDAppleIDDownload (%@), nên cài đặt nó sẽ thay thế NVDAppleIDDownload và iOS từ chối. Hãy ký NVDAppleIDDownload bằng một chứng chỉ khác, hoặc dùng Apple ID hay chứng chỉ wildcard cho app này."
+          }
+        }
+      }
+    },
+    "NVDAppleIDDownload itself has this bundle ID. An app signed with this certificate cannot be installed while NVDAppleIDDownload uses the same ID.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload itself has this bundle ID. An app signed with this certificate cannot be installed while NVDAppleIDDownload uses the same ID."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chính NVDAppleIDDownload mang bundle ID này. App ký bằng chứng chỉ này không thể cài đặt khi NVDAppleIDDownload đang dùng cùng ID đó."
+          }
+        }
+      }
+    },
+    "Keep the app's own bundle ID": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Keep the app's own bundle ID"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Giữ bundle ID gốc của app"
+          }
+        }
+      }
+    },
+    "This profile is made for %@. The app keeps its own bundle ID, so several apps can be installed side by side; app extensions are removed.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This profile is made for %@. The app keeps its own bundle ID, so several apps can be installed side by side; app extensions are removed."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ này được tạo cho %@. App giữ bundle ID gốc của nó, nên có thể cài đặt nhiều app cạnh nhau; phần mở rộng của app sẽ bị gỡ."
+          }
+        }
+      }
+    },
+    "Apple's profile does not include the UDID %@. Check the UDID in Certificates → Manage Apple ID account and sign in again with the right one.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple's profile does not include the UDID %@. Check the UDID in Certificates → Manage Apple ID account and sign in again with the right one."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hồ sơ của Apple không chứa UDID %@. Kiểm tra UDID trong Chứng chỉ → Quản lý tài khoản Apple ID rồi đăng nhập lại bằng UDID đúng."
+          }
+        }
+      }
+    },
+    "UDID detected": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "UDID detected"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã phát hiện UDID"
+          }
+        }
+      }
+    },
+    "Apple needs this iPhone's UDID. Tap Detect: Safari downloads a profile, open Settings → Profile Downloaded → Install, and you come back here with the UDID filled in.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple needs this iPhone's UDID. Tap Detect: Safari downloads a profile, open Settings → Profile Downloaded → Install, and you come back here with the UDID filled in."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple cần UDID của iPhone này. Chạm Phát hiện: Safari tải về một hồ sơ, mở Cài đặt → Đã tải về hồ sơ → Cài đặt, rồi bạn quay lại đây với UDID đã điền sẵn."
+          }
+        }
+      }
+    },
+    "Detect UDID automatically": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Detect UDID automatically"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động phát hiện UDID"
+          }
+        }
+      }
+    },
+    "Set the manifest service in Settings → Installing first": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Set the manifest service in Settings → Installing first"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đặt dịch vụ manifest trong Cài đặt → Cài đặt app trước"
+          }
+        }
+      }
+    },
+    "This Apple ID certificate was revoked, probably by signing in somewhere else. Delete it and sign in to your Apple ID again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Apple ID certificate was revoked, probably by signing in somewhere else. Delete it and sign in to your Apple ID again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ Apple ID này đã bị thu hồi, có thể do đăng nhập ở nơi khác. Xoá nó rồi đăng nhập lại Apple ID."
+          }
+        }
+      }
+    },
+    "Certificate ready": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Certificate ready"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chứng chỉ đã sẵn sàng"
+          }
+        }
+      }
+    },
+    "Revoke certificates": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke certificates"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu hồi chứng chỉ"
+          }
+        }
+      }
+    },
+    "This Apple ID already has as many development certificates as Apple allows. Choose which to revoke; apps signed with a revoked certificate stop opening.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This Apple ID already has as many development certificates as Apple allows. Choose which to revoke; apps signed with a revoked certificate stop opening."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Apple ID này đã có đủ số chứng chỉ phát triển tối đa mà Apple cho phép. Hãy chọn chứng chỉ cần thu hồi; app ký bằng chứng chỉ đã thu hồi sẽ không mở được nữa."
+          }
+        }
+      }
+    },
+    "Revoke and continue": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoke and continue"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Thu hồi và tiếp tục"
+          }
+        }
+      }
+    },
+    "Revoked %d certificate(s)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Revoked %d certificate(s)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã thu hồi %d chứng chỉ"
+          }
+        }
+      }
+    },
+    "%@ is installed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ is installed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ đã được cài đặt"
+          }
+        }
+      }
+    },
+    "Address": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Address"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Địa chỉ"
+          }
+        }
+      }
+    },
+    "An RPPairing file from StikDebug or PhonePair works too.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "An RPPairing file from StikDebug or PhonePair works too."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "File RPPairing từ StikDebug hoặc PhonePair cũng dùng được."
+          }
+        }
+      }
+    },
+    "Automatic": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Automatic"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tự động"
+          }
+        }
+      }
+    },
+    "Check connection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Check connection"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kiểm tra kết nối"
+          }
+        }
+      }
+    },
+    "Connecting to this iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connecting to this iPhone"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang kết nối tới iPhone này"
+          }
+        }
+      }
+    },
+    "Connection": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Connection"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Kết nối"
+          }
+        }
+      }
+    },
+    "Could not advertise on the local network. Allow Local Network for NVDAppleIDDownload in Settings.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not advertise on the local network. Allow Local Network for NVDAppleIDDownload in Settings."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể quảng bá trên mạng cục bộ. Hãy cho phép Mạng cục bộ cho NVDAppleIDDownload trong Cài đặt."
+          }
+        }
+      }
+    },
+    "Forget pairing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Forget pairing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Quên ghép nối"
+          }
+        }
+      }
+    },
+    "Free Apple ID apps can only be installed through pairing (like SideStore): iOS 27, Developer Mode and LocalDevVPN. Certificates (.p12) install over the air.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Free Apple ID apps can only be installed through pairing (like SideStore): iOS 27, Developer Mode and LocalDevVPN. Certificates (.p12) install over the air."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "App Apple ID miễn phí chỉ cài đặt được qua ghép nối (như SideStore): iOS 27, Chế độ nhà phát triển và LocalDevVPN. Chứng chỉ (.p12) cài đặt qua mạng."
+          }
+        }
+      }
+    },
+    "Get LocalDevVPN": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Get LocalDevVPN"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tải LocalDevVPN"
+          }
+        }
+      }
+    },
+    "Import pairing file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Import pairing file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập file ghép nối"
+          }
+        }
+      }
+    },
+    "Install method": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install method"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cách cài đặt"
+          }
+        }
+      }
+    },
+    "Installing %d%%": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Installing %d%%"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang cài đặt %d%%"
+          }
+        }
+      }
+    },
+    "Method": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Method"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cách"
+          }
+        }
+      }
+    },
+    "Not paired": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not paired"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa ghép nối"
+          }
+        }
+      }
+    },
+    "Not paired yet": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Not paired yet"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chưa ghép nối"
+          }
+        }
+      }
+    },
+    "Open Settings → Privacy & Security → Developer Mode and tap Pair with NVDAppleIDDownload": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Open Settings → Privacy & Security → Developer Mode and tap Pair with NVDAppleIDDownload"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mở Cài đặt → Quyền riêng tư & Bảo mật → Chế độ nhà phát triển rồi chạm Ghép nối với NVDAppleIDDownload"
+          }
+        }
+      }
+    },
+    "Or import a pairing file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Or import a pairing file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Hoặc nhập file ghép nối"
+          }
+        }
+      }
+    },
+    "Over the air": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Over the air"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Qua mạng"
+          }
+        }
+      }
+    },
+    "Pair on this iPhone (iOS 27)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pair on this iPhone (iOS 27)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối trên iPhone này (iOS 27)"
+          }
+        }
+      }
+    },
+    "Pair this iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pair this iPhone"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối iPhone này"
+          }
+        }
+      }
+    },
+    "Pair this iPhone first: Settings → Installing → Pair this iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pair this iPhone first: Settings → Installing → Pair this iPhone"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối iPhone này trước: Cài đặt → Cài đặt app → Ghép nối iPhone này"
+          }
+        }
+      }
+    },
+    "Paired": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Paired"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã ghép nối"
+          }
+        }
+      }
+    },
+    "Pairing": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang ghép nối"
+          }
+        }
+      }
+    },
+    "Pairing (LocalDevVPN)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing (LocalDevVPN)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối (LocalDevVPN)"
+          }
+        }
+      }
+    },
+    "Pairing failed": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing failed"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối thất bại"
+          }
+        }
+      }
+    },
+    "Pairing file imported": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing file imported"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã nhập file ghép nối"
+          }
+        }
+      }
+    },
+    "Pairing lets NVDAppleIDDownload install apps the way SideStore does, including apps signed with a free Apple ID. It needs iOS 27, Developer Mode and LocalDevVPN (free on the App Store) connected while installing.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Pairing lets NVDAppleIDDownload install apps the way SideStore does, including apps signed with a free Apple ID. It needs iOS 27, Developer Mode and LocalDevVPN (free on the App Store) connected while installing."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ghép nối giúp NVDAppleIDDownload cài đặt app như SideStore, kể cả app ký bằng Apple ID miễn phí. Cần iOS 27, Chế độ nhà phát triển và LocalDevVPN (miễn phí trên App Store) được kết nối trong lúc cài đặt."
+          }
+        }
+      }
+    },
+    "Tap Pair, then open Settings → Privacy & Security → Developer Mode → Pair with NVDAppleIDDownload and type the code shown here.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Tap Pair, then open Settings → Privacy & Security → Developer Mode → Pair with NVDAppleIDDownload and type the code shown here."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạm Ghép nối, rồi mở Cài đặt → Quyền riêng tư & Bảo mật → Chế độ nhà phát triển → Ghép nối với NVDAppleIDDownload và nhập mã hiện tại đây."
+          }
+        }
+      }
+    },
+    "This iPhone is paired": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This iPhone is paired"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "iPhone này đã ghép nối"
+          }
+        }
+      }
+    },
+    "This is a lockdown pairing file. NVDAppleIDDownload needs an RPPairing file (iOS 27 pairing).": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is a lockdown pairing file. NVDAppleIDDownload needs an RPPairing file (iOS 27 pairing)."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đây là file ghép nối lockdown. NVDAppleIDDownload cần file RPPairing (ghép nối iOS 27)."
+          }
+        }
+      }
+    },
+    "This is not a pairing file": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "This is not a pairing file"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đây không phải file ghép nối"
+          }
+        }
+      }
+    },
+    "Turn LocalDevVPN on, then check.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Turn LocalDevVPN on, then check."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Bật LocalDevVPN rồi kiểm tra lại."
+          }
+        }
+      }
+    },
+    "Type this code on the iPhone": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type this code on the iPhone"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập mã này trên iPhone"
+          }
+        }
+      }
+    },
+    "Uploading": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Uploading"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang tải lên"
+          }
+        }
+      }
+    },
+    "Waiting for the iPhone…": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Waiting for the iPhone…"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đang đợi iPhone…"
+          }
+        }
+      }
+    },
+    "Inside NVDAppleIDDownload": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Inside NVDAppleIDDownload"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạy trong NVDAppleIDDownload"
+          }
+        }
+      }
+    },
+    "Run": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạy"
+          }
+        }
+      }
+    },
+    "%@ starts when you open NVDAppleIDDownload again": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ starts when you open NVDAppleIDDownload again"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ sẽ chạy khi bạn mở lại NVDAppleIDDownload"
+          }
+        }
+      }
+    },
+    "Run inside NVDAppleIDDownload (experimental)": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run inside NVDAppleIDDownload (experimental)"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạy trong NVDAppleIDDownload (thử nghiệm)"
+          }
+        }
+      }
+    },
+    "Like LiveContainer: not installed in iOS, no app limit. Use the same certificate NVDAppleIDDownload itself is signed with.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Like LiveContainer: not installed in iOS, no app limit. Use the same certificate NVDAppleIDDownload itself is signed with."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Như LiveContainer: không cài đặt vào iOS, không giới hạn số app. Dùng cùng chứng chỉ mà chính NVDAppleIDDownload được ký."
+          }
+        }
+      }
+    },
+    "NVDAppleIDDownload closes; open it again and the app starts inside it. Close that app and open NVDAppleIDDownload again to come back.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload closes; open it again and the app starts inside it. Close that app and open NVDAppleIDDownload again to come back."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload sẽ đóng; mở lại và app sẽ chạy bên trong nó. Đóng app đó rồi mở lại NVDAppleIDDownload để quay về."
+          }
+        }
+      }
+    },
+    "Run inside NVDAppleIDDownload": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Run inside NVDAppleIDDownload"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Chạy trong NVDAppleIDDownload"
+          }
+        }
+      }
+    },
+    "The IPA has no app inside": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "The IPA has no app inside"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "IPA không chứa app nào bên trong"
+          }
+        }
+      }
+    },
+    "Cannot prepare the app to run inside NVDAppleIDDownload": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cannot prepare the app to run inside NVDAppleIDDownload"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không chuẩn bị được app để chạy trong NVDAppleIDDownload"
+          }
+        }
+      }
+    },
+    "%@ expires tomorrow": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ expires tomorrow"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "%@ hết hạn vào ngày mai"
+          }
+        }
+      }
+    },
+    "Re-sign it in NVDAppleIDDownload with your Apple ID to keep it working.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Re-sign it in NVDAppleIDDownload with your Apple ID to keep it working."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Ký lại trong NVDAppleIDDownload bằng Apple ID của bạn để tiếp tục dùng."
+          }
+        }
+      }
+    },
+    "Could not advertise on the local network. Connect to Wi-Fi, allow Local Network for NVDAppleIDDownload (Settings → Privacy & Security → Local Network) and try again.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Could not advertise on the local network. Connect to Wi-Fi, allow Local Network for NVDAppleIDDownload (Settings → Privacy & Security → Local Network) and try again."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Không thể quảng bá trên mạng cục bộ. Hãy kết nối Wi-Fi, cho phép Mạng cục bộ cho NVDAppleIDDownload (Cài đặt → Quyền riêng tư & Bảo mật → Mạng cục bộ) rồi thử lại."
+          }
+        }
+      }
+    },
+    "NVDAppleIDDownload pairing code: %@": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "NVDAppleIDDownload pairing code: %@"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Mã ghép nối NVDAppleIDDownload: %@"
+          }
+        }
+      }
+    },
+    "Type it in Settings → Developer Mode.": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Type it in Settings → Developer Mode."
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Nhập mã trong Cài đặt → Chế độ nhà phát triển."
+          }
+        }
+      }
+    },
+    "Code copied": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Code copied"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Đã sao chép mã"
+          }
+        }
+      }
+    },
+    "Copy code": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Copy code"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Sao chép mã"
+          }
+        }
+      }
+    },
+    "Install options": {
+      "localizations": {
+        "en": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Install options"
+          }
+        },
+        "vi": {
+          "stringUnit": {
+            "state": "translated",
+            "value": "Cài đặt app"
           }
         }
       }

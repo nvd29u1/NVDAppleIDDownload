@@ -267,6 +267,46 @@ struct SettingView: View {
             } footer: {
                 Text("This will reset all your settings.")
             }
+
+            // Giới thiệu (đợt 5, build 10): nội dung tab Trang chủ cũ
+            // (đã bỏ) gom vào đây — logo, lời chào, phiên bản, hướng
+            // dẫn, ghi công.
+            Section {
+                HStack(spacing: 14) {
+                    Image(.pigLogo)
+                        .resizable()
+                        .aspectRatio(contentMode: .fit)
+                        .frame(width: 64, height: 64)
+                        .clipShape(RoundedRectangle(cornerRadius: 15))
+                        .nvdBorderBeam(shape: .rounded(15))
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("NVDAppleIDDownload")
+                            .font(.title2.weight(.heavy))
+                        Text("Welcome to NVDAppleIDDownload")
+                            .font(.subheadline)
+                            .foregroundStyle(.secondary)
+                        Text("Phiên bản \(version)")
+                            .font(.caption)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+                .padding(.vertical, 6)
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("1. Đăng nhập tài khoản Apple ID ở tab Tài khoản.")
+                    Text("2. Thêm lượt tải theo tên app hoặc Bundle ID ở tab Lượt tải.")
+                    Text("3. Tải xong mở file IPA, bấm Ký IPA này để ký ở tab Ký IPA.")
+                    Text("4. Cài chứng chỉ ở mục Device bên trên rồi cài app trực tiếp hoặc qua AirDrop.")
+                }
+                .font(.callout)
+                Text("The App Store API can be unstable. Retry if an error occurs.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+                Text("Dựa trên Asspp của Lakr233 (MIT). Tính năng ký được cá nhân hoá từ SayoSign của murk-sus (GPL-3.0). Hiệu ứng viền sáng BorderBeam của ismnoiet (MIT).")
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+            } header: {
+                Text("Giới thiệu")
+            }
         }
         .formStyle(.grouped)
         .navigationTitle("Settings")

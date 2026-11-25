@@ -45,7 +45,7 @@ A build phase script errors if this file is missing. The CI scripts generate a n
 
 ## Build Configuration
 
-xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers live in `Configuration/Version.xcconfig` — BUT `MARKETING_VERSION` is also pinned in `Asspp.xcodeproj/project.pbxproj` (target Debug + Release build settings), and the pbxproj value overrides the xcconfig, so a version bump must change BOTH places or the built app keeps the old version. `CURRENT_PROJECT_VERSION` (build number) lives only in `Version.xcconfig`. From build 5 the app uses its own version **2.0** (build stays 5, no reset — the CI scripts never touch version numbers) instead of upstream Asspp 4.2.2; the welcome screen shows "`<MARKETING_VERSION> <build>`" (e.g. "2.0 5") from `Bundle.main` info dictionary (`main.swift`, `WelcomeView`).
+xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers live in `Configuration/Version.xcconfig` — BUT `MARKETING_VERSION` is also pinned in `Asspp.xcodeproj/project.pbxproj` (target Debug + Release build settings), and the pbxproj value overrides the xcconfig, so a version bump must change BOTH places or the built app keeps the old version. `CURRENT_PROJECT_VERSION` (build number) lives only in `Version.xcconfig`. From build 5 the app uses its own version **2.0** (build stays 5, no reset — the CI scripts never touch version numbers) instead of upstream Asspp 4.2.2; the About section in Settings shows "`<MARKETING_VERSION> <build>`" (e.g. "2.0 5") from `Bundle.main` info dictionary (`main.swift`, `SettingView`).
 
 ## Architecture
 
@@ -63,7 +63,7 @@ xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → 
 
 ### Interface Layer (`NVDAppleIDDownload/Interface/`)
 
-SwiftUI views organized by feature: Account, Search, Download, Installed (macOS only), Setting, Welcome. `MainView` uses `NavigationSplitView` sidebar on macOS and `TabView` on iOS.
+SwiftUI views organized by feature: Account, Search, Download, Installed (macOS only), Setting, Sign (iOS only, merged from NVDsign in build 10). `MainView` uses `NavigationSplitView` sidebar on macOS and `TabView` on iOS.
 
 NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with the green NVD pig logo (`PigLogo` image set). Forms keep the system background for readability.
 
@@ -527,3 +527,98 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.0 build 9 (`CURRENT_PROJECT_VERSION` 8 → 9, chỉ trong
     `Version.xcconfig`; pbxproj không pin CURRENT_PROJECT_VERSION,
     chỉ pin MARKETING_VERSION 2.0 nên không cần sửa pbxproj).
+- Đợt 5 build 10 (25 Nov 2026, 2.0 build 10): GỘP NVDsign vào
+  NVDAppleIDDownload thành 1 app duy nhất (quyết định của anh sáng
+  25/11). Nguồn: fork nvd29u1/SayoSign nhánh nvd, v1.4 build 1
+  (head 451036d4). Học ý tưởng rồi port code GPL-3.0 của murk-sus,
+  giữ LICENSE (`LICENSE-SayoSign-GPL-3.0` ở root) + dòng ghi công
+  trong Giới thiệu (Cài đặt) và trong About của tab Ký; KHÔNG copy
+  code iPadn (GPL-2.0). Chưa kiểm chứng trên iPhone thật.
+  - Tính năng ký đã gộp đủ (tab "Ký IPA", `Interface/Sign/`, chỉ
+    iOS — file bọc `#if os(iOS)`): ký bằng .p12, ký bằng Apple ID
+    (+2FA), chèn tweak (SayoHook qua framework CydiaSubstrate),
+    cài offline (máy chủ cài đặt local + manifest), nhập IPA từ
+    Tệp, nhập IPA từ file vừa tải (nút "Ký IPA này" ở màn chi tiết
+    gói đã tải trong tab Lượt tải), thư viện app đã ký, chạy app
+    trong NVDAppleIDDownload (Container.swift port nguyên; sửa 1
+    lỗi thật: đường request file cũ `.../SayoSign/SayoSign/...`
+    có thư mục cha không bao giờ được tạo nên ghi file có thể
+    fail — bản gộp dùng đường phẳng
+    `.../Application Support/NVDAppleIDDownload/container-launch.plist`
+    và tạo thư mục cha trong `run()` trước khi ghi; điểm vào ở
+    `main.swift`: `_ = Container.launchIfRequested()`).
+  - Đổi tên: bundle `com.NVD.appleiddownload`; URL scheme UDID
+    `nvdappleiddownload` (link `://udid` do Installer sinh khớp
+    scheme này, không còn `nvdsign://`); Keychain service ký
+    `com.NVD.appleiddownload.sign`; Application Support ký
+    `.../NVDAppleIDDownload`; CA local của tính năng ký đổi tên
+    sang NVDAppleIDDownload; CA local "NVD Local Installation CA"
+    của app giữ nguyên. App mới là app khác nên dữ liệu
+    Keychain/cert của NVDsign 1.4 KHÔNG mang sang — người dùng
+    phải nhập lại .p12 / đăng nhập lại Apple ID. Chuỗi
+    "SayoSign Desktop" giữ nguyên (tên sản phẩm thật của tác giả).
+  - Máy chủ manifest thống nhất MỘT setting: dùng setting sẵn
+    của NVDAppleIDDownload (`AppStore.manifestServerURL`, mặc
+    định worker nvd-manifest); `SignInstaller.manifestService()`
+    đọc setting đó; ô nhập trong Cài đặt ký bind vào
+    `$store.manifestServerURL`. Không còn 2 setting manifest.
+  - Bỏ hẳn tab Trang chủ: xoá `Interface/Welcome/` (MainView,
+    WelcomeView, SimpleInstruction); nội dung gộp vào mục "Giới
+    thiệu" cuối Cài đặt (logo PigLogo, tên app, phiên bản, 4 bước
+    hướng dẫn theo luồng mới + dòng ghi công Asspp/Lakr233 MIT +
+    SayoSign/murk-sus GPL-3.0 + BorderBeam/ismnoiet MIT). Tab bar
+    sau gộp chỉ còn đúng 4 tab: Tài khoản, Lượt tải, Ký IPA, Cài
+    đặt — cập nhật cả 3 biến thể (LegacyTabMainView, NewMainView
+    iOS 26+, sidebar macOS; macOS hiện SignUnavailableView vì ký
+    chỉ có trên iPhone). ⚠️ THEO QUYẾT ĐỊNH 4 TAB NÀY, CÁC TAB
+    TÌM KIẾM / ĐÃ MUA / ĐANG THEO DÕI / INSTALLED BỊ GỠ KHỎI
+    ĐIỀU HƯỚNG (build 4–8 chưa từng giao cho anh nên anh chưa
+    biết các tab đó tồn tại) — file view vẫn còn trong repo, khôi
+    phục được bằng 1 commit; luồng tải còn lại là nhập tên app /
+    Bundle ID trong tab Lượt tải (AddDownloadView, build 4). Cần
+    anh xác nhận lại trước khi giao.
+  - Strings: 352 key vi.lproj của NVDsign gộp vào
+    `Localizable.xcstrings` (336 key mới + "Install options" đổi
+    từ key "Installing" trùng khác nghĩa — NVD vi "Đang cài",
+    Sayo vi "Cài đặt app"; 16 key trùng giá trị bỏ qua); tổng
+    559 key, 0 literal L()/LF() thiếu. Key mới chỉ có en + vi
+    (zh-Hans bỏ — fallback về en).
+  - Project: script sửa `Asspp.xcodeproj/project.pbxproj`
+    (không sửa tay) — thêm 17 file C `core/src/*.c` vào Compile
+    Sources của app target; `SWIFT_OBJC_BRIDGING_HEADER`
+    `NVDAppleIDDownload/App/SignBridgingHeader.h` (`#include
+    "sayo.h"` + `#include "sayoidev.h"`); `HEADER_SEARCH_PATHS`
+    `$(SRCROOT)/core/include` + `$(SRCROOT)/core/src`;
+    `OTHER_LDFLAGS` `-lz -lcompression -framework Security` và
+    `OTHER_LDFLAGS[sdk=iphoneos*]` `-lsayoidev`,
+    `LIBRARY_SEARCH_PATHS[sdk=iphoneos*]` tới
+    `rust/sayoidev/target/aarch64-apple-ios/release` (chỉ iOS,
+    build macOS không cần .a); target framework mới
+    `CydiaSubstrate` (hook/SayoHook.c, bundle
+    `com.NVD.appleiddownload.hook`, hỗ trợ cả iphoneos + macosx)
+    + TargetDependency + phase "Embed Frameworks" ở app target
+    (embed-only, không link — signer tìm framework qua
+    `Bundle.main.privateFrameworksURL`). Vendor `core/` +
+    `rust/sayoidev/` + `hook/` từ fork NVDsign (header GPL giữ
+    nguyên; "SayoSign" còn sót trong comment code vendored
+    core/rust — không phải chỗ người dùng nhìn thấy).
+  - CI: KHÔNG sửa `.github/workflows/*` (token chỉ scope repo).
+    Bước build Rust thêm vào
+    `Resources/Scripts/compile.release.mobile.ci.sh` (sau git
+    clean, trước xcodebuild): kiểm tra `cargo`, `rustup target
+    add aarch64-apple-ios`, `IPHONEOS_DEPLOYMENT_TARGET=17.0
+    cargo build --release --target aarch64-apple-ios`,
+    kiểm chứng `libsayoidev.a` tồn tại, lỗi thì fail rõ ràng.
+    `compile.release.osx.sh` không đổi.
+  - Lưu ý: IPA tải từ App Store vẫn mã hoá FairPlay nên đưa vào
+    tab Ký sẽ báo encrypted ở SignView — không phải lỗi gộp.
+  - Rủi ro chưa xác minh: Commerce/DMAP của build 9 (dạng
+    request/response `/commerce/account/purchases` chưa xác minh
+    bằng tài khoản thật); Rust bridge trong CI (lần đầu build
+    .a trên runner); framework hook (lần đầu embed); toàn bộ
+    tính năng ký chưa kiểm chứng trên iPhone thật (lần đầu dùng
+    Apple ID phụ); app ký PHẢI cài trực tiếp qua SideStore,
+    không chạy trong LiveContainer (đã chứng minh 24/11).
+  - Version: 2.0 build 10 (`CURRENT_PROJECT_VERSION` 9 → 10,
+    chỉ trong `Version.xcconfig`; `MARKETING_VERSION` vẫn 2.0
+    ở cả xcconfig và pbxproj).

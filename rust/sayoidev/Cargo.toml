@@ -1,0 +1,24 @@
+[package]
+name = "sayoidev"
+version = "0.1.0"
+edition = "2024"
+license = "GPL-3.0-or-later"
+description = "SayoSign's bridge to idevice: on-device RPPairing (iOS 27) and installs through the pairing tunnel"
+
+[lib]
+crate-type = ["staticlib"]
+
+[dependencies]
+idevice = { git = "https://github.com/jkcoxson/idevice", tag = "v0.1.68", default-features = false, features = [
+  "ring", "remote_pairing", "tunnel_tcp_stack", "core_device_proxy", "rsd", "afc", "installation_proxy",
+] }
+tokio = { version = "1.44", features = ["rt-multi-thread", "net", "time", "macros", "fs", "sync"] }
+serde_json = "1"
+once_cell = "1.21"
+
+[profile.release]
+opt-level = "z"
+lto = true
+codegen-units = 1
+panic = "abort"
+strip = true

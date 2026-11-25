@@ -29,6 +29,8 @@ struct PackageView: View {
     #if os(iOS)
         @State private var installer: Installer?
         @State private var error: String = ""
+        @State private var signImportMessage: String?
+        @State private var showSignImportAlert = false
     #endif
     #if os(macOS)
         @State private var copied = false
@@ -110,6 +112,19 @@ struct PackageView: View {
                         // lưu vào Tệp / AirDrop / chia sẻ qua app khác. File
                         // vẫn mã hoá FairPlay, chỉ xuất đúng file đã tải.
                         ExportIPAButton(manifest: pkg)
+
+                        // Đưa IPA vừa tải sang tab Ký IPA (đợt 5, build 10):
+                        // nhập vào thư viện ký rồi mở tab Ký IPA để ký
+                        // (.p12 / Apple ID, chèn tweak) và cài offline.
+                        Button("Ký IPA này") {
+                            Task { await importToSign() }
+                        }
+                        .alert("Đã đưa vào Ký IPA", isPresented: $showSignImportAlert) {
+                            Button("Mở tab Ký IPA") { MainTabSelection.shared.tab = .sign }
+                            Button("Để sau", role: .cancel) {}
+                        } message: {
+                            if let signImportMessage { Text(signImportMessage) }
+                        }
 
                         // Giữ phiên bản này (đợt 3, build 8): đã giữ thì
                         // tab Lượt tải không nhắc "Có bản mới" nữa.
@@ -225,4 +240,13 @@ struct PackageView: View {
         .formStyle(.grouped)
         .navigationTitle(pkg.package.software.name)
     }
+
+    #if os(iOS)
+        /// Nhập IPA vừa tải vào thư viện ký (đợt 5, build 10).
+        private func importToSign() async {
+            await SignAppState.shared.importIPA(url)
+            signImportMessage = "Đã đưa \(archive.software.name) vào tab Ký IPA. Mở tab để chọn chứng chỉ và ký."
+            showSignImportAlert = true
+        }
+    #endif
 }
