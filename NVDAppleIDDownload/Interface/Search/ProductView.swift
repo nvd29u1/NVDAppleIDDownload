@@ -132,6 +132,9 @@ struct ProductView: View {
         case appleRedirectRefused
         case appleEmptyResponseNoServer
         case appleRedirectRefusedNoServer
+        /// Token hết hạn thật (Apple trả failureType 2034 — build 16:
+        /// rotate lặng lẽ thất bại rồi buyProduct báo token hết hạn).
+        case passwordTokenExpired
 
         var errorDescription: String? {
             switch self {
@@ -143,6 +146,8 @@ struct ProductView: View {
                 return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .appleRedirectRefusedNoServer:
                 return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
+            case .passwordTokenExpired:
+                return String(localized: "Phiên đăng nhập của tài khoản này đã hết hạn (mã 2034) — app đã thử làm mới lặng lẽ nhưng Apple không chấp nhận. Hãy đăng nhập lại tài khoản ở tab Tài khoản rồi bấm \"Nhập vào Đã mua\" lại.")
             }
         }
     }
@@ -221,6 +226,12 @@ struct ProductView: View {
         }
         if message.contains("request failed with status 204") || message.contains("HTTP 204") {
             return anisetteConfigured ? PurchaseGateError.appleEmptyResponse : PurchaseGateError.appleEmptyResponseNoServer
+        }
+        // Token hết hạn thật (fork: failureType 2034 → "password token is
+        // expired (failureType: 2034)"): phiên đã chết, đăng nhập lại mới
+        // xong — đừng để nguyên câu thô tiếng Anh.
+        if message.contains("password token is expired") || message.contains("failureType: 2034") {
+            return PurchaseGateError.passwordTokenExpired
         }
         return error
     }
@@ -421,6 +432,11 @@ struct ProductView: View {
         let serverURL = await vm.anisetteServerURL
         let anisetteConfigured = !serverURL.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
         var lastError: Error?
+        // Rotate có lần nào chạm cửa Apple không — để cuối hàm ghi rõ
+        // chuỗi lỗi khi buyProduct sau đó báo token hết hạn (build 16:
+        // log máy thật 18:43 25/11 chỉ thấy câu 2034 cuối cùng, không
+        // thấy rotate lỗi gì nên không soi tiếp được).
+        var rotateFailed = false
         for attempt in 1 ... 3 {
             do {
                 try await vm.withAccount(id: account.id) { userAccount in
@@ -435,6 +451,7 @@ struct ProductView: View {
                             // chạy xong không lỗi, và rotate chỉ gán tài
                             // khoản mới khi authenticate thành công, nên
                             // rotate hỏng không làm bẩn tài khoản đã lưu.
+                            rotateFailed = true
                             logger.info("acquireLicense: token rotation hit Apple gate, continuing with saved session: \(StoreDiagnostics.errorSummary(error))")
                         } else {
                             throw error
@@ -462,6 +479,12 @@ struct ProductView: View {
             }
         }
         if let lastError {
+            // Chuỗi lỗi đầy đủ cho lần chẩn đoán sau: rotate chạm cửa
+            // rồi buyProduct báo token hết hạn — làm mới lặng lẽ không
+            // xong, phải đăng nhập lại tay.
+            if rotateFailed, lastError.localizedDescription.contains("password token is expired") || lastError.localizedDescription.contains("failureType: 2034") {
+                logger.error("acquireLicense: token rotation failed earlier (Apple gate), buyProduct then reported token expired — silent refresh did not work, re-login needed")
+            }
             throw Self.translatePurchaseGateError(lastError, anisetteConfigured: anisetteConfigured)
         }
         licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)

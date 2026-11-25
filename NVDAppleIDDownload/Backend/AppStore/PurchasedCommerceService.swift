@@ -4,38 +4,41 @@
 //  Màn Đã mua, bước /commerce/account/purchases (đợt 4, build 9 — ý
 //  tưởng iPadn mục 3, viết lại sạch, KHÔNG copy code iPadn GPL-2.0).
 //
-//  ⚠️ ĐIỂM CHƯA BIẾT LỚN NHẤT — ĐỌC KỸ TRƯỚC KHI TIN KẾT QUẢ:
-//  Hình dạng request/response chính xác của endpoint này CHƯA được xác
-//  minh bằng tài khoản thật. Những gì code dưới đây dựa vào là: tên
-//  endpoint /commerce/account/purchases (JSON:API) mà iPadn dùng, và
-//  cách Apple thường làm JSON:API (khối `data` + `included` + phân
-//  trang `links.next`). Có thể Apple trả về dạng khác (tên trường khác,
-//  phân trang khác, hoặc yêu cầu thêm tham số / header khác) — khi đó
-//  service ném PurchasedCommerceError.unknownShape, PurchasedStore giữ
-//  nguyên danh sách DMAP và báo rõ trong màn Đã mua, KHÔNG crash,
-//  KHÔNG bịa app. Muốn chắc chắn phải thử thật với tài khoản thật trên
-//  iPhone rồi sửa parser theo response thật; CI không kiểm chứng được
-//  bước này (không có tài khoản Apple thật trên runner).
+//  HÌNH DẠNG REQUEST/RESPONSE ĐÃ XÁC MINH (build 16, từ source iPadn
+//  v2.3.5 thật — clone mới 25/11/2026, commit 4357456,
+//  `iPadn-iOS/iPadn/Services/AppleService.swift` hàm commerce* +
+//  `DMAP.swift` CommercePurchaseHistory; chỉ học giao thức, code dưới
+//  đây viết lại theo cấu trúc của app):
+//  - GET https://[p<pod>-]buy.itunes.apple.com/commerce/account/purchases
+//    ?isDeepLink=false&isJsonApiFormat=true[&page=N]&range=<năm>-all
+//    (range là "<năm>-all", vd "2026-all"; quét từng năm, năm hiện tại
+//    trước rồi lùi dần tới 2008; page chỉ gửi khi > 1).
+//  - Host theo pod khi biết pod (cookie `itspod` / header `pod` / host
+//    Location của 302 — dạng p<pod>-buy.itunes.apple.com); 404/5xx thì
+//    thử lại 1 lần trên host thường buy.itunes.apple.com.
+//  - Header: User-Agent, Accept-Language en-us, X-Dsid, X-Apple-Store-Front,
+//    Cookie, X-Token (+ header Anisette của app — cơ chế xác minh thiết
+//    bị riêng của app, không trùng các header trên). KHÔNG có Accept,
+//    KHÔNG có X-Apple-I-*, KHÔNG có X-GUID, KHÔNG có chữ ký SAP.
+//  - Theo 302 thủ công tối đa 4 hop (bắt tay `mzcprh=1` + `itspod`),
+//    gộp Set-Cookie vào cookie gửi tiếp, bắt pod từ header `pod` / host.
+//  - Response JSON:API thật: data là OBJECT, attributes["is-complete"]
+//    + attributes["purchases"] là các hoá đơn (order-id, invoice-date,
+//    items[] với kind/item-id/item-name/purchase-date). Phân trang bằng
+//    tham số `page`, dừng khi is-complete hoặc hết hoá đơn mới.
+//  - 429/5xx thì thử lại tối đa 3 lần (nghỉ 0,5s rồi 1,5s).
 //
-//  Cách làm (best-effort, học ý tưởng + giao thức, không copy code):
-//  - Endpoint: https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/commerce/account/purchases
-//    (cùng họ MZFinance với các lệnh mua/tải — xem StoreDownloadService).
-//  - Xác thực bằng phiên đã đăng nhập: X-Token, X-DSID,
-//    X-Apple-Store-Front, GUID máy, kèm cookie phiên + header
-//    Anisette như DMAP (build 15; trước đây thiếu cả hai — nghi
-//    phạm số 1 của lỗi HTTP 500 ngày 25/11/2026); body GET nên ký
-//    SAP trên body rỗng (như DMAP ký body) nếu ký được, ký không
-//    được thì vẫn gửi (token có thể đã đủ) — không dừng cả lần
-//    đồng bộ chỉ vì thiếu chữ ký.
-//  - Phân trang: theo `links.next` của JSON:API, tối đa 10 trang, gọi
-//    tuần tự (không gọi song song để khỏi bị Apple gắn cờ).
-//  - Gộp: khử trùng nội bộ theo order-id (id của mục data) rồi theo
-//    App ID; PurchasedStore gộp tiếp với kết quả DMAP theo App ID.
-//  - Không quét theo từng năm: vì chưa biết endpoint có tham số lọc
-//    theo năm hay không, gọi 1 lượt phân trang lấy toàn bộ lịch sử mà
-//    endpoint trả về rồi khử trùng; năm đồng bộ đầy đủ ghi theo tài
-//    khoản để màn Đã mua hiển thị, không dùng để lọc request.
-//
+//  VÌ SAO BẢN 9–15 TOÀN 500 (đã chứng minh bằng log máy thật 18:30
+//  25/11 — 3/3 lần HTTP 500, body 38 byte giống hệt nhau, không phải
+//  lỗi tạm thời): request cũ KHÔNG có tham số query nào (thiếu range +
+//  isDeepLink + isJsonApiFormat nên Apple không xác định được phạm vi
+//  tra cứu), gửi thừa Accept application/vnd.api+json + X-Apple-I-* +
+//  X-GUID + chữ ký SAP trên body rỗng (không lệnh store nào đang chạy
+//  ký GET rỗng), luôn dùng host thường thay vì host theo pod, và parser
+//  đi tìm `data` dạng mảng + `links.next` trong khi response thật là
+//  `data` dạng object với `attributes.purchases` — kể cả Apple có trả
+//  200 thì parser cũ cũng ném unknownShape. Cookie + Anisette ở build
+//  15 không sửa được vì đó không phải điểm sai.
 
 import ApplePackage
 import Foundation
@@ -66,85 +69,314 @@ enum PurchasedCommerceError: LocalizedError {
 }
 
 enum PurchasedCommerceService {
-    private static let baseURL = "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/commerce/account/purchases"
+    private static let plainHost = "buy.itunes.apple.com"
+    private static let commercePath = "/commerce/account/purchases"
+    /// App Store mở tháng 7/2008 — không có hoá đơn nào trước năm này.
+    private static let earliestYear = 2008
+    private static let maxPagesPerYear = 1000
 
-    /// Lấy toàn bộ lịch sử mua mà endpoint trả về (phân trang tuần tự
-    /// qua links.next, tối đa 10 trang). `account` chỉ đọc — hàm không
-    /// đổi gì trong tài khoản đã lưu. `anisetteHeaders` (build 15):
-    /// header xác minh thiết bị lấy từ máy chủ Anisette trong Cài đặt —
-    /// cùng chính sách như DMAP (build 14); rỗng khi chưa cấu hình.
+    /// Kết quả 1 trang đã đọc: app trong trang, còn trang nữa không,
+    /// số hoá đơn mới trong trang (dùng để dừng khi hết hoá đơn mới).
+    private struct PageParse {
+        let apps: [PurchasedApp]
+        let isComplete: Bool
+        let newInvoiceCount: Int
+    }
+
+    /// Lấy toàn bộ lịch sử mua: quét từng năm từ năm hiện tại lùi về
+    /// 2008 (tuần tự, không song song để khỏi bị Apple gắn cờ). `account`
+    /// chỉ đọc — hàm không đổi gì trong tài khoản đã lưu.
+    /// `anisetteHeaders` (build 14/15): header xác minh thiết bị lấy từ
+    /// máy chủ Anisette trong Cài đặt — cùng chính sách như DMAP; rỗng
+    /// khi chưa cấu hình.
+    /// Năm hiện tại lỗi thì ném ngay (lỗi có hệ thống sẽ giống hệt ở
+    /// mọi năm, quét tiếp chỉ tốn lượt); năm cũ lỗi thì bỏ qua năm đó
+    /// rồi quét tiếp — danh sách trả về có thể thiếu năm đó nhưng các
+    /// năm khác vẫn đủ. Chỉ ném lỗi khi không năm nào lấy được.
     static func fetchAllPurchasedApps(account: ApplePackage.Account, anisetteHeaders: [String: String] = [:]) async throws -> [PurchasedApp] {
+        let currentYear = Calendar(identifier: .gregorian).component(.year, from: Date())
         var all: [PurchasedApp] = []
-        var nextURL: URL? = URL(string: baseURL)
-        var pages = 0
-        while let url = nextURL, pages < 10 {
-            pages += 1
-            let (data, next) = try await fetchPage(account: account, url: url, anisetteHeaders: anisetteHeaders)
-            all.append(contentsOf: data)
-            nextURL = next
+        var pod = account.pod ?? ""
+        var cookie = cookieHeaderValue(cookies: account.cookie, url: commerceURL(pod: pod, page: nil, year: currentYear) ?? URL(string: "https://\(plainHost)\(commercePath)")!)
+        if pod.isEmpty { pod = podFromCookie(cookie) ?? "" }
+        var lastError: Error?
+        var anyYearSucceeded = false
+        for year in (earliestYear...currentYear).reversed() {
+            do {
+                let outcome = try await fetchYear(year: year, pod: pod, cookie: cookie, account: account, anisetteHeaders: anisetteHeaders)
+                pod = outcome.pod
+                cookie = outcome.cookie
+                all.append(contentsOf: outcome.apps)
+                anyYearSucceeded = true
+            } catch {
+                lastError = error
+                logger.info("Purchased commerce: year \(year) failed, skipping: \(StoreDiagnostics.errorSummary(error))")
+                if year == currentYear { throw error }
+            }
         }
+        if !anyYearSucceeded, let lastError { throw lastError }
         return merge(all)
     }
 
-    /// Một trang: GET JSON:API, theo links.next nếu có. Trả về (app
-    /// trong trang, URL trang sau hoặc nil).
-    private static func fetchPage(account: ApplePackage.Account, url: URL, anisetteHeaders: [String: String] = [:]) async throws -> ([PurchasedApp], URL?) {
-        let session = URLSession(configuration: ephemeralConfiguration(), delegate: nil, delegateQueue: nil)
-        defer { session.invalidateAndCancel() }
+    /// Lấy hết 1 năm: trang 1 (không tham số page), rồi page 2, 3...
+    /// cho tới khi is-complete hoặc hết hoá đơn mới.
+    private static func fetchYear(year: Int, pod: String, cookie: String, account: ApplePackage.Account, anisetteHeaders: [String: String]) async throws -> (apps: [PurchasedApp], pod: String, cookie: String) {
+        var seenOrderIDs = Set<String>()
+        var pod = pod
+        var cookie = cookie
+        var apps: [PurchasedApp] = []
+        var fetched = try await fetchPage(year: year, page: nil, pod: pod, cookie: cookie, account: account, anisetteHeaders: anisetteHeaders)
+        pod = fetched.pod
+        cookie = fetched.cookie
+        var parsed = try parsePage(fetched.data, seenOrderIDs: &seenOrderIDs)
+        apps.append(contentsOf: parsed.apps)
+        var page = 2
+        while !parsed.isComplete && parsed.newInvoiceCount > 0 && page <= maxPagesPerYear {
+            fetched = try await fetchPage(year: year, page: page, pod: pod, cookie: cookie, account: account, anisetteHeaders: anisetteHeaders)
+            pod = fetched.pod
+            cookie = fetched.cookie
+            parsed = try parsePage(fetched.data, seenOrderIDs: &seenOrderIDs)
+            apps.append(contentsOf: parsed.apps)
+            page += 1
+        }
+        return (apps, pod, cookie)
+    }
 
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.setValue("application/vnd.api+json", forHTTPHeaderField: "Accept")
-        applyHeaders(&request, account: account, anisetteHeaders: anisetteHeaders)
-        // Ký SAP trên body rỗng (GET không có body): ký được thì gắn,
-        // ký không được thì vẫn gửi — token có thể đã đủ, xem ghi chú
-        // đầu file.
-        if let signer = try? await ApplePackage.SAPSigner.connect(),
-           let signature = try? await signer.sign(Data())
+    /// Một trang: GET, theo 302 thủ công, bắt pod + gộp cookie, thử lại
+    /// lỗi tạm thời. Pod host 404/5xx thì thử lại 1 lần trên host thường.
+    private static func fetchPage(year: Int, page: Int?, pod: String, cookie: String, account: ApplePackage.Account, anisetteHeaders: [String: String]) async throws -> (data: Data, pod: String, cookie: String) {
+        guard let url = commerceURL(pod: pod, page: page, year: year) else {
+            throw PurchasedCommerceError.networkError("Không tạo được địa chỉ yêu cầu lịch sử mua.")
+        }
+        var outcome = try await fetchFollowingRedirects(url: url, pod: pod, cookie: cookie, account: account, anisetteHeaders: anisetteHeaders)
+        if !pod.isEmpty, outcome.http.statusCode == 404 || (500...599).contains(outcome.http.statusCode),
+           let plainURL = commerceURL(pod: "", page: page, year: year)
         {
-            request.setValue(signature.base64EncodedString(), forHTTPHeaderField: "x-apple-actionsignature")
+            logger.info("Purchased commerce: pod host HTTP=\(outcome.http.statusCode), retrying on plain host")
+            outcome = try await fetchFollowingRedirects(url: plainURL, pod: "", cookie: outcome.cookie, account: account, anisetteHeaders: anisetteHeaders)
         }
-        let (data, response): (Data, URLResponse)
-        do {
-            (data, response) = try await session.data(for: request)
-        } catch {
-            throw PurchasedCommerceError.networkError(error.localizedDescription)
+        let http = outcome.http
+        let data = outcome.data
+        if !(200..<300).contains(http.statusCode) {
+            // Body lỗi thường rất ngắn (25/11: 38 byte) nên log nguyên
+            // văn để lần sau biết Apple chê cái gì, đừng chỉ log số byte.
+            let bodyText = String(data: data, encoding: .utf8) ?? "<body không phải UTF-8 (\(data.count) byte)>"
+            logger.info("Purchased commerce: HTTP=\(http.statusCode) bytes=\(data.count) body=\(String(bodyText.prefix(500)))")
+        } else {
+            logger.info("Purchased commerce: HTTP=\(http.statusCode) bytes=\(data.count)")
         }
-        guard let http = response as? HTTPURLResponse else {
-            throw PurchasedCommerceError.appleRefused(0)
-        }
-        logger.info("Purchased commerce: HTTP=\(http.statusCode) bytes=\(data.count)")
         if http.statusCode == 401 || http.statusCode == 403 {
             throw PurchasedCommerceError.sessionExpired
         }
-        guard http.statusCode == 200 else {
+        guard (200..<300).contains(http.statusCode) else {
             throw PurchasedCommerceError.appleRefused(http.statusCode)
         }
+        return (data, outcome.pod, outcome.cookie)
+    }
+
+    /// Gửi 1 request, theo 302 thủ công tối đa 4 hop (bắt tay pod +
+    /// cookie của Apple), gộp Set-Cookie vào cookie gửi tiếp, bắt pod từ
+    /// header `pod` hoặc host của URL cuối.
+    private static func fetchFollowingRedirects(url: URL, pod: String, cookie: String, account: ApplePackage.Account, anisetteHeaders: [String: String]) async throws -> (data: Data, http: HTTPURLResponse, pod: String, cookie: String) {
+        var currentURL = url
+        var pod = pod
+        var cookie = cookie
+        let session = URLSession(configuration: ephemeralConfiguration(), delegate: NoFollowRedirectDelegate(), delegateQueue: nil)
+        defer { session.invalidateAndCancel() }
+        for _ in 0...4 {
+            let (data, response) = try await sendWithRetry(session: session, url: currentURL, cookie: cookie, account: account, anisetteHeaders: anisetteHeaders)
+            guard let http = response as? HTTPURLResponse else {
+                throw PurchasedCommerceError.appleRefused(0)
+            }
+            cookie = mergeSetCookie(into: cookie, response: http)
+            if let headerPod = http.value(forHTTPHeaderField: "pod")?.trimmingCharacters(in: .whitespacesAndNewlines),
+               !headerPod.isEmpty, headerPod.allSatisfy({ $0.isASCII && $0.isNumber })
+            {
+                pod = headerPod
+            } else if let host = http.url?.host, let hostPod = podFromHost(host) {
+                pod = hostPod
+            }
+            if [301, 302, 303, 307, 308].contains(http.statusCode) {
+                guard let location = http.value(forHTTPHeaderField: "Location"),
+                      let next = URL(string: location, relativeTo: currentURL)?.absoluteURL,
+                      next.scheme?.lowercased() == "https",
+                      let host = next.host?.lowercased(),
+                      host == "itunes.apple.com" || host.hasSuffix(".itunes.apple.com")
+                else {
+                    throw PurchasedCommerceError.networkError("Apple chuyển hướng lịch sử mua tới địa chỉ không hợp lệ.")
+                }
+                if let hostPod = podFromHost(next.host ?? "") { pod = hostPod }
+                currentURL = next
+                continue
+            }
+            return (data, http, pod, cookie)
+        }
+        throw PurchasedCommerceError.networkError("Apple chuyển hướng lịch sử mua quá nhiều lần.")
+    }
+
+    /// Một lượt GET, thử lại 429/5xx và lỗi mạng tạm thời tối đa 3 lần
+    /// (nghỉ 0,5s rồi 1,5s).
+    private static func sendWithRetry(session: URLSession, url: URL, cookie: String, account: ApplePackage.Account, anisetteHeaders: [String: String]) async throws -> (Data, URLResponse) {
+        var lastError: Error?
+        for attempt in 0..<3 {
+            do {
+                var request = URLRequest(url: url)
+                request.httpMethod = "GET"
+                applyHeaders(&request, account: account, cookie: cookie, anisetteHeaders: anisetteHeaders)
+                let (data, response) = try await session.data(for: request)
+                if let http = response as? HTTPURLResponse,
+                   (http.statusCode == 429 || (500...599).contains(http.statusCode)), attempt < 2
+                {
+                    try? await Task.sleep(nanoseconds: UInt64(attempt == 0 ? 500_000_000 : 1_500_000_000))
+                    continue
+                }
+                return (data, response)
+            } catch {
+                lastError = error
+                if error is CancellationError { throw error }
+                let nsCode = (error as NSError).code
+                let retryable = [NSURLErrorTimedOut, NSURLErrorNetworkConnectionLost,
+                                 NSURLErrorCannotConnectToHost, NSURLErrorDNSLookupFailed].contains(nsCode)
+                guard retryable, attempt < 2 else {
+                    throw PurchasedCommerceError.networkError(error.localizedDescription)
+                }
+                try? await Task.sleep(nanoseconds: UInt64(attempt == 0 ? 500_000_000 : 1_500_000_000))
+            }
+        }
+        throw (lastError as? PurchasedCommerceError) ?? PurchasedCommerceError.networkError(lastError?.localizedDescription ?? "Không rõ lỗi mạng.")
+    }
+
+    /// Địa chỉ 1 trang lịch sử mua theo năm. Tham số query là dữ kiện
+    /// giao thức của Apple (thấy trong source iPadn v2.3.5): bắt buộc có
+    /// isDeepLink + isJsonApiFormat + range "<năm>-all"; page chỉ gửi
+    /// khi > 1.
+    private static func commerceURL(pod: String, page: Int?, year: Int) -> URL? {
+        var components = URLComponents()
+        components.scheme = "https"
+        components.host = pod.isEmpty ? plainHost : "p\(pod)-buy.itunes.apple.com"
+        components.path = commercePath
+        var items = [
+            URLQueryItem(name: "isDeepLink", value: "false"),
+            URLQueryItem(name: "isJsonApiFormat", value: "true"),
+        ]
+        if let page, page > 0 {
+            items.append(URLQueryItem(name: "page", value: String(page)))
+        }
+        items.append(URLQueryItem(name: "range", value: "\(year)-all"))
+        components.queryItems = items
+        return components.url
+    }
+
+    /// Header cho Commerce — đúng tập đã chứng minh chạy được (iPadn
+    /// v2.3.5): User-Agent, Accept-Language, X-Dsid, X-Apple-Store-Front,
+    /// Cookie, X-Token, cộng header Anisette của app (cơ chế xác minh
+    /// thiết bị riêng của app). Không Accept riêng, không X-Apple-I-*,
+    /// không X-GUID, không chữ ký SAP (lệnh này Apple không ký).
+    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, cookie: String, anisetteHeaders: [String: String] = [:]) {
+        request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
+        request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
+        request.setValue(account.directoryServicesIdentifier, forHTTPHeaderField: "X-Dsid")
+        request.setValue("\(account.store)-1", forHTTPHeaderField: "X-Apple-Store-Front")
+        if !cookie.isEmpty {
+            request.setValue(cookie, forHTTPHeaderField: "Cookie")
+        }
+        if !account.passwordToken.isEmpty {
+            request.setValue(account.passwordToken, forHTTPHeaderField: "X-Token")
+        }
+        for (name, value) in anisetteHeaders {
+            request.setValue(value, forHTTPHeaderField: name)
+        }
+    }
+
+    /// Giá trị header Cookie ("a=b; c=d") từ cookie đã lưu của tài khoản.
+    private static func cookieHeaderValue(cookies: [ApplePackage.Cookie], url: URL) -> String {
+        for (name, value) in cookies.buildCookieHeader(url) where name.lowercased() == "cookie" {
+            return value
+        }
+        return ""
+    }
+
+    /// Gộp Set-Cookie trong response vào chuỗi cookie gửi tiếp (cookie
+    /// cùng tên thì ghi đè, cookie mới thì thêm vào).
+    private static func mergeSetCookie(into cookieString: String, response: HTTPURLResponse) -> String {
+        var fields: [String: String] = [:]
+        for (key, value) in response.allHeaderFields {
+            if let name = key as? String, let text = value as? String { fields[name] = text }
+        }
+        guard let url = response.url else { return cookieString }
+        let received = HTTPCookie.cookies(withResponseHeaderFields: fields, for: url)
+        guard !received.isEmpty else { return cookieString }
+        var pairs: [(String, String)] = []
+        for part in cookieString.split(separator: ";") {
+            let trimmed = part.trimmingCharacters(in: .whitespaces)
+            guard let eq = trimmed.firstIndex(of: "=") else { continue }
+            pairs.append((String(trimmed[..<eq]).trimmingCharacters(in: .whitespaces), String(trimmed[trimmed.index(after: eq)...])))
+        }
+        for cookie in received {
+            if let index = pairs.firstIndex(where: { $0.0.lowercased() == cookie.name.lowercased() }) {
+                pairs[index] = (pairs[index].0, cookie.value)
+            } else {
+                pairs.append((cookie.name, cookie.value))
+            }
+        }
+        return pairs.map { "\($0.0)=\($0.1)" }.joined(separator: "; ")
+    }
+
+    /// Pod từ host dạng p<pod>-buy.itunes.apple.com.
+    private static func podFromHost(_ host: String) -> String? {
+        let lower = host.lowercased()
+        guard lower.hasPrefix("p"), lower.hasSuffix("-buy.itunes.apple.com") else { return nil }
+        let digits = String(lower.dropFirst().dropLast("-buy.itunes.apple.com".count))
+        return (!digits.isEmpty && digits.allSatisfy({ $0.isASCII && $0.isNumber })) ? digits : nil
+    }
+
+    /// Pod từ cookie `itspod=<số>`.
+    private static func podFromCookie(_ cookieString: String) -> String? {
+        for part in cookieString.split(separator: ";") {
+            let pair = part.trimmingCharacters(in: .whitespaces)
+            guard let eq = pair.firstIndex(of: "=") else { continue }
+            let name = pair[..<eq].trimmingCharacters(in: .whitespaces).lowercased()
+            guard name == "itspod" else { continue }
+            let value = pair[pair.index(after: eq)...].trimmingCharacters(in: .whitespaces)
+            if !value.isEmpty, value.allSatisfy({ $0.isASCII && $0.isNumber }) { return value }
+        }
+        return nil
+    }
+
+    /// Đọc 1 trang JSON thành danh sách app + còn trang nữa không + số
+    /// hoá đơn mới. Dạng thật (iPadn v2.3.5): data là OBJECT,
+    /// attributes["is-complete"] + attributes["purchases"] là các hoá
+    /// đơn, mỗi hoá đơn có items[] là app. Dạng mảng cũ (data/results/
+    /// purchases/items + links.next) giữ lại làm dự phòng cho 1 trang.
+    private static func parsePage(_ data: Data, seenOrderIDs: inout Set<String>) throws -> PageParse {
         guard let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] else {
             throw PurchasedCommerceError.unknownShape
         }
-        return try parsePage(json)
-    }
-
-    /// Đọc 1 trang JSON:API thành danh sách app + URL trang sau.
-    /// Chấp nhận nhiều dạng đóng gói (data / results / purchases /
-    /// items) và nhiều tên trường vì dạng thật chưa xác minh — nhưng
-    /// KHÔNG bịa: mục nào không có App ID hợp lệ thì bỏ, trang nào
-    /// không đọc được cấu trúc thì ném unknownShape để UI báo rõ.
-    private static func parsePage(_ json: [String: Any]) throws -> ([PurchasedApp], URL?) {
-        // Tài nguyên đi kèm (JSON:API `included`): tra cứu theo id để
-        // lấy tên / Bundle ID khi mục data chỉ có quan hệ.
-        var includedByID: [String: [String: Any]] = [:]
-        if let included = json["included"] as? [[String: Any]] {
-            for resource in included {
-                if let id = stringValue(resource["id"]) {
-                    includedByID[id] = resource
+        if let envelope = json["data"] as? [String: Any],
+           let attributes = envelope["attributes"] as? [String: Any]
+        {
+            let isComplete = (attributes["is-complete"] as? Bool) ?? (attributes["isComplete"] as? Bool) ?? true
+            let invoices = attributes["purchases"] as? [[String: Any]] ?? []
+            var apps: [PurchasedApp] = []
+            var addedInvoices = 0
+            for invoice in invoices {
+                let orderID = stringValue(invoice["order-id"]) ?? stringValue(invoice["orderId"]) ?? ""
+                if !orderID.isEmpty, !seenOrderIDs.insert(orderID).inserted { continue }
+                addedInvoices += 1
+                let invoiceDate = stringValue(invoice["invoice-date"]) ?? stringValue(invoice["invoiceDate"])
+                let items = invoice["items"] as? [[String: Any]] ?? []
+                for item in items {
+                    if let app = parseInvoiceItem(item, invoiceDate: invoiceDate) {
+                        apps.append(app)
+                    }
                 }
             }
+            return PageParse(apps: apps, isComplete: isComplete, newInvoiceCount: addedInvoices)
         }
+        // Dự phòng: dạng mảng cũ (build 9) — chỉ đọc 1 trang, coi là đủ.
         let rawItems: [[String: Any]]
-        if let data = json["data"] as? [[String: Any]] {
-            rawItems = data
+        if let dataArray = json["data"] as? [[String: Any]] {
+            rawItems = dataArray
         } else if let results = json["results"] as? [[String: Any]] {
             rawItems = results
         } else if let purchases = json["purchases"] as? [[String: Any]] {
@@ -155,24 +387,65 @@ enum PurchasedCommerceService {
             throw PurchasedCommerceError.unknownShape
         }
         var apps: [PurchasedApp] = []
+        let included = includedByID(from: json)
         for raw in rawItems {
-            if let app = parseItem(raw, includedByID: includedByID) {
+            if let app = parseItem(raw, includedByID: included) {
                 apps.append(app)
             }
         }
-        var nextURL: URL?
-        if let links = json["links"] as? [String: Any],
-           let next = stringValue(links["next"]),
-           let url = URL(string: next)
-        {
-            nextURL = url
-        }
-        return (apps, nextURL)
+        return PageParse(apps: apps, isComplete: true, newInvoiceCount: apps.count)
     }
 
-    /// Đọc 1 mục thành PurchasedApp. App ID có thể nằm ở attributes
-    /// (nhiều tên trường thử lần lượt), ở id của mục, hoặc ở tài nguyên
-    /// included mà mục trỏ tới qua relationships.
+    /// Đọc 1 mục trong hoá đơn thành PurchasedApp. kind phải là app
+    /// ("iOS App", "iPad App", "Mac App", ... hoặc kết thúc bằng " App");
+    /// item-id phải là số; tên lấy item-name rồi item-title; ngày mua
+    /// lấy purchase-date của mục, không có thì lấy invoice-date.
+    /// Commerce không trả Bundle ID / phiên bản nên để trống — màn Đã
+    /// mua gộp với DMAP sẽ điền thêm.
+    private static func parseInvoiceItem(_ item: [String: Any], invoiceDate: String?) -> PurchasedApp? {
+        let kind = stringValue(item["kind"]) ?? ""
+        guard isAppKind(kind) else { return nil }
+        let rawID = stringValue(item["item-id"]) ?? stringValue(item["itemId"]) ?? ""
+        guard !rawID.isEmpty, rawID.allSatisfy({ $0.isASCII && $0.isNumber }), let appID = Int64(rawID) else { return nil }
+        let name = stringValue(item["item-name"]) ?? stringValue(item["itemName"])
+            ?? stringValue(item["item-title"]) ?? stringValue(item["itemTitle"]) ?? ""
+        let rawDate = stringValue(item["purchase-date"]) ?? stringValue(item["purchaseDate"]) ?? invoiceDate
+        return PurchasedApp(
+            appID: appID,
+            bundleID: "",
+            name: name,
+            version: "",
+            purchaseDate: rawDate.flatMap(dateValue),
+            platforms: []
+        )
+    }
+
+    private static func isAppKind(_ kind: String) -> Bool {
+        let normalized = kind.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+        guard !normalized.isEmpty else { return false }
+        if ["ios app", "ipad app", "mac app", "apple tv app", "tvos app", "universal app", "app"].contains(normalized) {
+            return true
+        }
+        return normalized.hasSuffix(" app")
+    }
+
+    /// Tài nguyên đi kèm (JSON:API `included`) cho đường dự phòng dạng mảng.
+    private static func includedByID(from json: [String: Any]) -> [String: [String: Any]] {
+        var includedByID: [String: [String: Any]] = [:]
+        if let included = json["included"] as? [[String: Any]] {
+            for resource in included {
+                if let id = stringValue(resource["id"]) {
+                    includedByID[id] = resource
+                }
+            }
+        }
+        return includedByID
+    }
+
+    /// Đọc 1 mục dạng mảng cũ thành PurchasedApp (đường dự phòng, giữ
+    /// nguyên logic build 9). App ID có thể nằm ở attributes (nhiều tên
+    /// trường thử lần lượt), ở id của mục, hoặc ở tài nguyên included mà
+    /// mục trỏ tới qua relationships.
     private static func parseItem(_ raw: [String: Any], includedByID: [String: [String: Any]]) -> PurchasedApp? {
         let attributes = raw["attributes"] as? [String: Any] ?? [:]
         // Ghép attributes với tài nguyên included được trỏ tới (nếu có).
@@ -272,14 +545,18 @@ enum PurchasedCommerceService {
     private static func dateValue(_ value: Any?) -> Date? {
         guard let text = stringValue(value) else {
             if let number = value as? NSNumber {
-                return Date(timeIntervalSince1970: number.doubleValue)
+                let seconds = number.doubleValue
+                // Số > 10^10 là mili-giây (iPadn: > 10_000_000_000 thì /1000).
+                return Date(timeIntervalSince1970: seconds > 10_000_000_000 ? seconds / 1000 : seconds)
             }
             return nil
         }
-        // ISO 8601 trước, Unix giây sau.
+        // ISO 8601 trước, Unix giây (hoặc mili-giây) sau.
         let iso = ISO8601DateFormatter()
         if let date = iso.date(from: text) { return date }
-        if let seconds = Double(text) { return Date(timeIntervalSince1970: seconds) }
+        if let seconds = Double(text) {
+            return Date(timeIntervalSince1970: seconds > 10_000_000_000 ? seconds / 1000 : seconds)
+        }
         return nil
     }
 
@@ -293,44 +570,13 @@ enum PurchasedCommerceService {
         configuration.timeoutIntervalForResource = 60
         return configuration
     }
+}
 
-    /// Header xác thực cho Commerce: token + DSID của tài khoản,
-    /// storefront của tài khoản, GUID máy — cùng họ header với DMAP
-    /// (PurchasedDMAPService.applyHeaders). Build 15: gửi kèm cookie
-    /// phiên đã đăng nhập + header Anisette như DMAP — trước đây bước
-    /// này là lệnh store duy nhất không gửi cả hai (nghi phạm số 1
-    /// của lỗi HTTP 500 ngày 25/11/2026: Apple trả 500 chứ không
-    /// phải 401/403, tức đã qua cửa xác thực rồi lỗi ở bước tra cứu
-    /// phía máy chủ).
-    private static func applyHeaders(_ request: inout URLRequest, account: ApplePackage.Account, anisetteHeaders: [String: String] = [:]) {
-        let now = Date()
-        // Không đặt lại Accept ở đây: fetchPage đã đặt
-        // "application/vnd.api+json" cho JSON:API.
-        request.setValue("en-us", forHTTPHeaderField: "Accept-Language")
-        request.setValue(Self.iso8601(now), forHTTPHeaderField: "X-Apple-I-Client-Time")
-        request.setValue("en_US", forHTTPHeaderField: "X-Apple-I-Locale")
-        request.setValue("UTC", forHTTPHeaderField: "X-Apple-I-Timezone")
-        request.setValue("\(account.store)-1", forHTTPHeaderField: "X-Apple-Store-Front")
-        request.setValue("0", forHTTPHeaderField: "X-Apple-TZ")
-        request.setValue(account.directoryServicesIdentifier, forHTTPHeaderField: "X-DSID")
-        request.setValue(ApplePackage.Configuration.deviceIdentifier, forHTTPHeaderField: "X-GUID")
-        request.setValue(account.passwordToken, forHTTPHeaderField: "X-Token")
-        request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
-        if let url = request.url {
-            for (name, value) in account.cookie.buildCookieHeader(url) {
-                request.setValue(value, forHTTPHeaderField: name)
-            }
-        }
-        for (name, value) in anisetteHeaders {
-            request.setValue(value, forHTTPHeaderField: name)
-        }
-    }
-
-    private static func iso8601(_ date: Date) -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "en_US_POSIX")
-        formatter.timeZone = TimeZone(secondsFromGMT: 0)
-        formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
-        return formatter.string(from: date)
+/// URLSession delegate chặn redirect để caller theo thủ công (bắt pod +
+/// gộp cookie từng hop). Trả nil là không theo — request sẽ hoàn thành
+/// với response 3xx để caller tự đọc header Location.
+private final class NoFollowRedirectDelegate: NSObject, URLSessionTaskDelegate {
+    func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
+        completionHandler(nil)
     }
 }
