@@ -87,20 +87,18 @@ struct ProductView: View {
         )
     }
 
-    /// Ghi chú dưới nút "Nhập vào Đã mua" khi lệch vùng: Apple chỉ cho
-    /// nhập app vào Đã mua ở đúng vùng của tài khoản — nút vẫn bấm được
-    /// (app có ở cả hai vùng thì vẫn nhập được bằng vùng của tài khoản),
-    /// nhưng nếu Apple báo app không có trong cửa hàng thì phải thêm tài
-    /// khoản đúng vùng. Đã kiểm tra ApplePackage (fork nvd29u1, pin
-    /// 541c43a): `Purchase.purchase(account:app:anisetteHeaders:)` KHÔNG có tham số vùng
-    /// — header `X-Apple-Store-Front` lấy từ `account.store` (vùng đăng ký
-    /// của tài khoản, do Apple trả về lúc đăng nhập), không có cách nào
-    /// mua license theo vùng của gói bằng 1 tài khoản; đổi `store` của
-    /// tài khoản đã lưu cũng không được vì `withAccount` sẽ ghi đè lại
-    /// tài khoản đã lưu. Đây là giới hạn phía Apple, không phải lỗi app.
+    /// Ghi chú dưới nút "Nhập vào Đã mua" khi lệch vùng: iOS (3.0 build 2)
+    /// nhập license qua acquireFreeApp của iPadn, truyền vùng của gói —
+    /// Apple tự sửa storefront theo phản hồi -128 rồi thử lại nên khác
+    /// vùng cũng nhập được khi app có trong cửa hàng đích; nếu Apple báo
+    /// app không có trong cửa hàng thì phải thêm tài khoản đúng vùng.
+    /// macOS vẫn đường fork cũ: `Purchase.purchase(account:app:anisetteHeaders:)`
+    /// KHÔNG có tham số vùng — header `X-Apple-Store-Front` lấy từ
+    /// `account.store` (vùng đăng ký của tài khoản), không có cách nào
+    /// mua license theo vùng của gói bằng 1 tài khoản.
     private func crossRegionPurchaseNote(for accountRegion: String) -> String {
         String(
-            format: String(localized: "Tài khoản đang chọn vùng %@, app này vùng %@. Apple chỉ cho nhập vào Đã mua ở đúng vùng của tài khoản — nếu Apple báo lỗi, hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."),
+            format: String(localized: "Tài khoản đang chọn vùng %@, app này vùng %@. App sẽ thử nhập bằng vùng của gói — nếu Apple không cho thì hãy thêm tài khoản vùng %@ ở tab Tài khoản rồi chọn lại."),
             accountRegion, region, region
         )
     }
@@ -400,6 +398,55 @@ struct ProductView: View {
         }
     }
 
+    /// Lấy license app miễn phí cho tài khoản đang chọn ("Nhập vào Đã
+    /// mua"). iOS (3.0 build 2) đi qua lõi iPadn (acquireFreeApp) thay
+    /// cho rotate + buyProduct của fork; macOS giữ đường fork cũ.
+    /// Thành công thì hiện hint xanh + làm mới Lịch sử phiên bản;
+    /// lỗi do caller xử lý (vùng -> popup, khác -> hint đỏ).
+    private func acquireLicense() async throws {
+        guard let account else { return }
+        #if os(iOS)
+        try await acquireLicenseIPadn(account: account)
+        #else
+        try await acquireLicenseFork(account: account)
+        #endif
+        licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
+        hint = licenseHint
+        refreshVersionHistoryAfterLicense()
+    }
+
+    /// iOS 3.0 build 2 — nhập license qua lõi iPadn (acquireFreeApp):
+    /// không rotate token fork (đó là chỗ chết 2034), không cần header
+    /// Anisette (ký SAP bằng WASM như đăng nhập bản 20). `region` là
+    /// vùng của gói đang xem — lõi tự sửa storefront theo phản hồi -128
+    /// của Apple rồi thử lại 1 lần nên khác vùng cũng nhập được khi
+    /// Apple cho; không thì lỗi vùng dịch về RegionPurchaseRefusal như
+    /// đường fork cũ để popup chẩn đoán hiện.
+    private func acquireLicenseIPadn(account: AppStore.UserAccount) async throws {
+        do {
+            try await IPadnStoreBridge.shared.acquireFreeLicense(
+                account: account.account,
+                appID: String(archive.package.software.id),
+                entityType: archive.package.entityType,
+                region: region)
+        } catch {
+            if let code = Self.regionFailureCode(in: error) {
+                throw RegionPurchaseRefusal(
+                    code: code,
+                    accountRegion: selectedAccountRegion ?? "?",
+                    packageRegion: region
+                )
+            }
+            if error is IPadnAppleAuthError || error is IPadnAppleLoginError {
+                throw PurchaseGateError.passwordTokenExpired
+            }
+            if let http = error as? IPadnHTTPStatusError, http.code == 401 || http.code == 403 {
+                throw PurchaseGateError.passwordTokenExpired
+            }
+            throw Self.translatePurchaseGateError(error, anisetteConfigured: true)
+        }
+    }
+
     /// Rotates the password token and requests a license for the current
     /// account. Sets `licenseHint` to a success message; callers handle errors.
     ///
@@ -425,8 +472,9 @@ struct ProductView: View {
     /// mật khẩu, token hết hạn) mới dừng ngay. Nếu token cũ thật sự
     /// chết thì buyProduct sẽ báo đúng lỗi hết hạn, không bị nhầm
     /// thành lỗi cửa nữa.
-    private func acquireLicense() async throws {
-        guard let account else { return }
+    ///
+    /// Chỉ macOS dùng từ 3.0 build 2 (iOS đã sang lõi iPadn).
+    private func acquireLicenseFork(account: AppStore.UserAccount) async throws {
         // Lấy header Anisette trước (cùng chính sách như đăng nhập: máy
         // chủ đã đặt mà lấy không được thì dừng, không mua thiếu header).
         let anisetteHeaders = try await vm.anisetteHeadersForStoreCall()
@@ -491,9 +539,6 @@ struct ProductView: View {
             }
             throw Self.translatePurchaseGateError(lastError, anisetteConfigured: anisetteConfigured)
         }
-        licenseHint = Hint(message: String(localized: "Đã nhập vào mục Đã mua. App sẽ hiện trong danh sách Đã mua của Apple ID này, chưa tải file IPA về máy."), color: .green)
-        hint = licenseHint
-        refreshVersionHistoryAfterLicense()
     }
 
     /// Lấy license xong thì tự làm mới Lịch sử phiên bản (ý tưởng iPadn

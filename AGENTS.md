@@ -1841,7 +1841,7 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     `buildCookieHeader` nên có thể gặp cùng lỗi cookie với tài khoản
     đã lưu bằng đường iPadn — chờ anh test Lượt tải rồi soi tiếp.
 
-## Đợt 5 build 1 — GHÉP NGUYÊN LÕI STORE iPadn (3.0 build 1, BẢN ĐẦU dãy 3.x)
+## Đợt 5 build 3.0 — GHÉP NGUYÊN LÕI STORE iPadn (3.0 build 1, BẢN ĐẦU dãy 3.x)
   (Anh test bản 21 trên máy thật 09:41–09:44 26/11: Đã mua VẪN 401 ở
   bước items + Commerce vẫn 403 `{"status":-1,"errors":[{"code":
   "authentication"}]}` + Lượt tải lỗi "Sign In to the iTunes Store"
@@ -1998,5 +1998,50 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     so với tiền lệ build 5 không reset). Quy tắc dãy 3.x (anh chốt
     10:02 26/11, đã ghi ở mục Build Configuration): 3.0 đi tới build
     10 thì lên ver 3.1 (3.0 build 1–10, sau build 10 là 3.1).
-  - (CI/IPA bổ sung sau khi đẩy.)
+  - Đẩy: remote `ce2cc91e` (local `1cf235c`; push-tree tạo commit
+    mới, tree khớp). 3 commit: `ba3a8db` port lõi, `0cd13be` thêm
+    import Foundation (Date/URL/Data), `1cf235c` fix CI.
+  - CI "Build App" run 45751296972: SUCCESS cả 2 job (build-osx +
+    build-ios). Run trước 45748626013 (head f591cce9) FAIL nên mới có
+    commit fix 1cf235c: port thiếu type iPadn
+    (AppSearchRanking/ReleaseNote/VersionMetadata) + sửa lỗi đổi tên
+    raw-string sót (HTTPClient).
+  - Artifact iOS `NVDAppleIDDownload.ipa` 52.811.763 byte — tải về
+    bằng redirect-capture (lấy Location 302 rồi tải trực tiếp từ
+    blob; tải thẳng qua API timeout rồi 401 do SAS hết hạn như bản
+    21). Artifact là zip chứa 1 IPA trong (53.129.666 byte, chưa
+    ký). Ký ad-hoc zsign -a -z 9 (/tmp trống 512M).
+  - IPA `deliver/NVDAppleIDDownload.ipa` 53.352.121 byte, SHA256
+    `e961a4ad8b03678f808e79eccd5e972db9f9e567062f731340a02affb54be595`:
+    kiểm chứng độc lập 3.0 build 1, bundle
+    com.NVD.appleiddownload, min iOS 16.0, sap.wasm ở root bundle +
+    đủ 7 file runtime, không còn file .part, CodeResources có,
+    IPadnLoginService + ký hiệu lõi mới trong binary
+    (IPadnStoreService 1, IPadnDMAP 2, IPadnCommerce 1,
+    IPadnDownload 2), Configurator/2.21 1 hit, "No Downloads"/"No
+    Accounts"/Twemoji 0 hit, đủ 7 tab, "token refreshed via iPadn
+    login" 1 hit. "Purchased DMAP: saved cookies" 0 hit — ĐÚNG
+    (dòng log fork cũ đã thay bằng lõi DMAP iPadn, không còn code
+    đó). Backup bản 21:
+    `deliver/NVDAppleIDDownload-2.1-build21-backup.ipa` (SHA256
+    `f1db3260…` khớp bản đã giao).
+  - README đã xong từ commit port `ba3a8db` (16 dòng, CHỈ tính
+    năng, 1 H1, tiếng Việt, không mục giấy phép/cài đặt/cảnh báo);
+    kiểm chứng README trên remote head ce2cc91e: 16 dòng, có "##
+    Tính năng", không "## Cài đặt", không mục giấy phép. Nháp cũ
+    `docs/README-3.0-DRAFT.md` (bản chưa gọn, còn mục Cài đặt/Yêu
+    cầu/Lưu ý) đã xoá — README thật đã là bản gọn nên KHÔNG cần
+    đẩy riêng, không tốn thêm 1 lần CI.
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: mở tab Đã mua
+    xem đồng bộ có chạy không (danh sách mới thay cache 368 app
+    cũ); bấm "Đồng bộ toàn bộ lịch sử mua" kiểm tra bước Commerce;
+    tải trực tiếp 1 app (vd. app.nicegram) kiểm tra Lượt tải. Nếu
+    vẫn lỗi thì chụp Nhật ký quanh dòng lỗi (DMAP/Commerce/tải).
+  - **Kết quả test trên máy thật 17:30 26/11: Đã mua + toàn bộ lịch
+    sử mua ĐỒNG BỘ OK — 564 app (thay cache 368 cũ), Commerce cuối
+    cùng đã chạy (lỗi từ build 9, qua 3 vòng vá không xong). Tải trực
+    tiếp + cài qua manifest cũng OK (17:40 26/11) — bản 3.0 build 1
+    đã kiểm chứng đủ cả 3 mục trên máy thật. Lỗi nhỏ thấy ở ảnh test:
+    năm hiện "2.026" thay vì 2026 (định dạng số có dấu phân cách
+    nghìn) — sửa ở bản sau cùng các lỗi anh tổng hợp.**
 

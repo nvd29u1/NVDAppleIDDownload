@@ -150,7 +150,9 @@ struct PurchasedView: View {
                     .disabled(store.isSyncing || store.isSyncingFullHistory || account == nil)
                 } footer: {
                     if let year = store.lastFullSyncYear {
-                        Text("Đã đồng bộ toàn bộ lịch sử mua năm \(year) (bước /commerce/account/purchases gộp với DMAP).")
+                        // \(String(year)): Text nội suy số Int theo locale
+                        // nên 2026 thành "2.026" — ép sang String trước.
+                        Text("Đã đồng bộ toàn bộ lịch sử mua năm \(String(year)) (bước /commerce/account/purchases gộp với DMAP).")
                     } else {
                         Text("Đồng bộ toàn bộ sẽ quét thêm bước lịch sử mua đầy đủ của Apple (/commerce/account/purchases) rồi gộp với danh sách DMAP — một số app mua gần đây chưa hiện ở DMAP có thể sẽ hiện thêm.")
                     }
@@ -204,7 +206,9 @@ struct PurchasedView: View {
                             }
                         }
                     } header: {
-                        Text("\(filteredItems.count) app")
+                        // Cùng lỗi locale như năm ở trên: 1564 app sẽ
+                        // thành "1.564 app" nếu nội suy Int trực tiếp.
+                        Text("\(String(filteredItems.count)) app")
                     } footer: {
                         Text(dmapNote)
                     }

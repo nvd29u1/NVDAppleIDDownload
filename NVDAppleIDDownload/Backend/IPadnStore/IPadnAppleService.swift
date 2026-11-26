@@ -785,6 +785,21 @@ final class IPadnAppleService: ObservableObject {
         return URL(string: "https://buy.itunes.apple.com/WebObjects/MZFinance.woa/wa/buyProduct")!
     }
 
+    /// Lấy license app miễn phí (nút "Nhập vào Đã mua", 3.0 build 2):
+    /// gọi thẳng acquireFreeApp bằng tài khoản đang dùng. `selectedCountry`
+    /// là vùng của gói đang xem — lõi tự sửa storefront theo phản hồi -128
+    /// của Apple rồi thử lại 1 lần, nên khác vùng cũng nhập được khi Apple
+    /// cho (app có trong cửa hàng đích); không thì báo lỗi vùng rõ ràng.
+    /// Chỉ mở lối gọi — không đụng logic lõi iPadn.
+    @discardableResult
+    func acquireFreeLicense(appID: String, platform: IPadnAppPlatform = .iOS,
+                            selectedCountry: String?, useCache: Bool = true) async throws -> IPadnAppleAccount {
+        let account = try requireSignedInAccount()
+        return try await acquireFreeApp(appID, account: account, mac: platform == .macOS,
+                                        platform: platform, selectedCountry: selectedCountry,
+                                        useCache: useCache)
+    }
+
     /// `arcade` false first; an iOS app that Apple reports unavailable (2059)
     /// is retried as an Apple Arcade game, as ipatool does.
     @discardableResult

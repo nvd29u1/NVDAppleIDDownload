@@ -136,6 +136,36 @@ final class IPadnStoreBridge {
         return item
     }
 
+    // MARK: - Nhập vào Đã mua (license free, 3.0 build 2)
+
+    /// Lấy license app miễn phí qua lõi iPadn (acquireFreeApp) — nút
+    /// "Nhập vào Đã mua" ở ProductView. `region` là vùng của gói đang
+    /// xem: lõi tự sửa storefront theo phản hồi -128 của Apple rồi thử
+    /// lại 1 lần nên khác vùng cũng nhập được khi Apple cho (app có
+    /// trong cửa hàng đích). Lỗi vùng dịch về StoreDownloadError.rejected
+    /// cùng mã (-128/1010) để ProductView mở popup chẩn đoán như đường
+    /// fork cũ; lỗi khác giữ nguyên (đã là tiếng Việt) để ProductView
+    /// tự dịch (hết phiên -> passwordTokenExpired).
+    func acquireFreeLicense(
+        account: ApplePackage.Account,
+        appID: String,
+        entityType: ApplePackage.EntityType?,
+        region: String?
+    ) async throws {
+        do {
+            try await run(account: account) {
+                _ = try await self.service.acquireFreeLicense(
+                    appID: appID,
+                    platform: Self.ipadnPlatform(for: entityType),
+                    selectedCountry: region)
+            }
+        } catch is CancellationError {
+            throw CancellationError()
+        } catch {
+            throw mapPurchaseError(error)
+        }
+    }
+
     // MARK: - Khung chạy chung
 
     /// Xếp hàng nối tiếp + đặt tài khoản + ghi cookie về sau mỗi lần gọi.
@@ -304,6 +334,25 @@ final class IPadnStoreBridge {
             return .appleRefused(http.code)
         }
         return .networkError(error.localizedDescription)
+    }
+
+    /// Lỗi iPadn -> lỗi nhập license mà ProductView hiểu (3.0 build 2):
+    /// chỉ dịch lỗi vùng về StoreDownloadError.rejected cùng mã để
+    /// `regionFailureCode` nhận ra (-128/1010 -> popup chẩn đoán như
+    /// đường fork cũ); lỗi khác giữ nguyên vì đã là tiếng Việt
+    /// (hết phiên / ToolError / HTTP) để ProductView tự dịch tiếp.
+    private func mapPurchaseError(_ error: Error) -> Error {
+        if let storefront = error as? IPadnAppleStorefrontDownloadError {
+            switch storefront.reason {
+            case .accountRegionMismatch:
+                return StoreDownloadError.rejected("-128", storefront.localizedDescription)
+            case .appUnavailableInAccountRegion:
+                return StoreDownloadError.rejected("1010", storefront.localizedDescription)
+            case .temporarilyUnavailable:
+                return StoreDownloadError.rejected("", storefront.localizedDescription)
+            }
+        }
+        return error
     }
 
     /// Lỗi iPadn -> lỗi tải sẵn có của app (StoreDownloadError /
