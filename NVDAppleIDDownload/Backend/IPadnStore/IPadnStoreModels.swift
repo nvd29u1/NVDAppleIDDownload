@@ -3,6 +3,7 @@
 // Models/Models.swift (trích type lõi store). Đã đổi tên tiền tố IPadn/ipadn + dịch chuỗi tiếng Trung sang
 // tiếng Việt + bỏ AppText/InstallLog, theo cùng quy ước bản 20 (đăng nhập).
 // Giấy phép xem LICENSES.md (GPL-2.0-or-later cho phần lõi iPadn này).
+import Foundation
 enum IPadnAppPlatform: String, Codable, CaseIterable, Identifiable {
     case iOS = "itunes", iPadOS = "ipad", tvOS = "atv9", macOS = "mac"
     var id: String { rawValue }
