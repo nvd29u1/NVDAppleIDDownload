@@ -422,6 +422,11 @@ struct ProductView: View {
     /// của Apple rồi thử lại 1 lần nên khác vùng cũng nhập được khi
     /// Apple cho; không thì lỗi vùng dịch về RegionPurchaseRefusal như
     /// đường fork cũ để popup chẩn đoán hiện.
+    ///
+    /// Cả hàm bọc `#if os(iOS)` vì mọi type iPadn (bridge/service/login)
+    /// đều chỉ biên dịch trên iOS — để trơ là build macOS chết
+    /// (CI build-osx run 45803970071).
+    #if os(iOS)
     private func acquireLicenseIPadn(account: AppStore.UserAccount) async throws {
         do {
             try await IPadnStoreBridge.shared.acquireFreeLicense(
@@ -446,6 +451,7 @@ struct ProductView: View {
             throw Self.translatePurchaseGateError(error, anisetteConfigured: true)
         }
     }
+    #endif
 
     /// Rotates the password token and requests a license for the current
     /// account. Sets `licenseHint` to a success message; callers handle errors.
