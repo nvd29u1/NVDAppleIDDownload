@@ -4,6 +4,7 @@ import Foundation
 /// Download metadata transport. Keep Apple's raw bodies, cookies and signed
 /// asset URLs out of both the Xcode console and the in-app log viewer.
 enum StoreDownloadService {
+    #if !os(iOS)
     private final class NoRedirect: NSObject, URLSessionTaskDelegate {
         func urlSession(_: URLSession, task _: URLSessionTask,
                         willPerformHTTPRedirection _: HTTPURLResponse,
@@ -13,6 +14,7 @@ enum StoreDownloadService {
             completionHandler(nil)
         }
     }
+    #endif
 
     /// `region` là mã vùng của gói đang xem (vd "VN"), khi caller biết
     /// (màn chi tiết app / Lịch sử phiên bản). Chỉ dùng để tự sửa lỗi
@@ -82,6 +84,7 @@ enum StoreDownloadService {
         let version = version.flatMap { $0.isEmpty ? nil : $0 }
         let platform = package.entityType ?? .iPhone
         logger.info("Store download [\(trace)]: operation=\(operation) app=\(app.id) platform=\(platform.rawValue) store=\(account.store) version=\(version ?? "latest")")
+        #if !os(iOS)
         let configuration = URLSessionConfiguration.ephemeral
         configuration.httpCookieStorage = nil
         configuration.httpShouldSetCookies = false
@@ -91,8 +94,11 @@ enum StoreDownloadService {
         configuration.timeoutIntervalForResource = 60
         let session = URLSession(configuration: configuration, delegate: NoRedirect(), delegateQueue: nil)
         defer { session.invalidateAndCancel() }
+        #endif
         do {
+            #if !os(iOS)
             var effectiveVersion = version
+            #endif
             // Apple đôi khi trả về trống / lỗi tạm thời (204/403/404/5xx,
             // redirect không hợp lệ) rồi mới xét tài khoản — cùng họ lỗi
             // với đăng nhập. Thử lại tối đa 3 lần với phiên đã đăng nhập
@@ -101,6 +107,29 @@ enum StoreDownloadService {
             // gói lại để lỗi -128 bên dưới thử lại được với bản sao tài
             // khoản đã chỉnh vùng.
             func fetchAndParse(using requestAccount: inout Account) async throws -> Result {
+                #if os(iOS)
+                // Lõi iPadn (asset) thay cho fork fetchWithFallback: tự
+                // xử lý versionTicket / kbsync / refresh phiên /
+                // acquireFreeApp, không còn gọi ent/download/update của
+                // fork. Lỗi -128 (lệch vùng) do cầu nối map từ lỗi
+                // storefront của iPadn nên vòng retry -128 bên ngoài
+                // vẫn chạy như cũ.
+                var lastError: Error?
+                for attempt in 1 ... 3 {
+                    do {
+                        let item = try await IPadnStoreBridge.shared.fetchProductItem(
+                            account: &requestAccount, package: package, version: version,
+                            operation: operation, region: region, trace: trace)
+                        return try parse(item)
+                    } catch {
+                        lastError = error
+                        guard Self.isTransientDownloadError(error), attempt < 3 else { throw error }
+                        logger.info("Store download [\(trace)]: transient failure (attempt \(attempt)/3), retrying: \(StoreDiagnostics.errorSummary(error))")
+                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                    }
+                }
+                throw lastError ?? StoreDownloadError.empty
+                #else
                 let region = Configuration.countryCode(for: requestAccount.store)
                 let response: [String: Any]
                 do {
@@ -147,6 +176,7 @@ enum StoreDownloadService {
                 }
                 let item = try StoreDownloadProtocol.packageItem(response, bundleID: app.bundleID, version: effectiveVersion)
                 return try parse(item)
+                #endif
             }
             do {
                 let result = try await fetchAndParse(using: &account)
@@ -210,6 +240,7 @@ enum StoreDownloadService {
         return ["HTTP 204", "HTTP 403", "HTTP 404", "HTTP 500", "HTTP 502", "HTTP 503", "HTTP 504", "failed to retrieve redirect location", "redirect limit exceeded"].contains { message.contains($0) }
     }
 
+    #if !os(iOS)
     private static func catalogVersion(session: URLSession, appID: Int64, region: String, platform: EntityType, trace: String) async throws -> StoreDownloadProtocol.CatalogVersion {
         var url = URLComponents(string: "https://uclient-api.itunes.apple.com/WebObjects/MZStorePlatform.woa/wa/lookup")!
         url.queryItems = [
@@ -307,6 +338,7 @@ enum StoreDownloadService {
                                          expiresAt: cookie.expiresDate?.timeIntervalSince1970, httpOnly: cookie.isHTTPOnly, secure: cookie.isSecure))
         }
     }
+    #endif
 
     /// ApplePackage's DownloadOutput format, also consumed by SignatureInjector.
     private static func output(item: [String: Any], email: String) throws -> DownloadOutput {

@@ -188,18 +188,46 @@ final class IPadnLoginService {
         // đầu không có ý nghĩa). Tài khoản đã lưu trước bản này giữ
         // nguyên domain cũ tới khi đăng nhập lại; đường DMAP/Commerce
         // gửi cookie nguyên chuỗi nên không phụ thuộc vào đây.
-        let forkCookies: [ApplePackage.Cookie] = cookies.map {
+        // Gộp trùng tên (3.0 build 1, đúng `mergedCookie` của iPadn: tên
+        // sau ghi đè tên trước): response đăng nhập trả X-Token ×2,
+        // X-Dsid ×3, wosid-lite ×3 — gửi nguyên cả 3 tên trùng thì Apple
+        // có thể lấy phải giá trị cũ ở bước items (bản 21 vẫn 401 dù
+        // cookie đã gắn).
+        let forkCookies = Self.dedupedCookies(cookies.map {
             var domain = $0.domain
             if domain.hasPrefix(".") { domain = String(domain.dropFirst()) }
             return ApplePackage.Cookie(name: $0.name, value: $0.value, path: $0.path,
                 domain: domain, expiresAt: $0.expiresDate?.timeIntervalSince1970,
                 httpOnly: $0.isHTTPOnly, secure: $0.isSecure)
+        })
+        // Storefront đầy đủ Apple trả ở X-Set-Apple-Store-Front (vd
+        // "143467-1,34"): iPadn giữ nguyên giá trị này cho mọi lệnh
+        // store; app trước đây chỉ giữ mã store rồi dựng lại nên
+        // Commerce gửi thiếu hậu tố ",34" → Apple trả 403
+        // authentication (3.0 build 1). Lưu theo DSID để DMAP/Commerce/tải
+        // dùng; log giá trị (mã cửa hàng không phải bí mật).
+        if !setStore.isEmpty {
+            AppStore.this.saveFullStoreFront(dsid: resolvedDSID, value: setStore)
+            logger.info("ipadn login: full storefront \(setStore)")
         }
         logger.info("ipadn login: success (dsid set, store \(store), cookies \(forkCookies.count), cookie header \(cookieString.isEmpty ? "empty" : "set"))")
         return ApplePackage.Account(
             email: email, password: password, appleId: id, store: store,
             firstName: firstName, lastName: lastName, passwordToken: passwordToken,
             directoryServicesIdentifier: resolvedDSID, cookie: forkCookies, pod: pod.isEmpty ? nil : pod)
+    }
+
+    /// Gộp cookie trùng tên (tên sau ghi đè tên trước, giữ thứ tự xuất
+    /// hiện đầu — đúng `mergedCookie` của iPadn): response đăng nhập trả
+    /// X-Token ×2, X-Dsid ×3, wosid-lite ×3.
+    private static func dedupedCookies(_ cookies: [ApplePackage.Cookie]) -> [ApplePackage.Cookie] {
+        var order: [String] = []
+        var byName: [String: ApplePackage.Cookie] = [:]
+        for cookie in cookies {
+            if byName[cookie.name] == nil { order.append(cookie.name) }
+            byName[cookie.name] = cookie
+        }
+        return order.compactMap { byName[$0] }
     }
 
     /// Pod từ header `pod`, rồi từ host Location / URL (p<digits>-buy...).

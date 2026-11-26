@@ -189,17 +189,27 @@ enum DMAP {
 }
 
 enum PurchasedDMAPService {
+    #if !os(iOS)
     private static let baseURL = "https://pd.itunes.apple.com/WebObjects/MZPurchaseDaap.woa/purchase"
 
     /// Loại media cần lấy trong query DMAP: app iPhone/iPad (131072),
     /// Arcade (262144) và app Mac (67108864).
     private static let mediaQuery =
         "('com.apple.itunes.extended\\-media\\-kind:131072','com.apple.itunes.extended\\-media\\-kind:262144','com.apple.itunes.extended\\-media\\-kind:67108864')"
+    #endif
 
     /// Lấy toàn bộ danh sách app đã mua của tài khoản (2 lượt cửa hàng
     /// 34 + 13, gộp + khử trùng, mới nhất lên đầu). `account` chỉ đọc —
     /// hàm không đổi gì trong tài khoản đã lưu.
+    ///
+    /// 3.0 build 1: trên iOS dùng lõi iPadn port sang (IPadnStoreBridge →
+    /// ownedApps) thay cho đường fork dưới đây; macOS giữ fork (lõi
+    /// iPadn chỉ port cho iOS). Chữ ký hàm + kiểu lỗi giữ nguyên nên
+    /// PurchasedStore không phải đổi gì.
     static func fetchPurchasedApps(account: ApplePackage.Account) async throws -> [PurchasedApp] {
+        #if os(iOS)
+        return try await IPadnStoreBridge.shared.purchasedApps(account: account)
+        #else
         // Fork ApplePackage trap (precondition) ở cấu hình TLS khi chưa
         // cài device identifier; AppStore.init cài sẵn identifier đã
         // lưu / tạo ngẫu nhiên vào Configuration, nên chạm vào nó trước
@@ -227,8 +237,10 @@ enum PurchasedDMAPService {
             all.append(contentsOf: apps)
         }
         return merge(all)
+        #endif
     }
 
+    #if !os(iOS)
     /// Một lượt cửa hàng ("34" = iPhone/iPad, "13" = Mac): login →
     /// update → items.
     private static func fetchStorefront(
@@ -553,4 +565,5 @@ enum PurchasedDMAPService {
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ss'Z'"
         return formatter.string(from: date)
     }
+    #endif
 }

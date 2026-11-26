@@ -69,6 +69,7 @@ enum PurchasedCommerceError: LocalizedError {
 }
 
 enum PurchasedCommerceService {
+    #if !os(iOS)
     private static let plainHost = "buy.itunes.apple.com"
     private static let commercePath = "/commerce/account/purchases"
     /// App Store mở tháng 7/2008 — không có hoá đơn nào trước năm này.
@@ -82,6 +83,7 @@ enum PurchasedCommerceService {
         let isComplete: Bool
         let newInvoiceCount: Int
     }
+    #endif
 
     /// Lấy toàn bộ lịch sử mua: quét từng năm từ năm hiện tại lùi về
     /// 2008 (tuần tự, không song song để khỏi bị Apple gắn cờ). `account`
@@ -95,7 +97,15 @@ enum PurchasedCommerceService {
     /// mọi năm, quét tiếp chỉ tốn lượt); năm cũ lỗi thì bỏ qua năm đó
     /// rồi quét tiếp — danh sách trả về có thể thiếu năm đó nhưng các
     /// năm khác vẫn đủ. Chỉ ném lỗi khi không năm nào lấy được.
+    ///
+    /// 3.0 build 1: trên iOS dùng lõi iPadn port sang (IPadnStoreBridge →
+    /// commercePurchaseHistory) thay cho đường fork dưới đây; macOS giữ
+    /// fork (lõi iPadn chỉ port cho iOS). Chữ ký hàm + kiểu lỗi giữ
+    /// nguyên nên PurchasedStore không phải đổi gì.
     static func fetchAllPurchasedApps(account: ApplePackage.Account, anisetteHeaders: [String: String] = [:]) async throws -> [PurchasedApp] {
+        #if os(iOS)
+        return try await IPadnStoreBridge.shared.commerceHistory(account: account)
+        #else
         let currentYear = Calendar(identifier: .gregorian).component(.year, from: Date())
         var all: [PurchasedApp] = []
         var pod = account.pod ?? ""
@@ -118,8 +128,10 @@ enum PurchasedCommerceService {
         }
         if !anyYearSucceeded, let lastError { throw lastError }
         return merge(all)
+        #endif
     }
 
+    #if !os(iOS)
     /// Lấy hết 1 năm: trang 1 (không tham số page), rồi page 2, 3...
     /// cho tới khi is-complete hoặc hết hoá đơn mới.
     private static func fetchYear(year: Int, pod: String, cookie: String, account: ApplePackage.Account, anisetteHeaders: [String: String]) async throws -> (apps: [PurchasedApp], pod: String, cookie: String) {
@@ -581,13 +593,16 @@ enum PurchasedCommerceService {
         configuration.timeoutIntervalForResource = 60
         return configuration
     }
+    #endif
 }
 
 /// URLSession delegate chặn redirect để caller theo thủ công (bắt pod +
 /// gộp cookie từng hop). Trả nil là không theo — request sẽ hoàn thành
 /// với response 3xx để caller tự đọc header Location.
+#if !os(iOS)
 private final class NoFollowRedirectDelegate: NSObject, URLSessionTaskDelegate {
     func urlSession(_ session: URLSession, task: URLSessionTask, willPerformHTTPRedirection response: HTTPURLResponse, newRequest request: URLRequest, completionHandler: @escaping (URLRequest?) -> Void) {
         completionHandler(nil)
     }
 }
+#endif

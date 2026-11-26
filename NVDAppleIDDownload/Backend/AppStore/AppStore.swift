@@ -206,6 +206,32 @@ class AppStore: ObservableObject {
         searchFavoriteRegions = StoreRegionCatalog.defaultFavorites
     }
 
+    /// Storefront đầy đủ Apple trả ở X-Set-Apple-Store-Front lúc đăng
+    /// nhập (vd "143467-1,34"), lưu theo DSID (3.0 build 1): các lệnh store
+    /// của iPadn (DMAP/Commerce/tải) gửi nguyên giá trị này, còn app
+    /// trước đây chỉ giữ mã store ("143467") rồi dựng lại — Commerce
+    /// gửi thiếu hậu tố ",34" nên Apple trả 403 authentication. Tài
+    /// khoản đăng nhập từ 3.0 build 1 trở đi mới có giá trị này; tài khoản
+    /// cũ thì các đường dùng hậu tố mặc định (xem
+    /// IPadnStoreBridge.fullStoreFront).
+    private var _fullStoreFrontByDSID = Persist<[String: String]>(
+        key: "FullStoreFrontByDSID",
+        defaultValue: [:]
+    )
+
+    /// Storefront đầy đủ đã lưu của tài khoản (nil = chưa đăng nhập lại
+    /// từ 3.0 build 1).
+    func fullStoreFront(dsid: String) -> String? {
+        _fullStoreFrontByDSID.wrappedValue[dsid]
+    }
+
+    func saveFullStoreFront(dsid: String, value: String) {
+        guard !dsid.isEmpty, !value.isEmpty else { return }
+        var saved = _fullStoreFrontByDSID.wrappedValue
+        saved[dsid] = value
+        _fullStoreFrontByDSID.wrappedValue = saved
+    }
+
     static let this = AppStore()
 
     static func normalizedDeviceIdentifier(_ value: String) -> String? {

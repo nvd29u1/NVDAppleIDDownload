@@ -45,7 +45,7 @@ A build phase script errors if this file is missing. The CI scripts generate a n
 
 ## Build Configuration
 
-xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers live in `Configuration/Version.xcconfig` — BUT `MARKETING_VERSION` is also pinned in `Asspp.xcodeproj/project.pbxproj` (target Debug + Release build settings), and the pbxproj value overrides the xcconfig, so a version bump must change BOTH places or the built app keeps the old version. `CURRENT_PROJECT_VERSION` (build number) lives only in `Version.xcconfig`. From build 5 the app uses its own version **2.0** (build stays 5, no reset — the CI scripts never touch version numbers) instead of upstream Asspp 4.2.2; the About section in Settings shows "`<MARKETING_VERSION> <build>`" (e.g. "2.0 5") from `Bundle.main` info dictionary (`main.swift`, `SettingView`). **Quy tắc version (anh chốt 25/11): dòng gộp 2.0 dừng ở build 19, xong đến 2.1 (MARKETING_VERSION 2.0 → 2.1, đổi ở cả `Version.xcconfig` và pbxproj như mọi lần đổi MARKETING_VERSION).**
+xcconfig hierarchy: `Debug.xcconfig`/`Release.xcconfig` → `Base.xcconfig` → `Version.xcconfig`, plus `Developer.xcconfig` for signing. Version numbers live in `Configuration/Version.xcconfig` — BUT `MARKETING_VERSION` is also pinned in `Asspp.xcodeproj/project.pbxproj` (target Debug + Release build settings), and the pbxproj value overrides the xcconfig, so a version bump must change BOTH places or the built app keeps the old version. `CURRENT_PROJECT_VERSION` (build number) lives only in `Version.xcconfig`. From build 5 the app uses its own version **2.0** (build stays 5, no reset — the CI scripts never touch version numbers) instead of upstream Asspp 4.2.2; the About section in Settings shows "`<MARKETING_VERSION> <build>`" (e.g. "2.0 5") from `Bundle.main` info dictionary (`main.swift`, `SettingView`). **Quy tắc version (anh chốt 25/11): dòng gộp 2.0 dừng ở build 19, xong đến 2.1 (MARKETING_VERSION 2.0 → 2.1, đổi ở cả `Version.xcconfig` và pbxproj như mọi lần đổi MARKETING_VERSION).** **Quy tắc version (anh chốt 10:02 26/11): dãy 3.x đi tới build 10 thì lên ver 3.1 (3.0 build 1–10, sau build 10 là 3.1).**
 
 ## Architecture
 
@@ -1808,3 +1808,195 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
   - Version: 2.1 build 21 (`CURRENT_PROJECT_VERSION` 20 → 21, chỉ
     trong `Configuration/Version.xcconfig`; `MARKETING_VERSION` giữ
     2.1 ở cả xcconfig và pbxproj).
+  - Đẩy: remote `9f291740` (local `a5c27fa`, base build 20
+    `a618250f`); push-tree tạo 6 blob mới + tái dùng 219; đã kiểm
+    chứng remote có đủ 6 file đổi (nội dung DMAP không còn gọi
+    `account.cookie.buildCookieHeader`, PurchasedStore có
+    `authenticateIPadn`).
+  - CI "Build App" run 45729316539: SUCCESS cả 2 job (build-osx
+    xong trước, build-ios ~22 phút). Artifact iOS
+    `NVDAppleIDDownload.ipa` 52.671.498 byte — tải về bằng
+    redirect-capture (lấy Location 302 rồi tải trực tiếp từ blob;
+    tải thẳng qua API timeout 300s rồi 401 do SAS hết hạn nên
+    KHÔNG tải thẳng nữa). Artifact là zip chứa 1 IPA trong
+    (52.989.265 byte, chưa ký). Ký ad-hoc zsign -a -z 9 (/tmp trống
+    512M, không gặp vụ đầy).
+  - IPA `deliver/NVDAppleIDDownload.ipa` 53.212.595 byte, SHA256
+    `f1db3260e2da704cb52e51d328e582ca656ab11750d08d48e0c405f097f0256d`:
+    kiểm chứng độc lập 2.1 build 21, bundle
+    com.NVD.appleiddownload, min iOS 16.0, sap.wasm ở root bundle +
+    đủ 7 file runtime, không còn file .part, CodeResources có,
+    IPadnLoginService 131 hit, Configurator/2.21 1 hit, "No
+    Downloads"/"No Accounts"/Twemoji 0 hit, đủ 7 tab, chuỗi code
+    mới có trong binary ("Purchased DMAP: saved cookies" 1 hit,
+    "token refreshed via iPadn login" 1 hit). Backup bản 20:
+    `deliver/NVDAppleIDDownload-2.1-build20-backup.ipa` (SHA256
+    `daa96369…` khớp bản đã giao).
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: mở tab Đã mua
+    xem đồng bộ có chạy không (danh sách mới thay cache 368 app cũ);
+    nếu vẫn lỗi thì chụp Nhật ký quanh dòng "Purchased DMAP: saved
+    cookies ..." (số cookie + header Cookie có gắn không) và dòng
+    "Purchased sync: ..." (có làm mới token bằng iPadn không).
+    Chưa sửa: đường tải (StoreDownloadService) vẫn dùng
+    `buildCookieHeader` nên có thể gặp cùng lỗi cookie với tài khoản
+    đã lưu bằng đường iPadn — chờ anh test Lượt tải rồi soi tiếp.
+
+## Đợt 5 build 1 — GHÉP NGUYÊN LÕI STORE iPadn (3.0 build 1, BẢN ĐẦU dãy 3.x)
+  (Anh test bản 21 trên máy thật 09:41–09:44 26/11: Đã mua VẪN 401 ở
+  bước items + Commerce vẫn 403 `{"status":-1,"errors":[{"code":
+  "authentication"}]}` + Lượt tải lỗi "Sign In to the iTunes Store"
+  khi tải trực tiếp app.nicegram. Log chứng minh giả thuyết cookie
+  của bản 21 SAI: Cookie header đã gắn đủ 18 cookie, làm mới token
+  bằng iPadn đã thành công (dsid set, store 143467) mà items vẫn 401
+  — nguyên nhân nằm ở chỗ khác trong request. Anh chốt 09:55 26/11:
+  "nếu mã nguồn iPadn sạch thì bê nguyên sang app của a rồi cá nhân
+  hoá và giữ nguyên giao diện hiện tại của app a, chỉ là lõi của
+  ipadn" — DỪNG vá từng trường 3 đường, chuyển sang ghép nguyên lõi.)
+
+  ### 0. Kết luận kiểm tra "sạch" (soi source iPadn v2.3.5, commit c7be403)
+  - Lõi store tách khỏi giao diện: `AppleService` (1855 dòng) +
+    `DMAP` (283) + `StoreService` (1220) + `Models` chỉ import
+    Foundation (+ Combine cho AppleService, ObservableObject chạy
+    được iOS 16, không SwiftUI). Target iPadn cũng 16.0 như app.
+  - Không code mờ ám: chỉ gọi host `*.apple.com` /
+    `*.itunes.apple.com`; `https://example.invalid/` chỉ là base giả
+    để parse query, không fetch; mật khẩu chỉ gửi tới Apple
+    authenticate; store-proof giữ trong Keychain. WASM SAP runtime
+    đã chấp nhận ở bản 20.
+  - DownloadManager KHÔNG port (2022 dòng, dính UIKit + TestFlightKit
+    + UserNotifications + Network, hàng đợi tải + tự cài + thông báo
+    dính UI iPadn) — app giữ engine tải của mình (Digger +
+    BackgroundDownloadService) + hàng đợi Lượt tải + UI; chỉ lấy phần
+    xin asset trong AppleService (`asset`/`fetchAsset`, có kbsync mà
+    đường tải fork thiếu).
+  - Phần đăng nhập đã port sạch ở bản 20 là bằng chứng lõi ít nhất
+    phần đó sạch; giờ port nốt Đã mua/Commerce/tải.
+
+  ### 1. Port lõi store (script `~/workspace/ipadn-port/build-port.py`,
+  chạy lại được; 6 file mới `Backend/IPadnStore/`, 3536 dòng)
+  - `IPadnDMAP.swift` (nguyên `DMAP.swift`), `IPadnStoreService.swift`
+    (nguyên `StoreService.swift`, chỉ `localizedGenre` dịch thẳng
+    sang tiếng Việt thay vì tra catalog chuỗi iPadn),
+    `IPadnAppleService.swift` (nguyên `AppleService.swift`, trừ code
+    backup tài khoản `flushedAccountsForBackup` /
+    `importAccountBackup` / `importAccountProfiles` — phụ thuộc
+    subsystem không có UI trong app — và extension DEBUG
+    `prepareAccountPreview` dùng `PreviewData` không có trong app),
+    `IPadnStoreModels.swift` (trích 11 type cần thiết từ
+    `Models.swift`: AppPlatform, StoreContext, StoreApp, AppVersion,
+    VersionListUnavailableError, AppleAccount, DownloadAsset, OwnedApp,
+    OwnedHistorySyncState, SearchQuery, VersionSource),
+    `IPadnAccountStore.swift` (kho chỉ-trong-bộ-nhớ thay KeychainStore
+    của iPadn — AppStore của app mới là nguồn thật duy nhất; load/save
+    chỉ để code port giữ nguyên luồng), `IPadnLocalResources.swift`
+    (tối thiểu cho cache versions.json của VersionService).
+  - Đổi tên tiền tố IPadn/ipadn (DMAP → IPadnDMAP vì app đã có `enum
+    DMAP` riêng cho macOS); dùng lại helper bản 20 (IPadnToolError,
+    IPadnHTTPStatusError, IPadnAppleLoginError/Response,
+    IPadnStoreProofRecord, ipadnPlistString, IPadnHTTPClient,
+    IPadnAppleAuthentication, IPadnSAPSigner, IPadnRequestFailureLog)
+    — KHÔNG định nghĩa lại. ~70 chuỗi tiếng Trung dịch sang tiếng
+    Việt (AppText.text + 2 literal trơ `unknown` /
+    `delistedPlaceholder`); `StoreApp.isFree` GIỮ literal `"免费"` cũ
+    (so khớp dữ liệu đã lưu), chỉ `priceLabel` hiện "Miễn phí".
+    `localizedGenre` dịch thẳng Anh → Việt.
+  - Seam trong AppleService port: `guid` dùng chung
+    `ApplePackage.Configuration.deviceIdentifier` (như đăng nhập bản
+    20 — phiên + chữ ký SAP + DMAP/tải phải cùng guid); `setGUID` ghi
+    về `AppStore.this.deviceIdentifier`; init/activeID chỉ trong bộ
+    nhớ; `select` bỏ ghi UserDefaults; `InstallLog` → `logger.info`;
+    thêm `useAccount(_:)` + `liveCookie(for:)` cho cầu nối. Login
+    giữ nguyên (trùng với IPadnLoginService bản 20, ghi rõ là để
+    `refresh()` nội bộ dùng; điểm vào đăng nhập của app vẫn là
+    IPadnLoginService).
+  - Sửa trong lúc port: bỏ 2 enum `IPadnAppleLoginError` /
+    `IPadnAppleLoginResponse` trùng bản 20 (định nghĩa lại sẽ trùng
+    tên trong cùng module); thêm shim `StoreRegions.name` (dùng bảng
+    177 vùng sẵn có của app) vì `AppleStorefrontDownloadError` của
+    iPadn gọi nó; `AppleStorefrontDownloadError` đổi tên tiền tố
+    IPadn như các type khác.
+  - Kiểm chứng code-level: `swiftc -parse -target
+    arm64-apple-ios16.0` pass cả 6 file port + cầu nối + 3 service
+    sửa (iOS + macOS); 26 type mới đều đúng 1 định nghĩa, không
+    trùng; không còn chữ Hán ngoài dữ liệu/regex đã rõ (`免费`/`免費`
+    trong isFree + comment, `年/月/日` trong regex parse ngày CJK).
+
+  ### 2. Cầu nối + nối dây (`IPadnStoreBridge.swift`, @MainActor)
+  - Một `IPadnAppleService` dùng chung 3 đường, signer WASM riêng
+    (IPadnLoginService giữ signer riêng cho đăng nhập — 2 runtime
+    WASM, chấp nhận được). Mọi lần gọi xếp hàng nối tiếp (withSerial)
+    vì iPadn chỉ có 1 tài khoản đang dùng — không để 2 tài khoản khác
+    nhau chen nhau làm lõi báo "Tài khoản đã đổi".
+  - Mapping fork → iPadn: id=email, name=họ+tên, password, cookie =
+    chuỗi gộp trùng tên (tên sau ghi đè, giữ thứ tự xuất hiện đầu —
+    đúng `mergedCookie` iPadn, chỉ cookie còn hạn), dsid,
+    passwordToken, storeFront=account.store, fullStoreFront = giá trị
+    đã lưu khi khớp store, không thì `"<store>-1,34"` (để vòng retry
+    -128 với bản sao đã chỉnh store vẫn dựng đúng header vùng mới).
+  - Sau mỗi lần gọi: đọc cookie gộp qua `liveCookie(for:)` rồi ghi về
+    tài khoản fork đã lưu qua `AppStore.withAccount` (chỉ khi khác
+    chuỗi cũ); đường tải còn cập nhật luôn bản sao local (inout) để
+    caller ghi tiếp.
+  - Mapping lỗi về kiểu cũ của app để UI không đổi: DMAP →
+    PurchasedDMAPError (401/403 hoặc reauthentication → sessionExpired
+    bước items; HTTP khác → appleRefused; còn lại → badResponse);
+    Commerce → PurchasedCommerceError (tương tự; còn lại →
+    networkError); tải → StoreDownloadError / ApplePackageError
+    (notOwned → licenseRequired; accountRegionMismatch → rejected
+    "-128" để popup đổi tài khoản hiện; appUnavailableInAccountRegion
+    → rejected "1010"; auth hết hạn → rejected "" với thông báo đăng
+    nhập lại; HTTP status → response(code); ToolError → rejected ""
+    với thông báo tiếng Việt của iPadn).
+  - Nối dây (giữ nguyên chữ ký hàm + kiểu lỗi, giao diện không đổi):
+    `PurchasedDMAPService.fetchPurchasedApps` iOS → bridge
+    `purchasedApps` (ownedApps, chỉ kind 131072), macOS → fork cũ;
+    `PurchasedCommerceService.fetchAllPurchasedApps` iOS → bridge
+    `commerceHistory` (sinceYear 2008, allowSessionRefresh true),
+    macOS → fork cũ; `StoreDownloadService.product` iOS → bridge
+    `fetchProductItem` (asset, allowLicenseAcquisition=true chỉ khi
+    operation download, false khi xem versions/version-metadata —
+    browsing không lấy license, 9610 → notOwned), macOS → fork cũ.
+    Asset → dict `item` đúng hình dạng parse closure đang chờ (URL =
+    asset.url, metadata = asset.metadata giải plist + bổ sung
+    softwareVersionExternalIdentifiers từ asset.externalVersionIDs
+    nếu thiếu, sinfs = asset.sinfs đánh id theo vị trí 0,1,2… vì
+    SignatureInjector dùng sinfs[index] theo vị trí). Vòng retry lỗi
+    tạm thời 3 lần + vòng retry -128 với bản sao đã chỉnh store giữ
+    nguyên; `PurchasedStore.sync` / `syncFullHistory` /
+    `fetchDMAPWithTokenRefresh` KHÔNG đổi (gọi cùng entry point).
+    Helper fork chỉ macOS dùng được bọc `#if !os(iOS)` để khỏi warning
+    unused trên iOS (DMAP/Commerce/StoreDownloadService).
+  - Sửa kèm: `IPadnLoginService` bỏ tham chiếu treo
+    `IPadnStoreHeaders.dedupedCookies` (file đã xoá lúc đổi hướng) —
+    helper gộp trùng tên viết lại local trong file; comment trỏ
+    IPadnStoreHeaders trong AppStore.swift đổi sang IPadnStoreBridge.
+  - Không đổi: đăng nhập (đang chạy), vùng tìm kiếm, tab/giao diện
+    (7 tab nguyên), "Nhập vào Đã mua" + nút làm mới ở chi tiết tài
+    khoản vẫn dùng fork rotate (chưa nối sang iPadn — cần anh chốt
+    riêng, như đã ghi ở bản 21). `acquireFreeApp` của iPadn có trong
+    file port nhưng chỉ gọi qua `asset` khi download (lấy license
+    free); nút "Nhập vào Đã mua" riêng vẫn là đường fork cũ.
+
+  ### 3. Giấy phép + README
+  - `LICENSES.md`: mục 3 iPadn mở rộng từ "phần Đăng nhập" thành
+    "phần Đăng nhập + lõi cửa hàng" (liệt kê Backend/IPadnStore/ +
+    3.0 build 1 dùng lõi này thay fork trên iOS, macOS giữ fork);
+    mục 1 MIT ghi rõ iOS từ 3.0 dùng lõi iPadn ở các đường đó.
+  - `README.md` viết lại theo dặn 10:05 + sửa 10:06 26/11: CHỈ trình
+    bày tính năng (1 H1, tiếng Việt, 7 tab + ký IPA + tìm kiếm/tải/
+    Đã mua + hỗ trợ iOS 16.0–27.2 + cài qua chứng chỉ cá nhân/
+    SideStore/AltStore/LiveContainer/TrollStore) — KHÔNG mục giấy phép,
+    cài đặt, cảnh báo giao thức hay cảm ơn (giấy phép ở LICENSES.md +
+    file LICENSE trong repo như đã chốt). Nháp cũ ở
+    `docs/README-3.0-DRAFT.md` đã bỏ các mục đó theo dặn mới.
+
+  ### 4. Version + CI/IPA
+  - Version: 3.0 build 1 (`MARKETING_VERSION` 2.1 → 3.0 ở CẢ
+    `Configuration/Version.xcconfig` LẪN `Asspp.xcodeproj/project.pbxproj`
+    dòng 522 + 565; `CURRENT_PROJECT_VERSION` 21 → 1, chỉ trong
+    xcconfig — reset về 1 theo đúng lời anh dặn 10:01 26/11, ngoại lệ
+    so với tiền lệ build 5 không reset). Quy tắc dãy 3.x (anh chốt
+    10:02 26/11, đã ghi ở mục Build Configuration): 3.0 đi tới build
+    10 thì lên ver 3.1 (3.0 build 1–10, sau build 10 là 3.1).
+  - (CI/IPA bổ sung sau khi đẩy.)
+

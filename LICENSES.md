@@ -5,7 +5,9 @@ trộn giấy phép 23:24 25/11/2026 — "giờ cho lẫn lộn luôn đi").
 
 ## 1. MIT — Asspp gốc (Lakr233 / Lakr Aream)
 - **Phần code:** toàn bộ app gốc Asspp (giao diện, tải/tìm kiếm/cài đặt IPA,
-  backend App Store qua ApplePackage) trừ 2 phần dưới.
+  backend App Store qua ApplePackage) trừ 2 phần dưới. Từ 3.0 build 1, trên
+  iOS các đường đăng nhập / Đã mua / Commerce / tải dùng lõi iPadn (mục 3),
+  không còn dùng backend fork ở các đường đó; macOS vẫn dùng backend fork.
 - **Nguồn:** https://github.com/Lakr233/Asspp (Asspp 4.2.2, đã archive 18/11/2026)
 - **File giấy phép:** [`LICENSE`](./LICENSE)
 
@@ -16,12 +18,18 @@ trộn giấy phép 23:24 25/11/2026 — "giờ cho lẫn lộn luôn đi").
 - **Nguồn:** https://github.com/murk-sus/SayoSign
 - **File giấy phép:** [`LICENSE-SayoSign-GPL-3.0`](./LICENSE-SayoSign-GPL-3.0)
 
-## 3. GPL-2.0-or-later — iPadn (mengangs), phần Đăng nhập
-- **Phần code:** hệ đăng nhập port trực tiếp từ iPadn v2.3.5 (commit c7be403) —
+## 3. GPL-2.0-or-later — iPadn (mengangs), phần Đăng nhập + lõi cửa hàng
+- **Phần code:** hệ đăng nhập + lõi cửa hàng port trực tiếp từ iPadn v2.3.5 (commit c7be403) —
   `NVDAppleIDDownload/Backend/IPadnLogin/` (HTTPClient URLSession, AppleAuthentication,
-  SAPSigner + LoopbackServer chạy runtime SAP bằng WASM, ApplePropertyList, LoginService)
+  SAPSigner + LoopbackServer chạy runtime SAP bằng WASM, ApplePropertyList, LoginService),
+  `NVDAppleIDDownload/Backend/IPadnStore/` (AppleService: đăng nhập/làm mới phiên,
+  Đã mua qua DMAP, lịch sử mua qua Commerce, tải qua asset/kbsync; DMAP; StoreService:
+  tra cứu catalog, lịch sử phiên bản; AccountStore chỉ-trong-bộ-nhớ; LocalResources
+  tối thiểu cho cache phiên bản; StoreBridge nối tài khoản/lỗi sang kiểu của app)
   và `NVDAppleIDDownload/SAPRuntime/` (runtime SAP: sap.wasm, sap-signer.js,
   wasm_exec.js, unicorn_x86.js, libCoreADI.so, libstoreservicescore.so, index.html).
+  Từ 3.0 build 1, các đường Đã mua / Commerce / tải trên iOS dùng lõi này thay
+  cho lõi fork ApplePackage cũ (macOS giữ fork).
   Lưu ý: `sap.wasm` (~50 MB) quá lớn cho một blob Git Data API nên repo chỉ
   lưu dạng chia nhỏ `sap.wasm.part00..05` (8 MB/mảnh); script CI
   (`Resources/Scripts/compile.release.mobile.ci.sh`) ghép lại thành
@@ -55,4 +63,4 @@ trộn giấy phép 23:24 25/11/2026 — "giờ cho lẫn lộn luôn đi").
 |---|---|---|
 | App gốc (tìm/tải/cài IPA, backend store) | Asspp — Lakr233 | MIT |
 | Ký IPA | SayoSign — murk-sus | GPL-3.0 |
-| Đăng nhập (SAP + request authenticate) | iPadn — mengangs | GPL-2.0-or-later |
+| Đăng nhập (SAP + request authenticate) + lõi cửa hàng (Đã mua, Commerce, tải) | iPadn — mengangs | GPL-2.0-or-later |
