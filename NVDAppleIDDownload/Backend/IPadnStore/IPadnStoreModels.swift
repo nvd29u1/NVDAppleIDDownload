@@ -209,4 +209,40 @@ struct IPadnVersionSource: Codable, Identifiable, Equatable {
         return url
     }
 }
+
+struct IPadnReleaseNote: Equatable {
+    var version: String
+    var date: Date?
+    var text: String
+}
+
+struct IPadnVersionMetadata: Codable, Hashable, Sendable {
+    static let currentSchema = 4
+
+    var version: String
+    var released: Date?
+    /// nil in legacy caches; those dates must also be treated as approximate.
+    var releaseDateIsEstimated: Bool? = nil
+    /// Complete remote IPA length, not the extracted app or an individual ZIP entry.
+    /// Optional so caches written before size support remain readable.
+    var packageSize: Int64? = nil
+    /// nil: not checked/retryable; false: no readable primary PNG; true: cached PNG.
+    var iconAvailable: Bool? = nil
+    /// nil in legacy caches; ensures dotless versions written solely from IPA Info.plist
+    /// are reconciled once against Apple's DownloadDispatch ticket metadata.
+    var ticketChecked: Bool? = nil
+    /// nil in legacy caches created before stale latest-version fallback filtering.
+    var metadataSchema: Int? = nil
+    /// Raw `Info.plist` `CFBundleShortVersionString`, preserved separately from the
+    /// App Store public marketing version (e.g. `10.0.22` when Store says `1.9.5`).
+    var bundleShortVersion: String? = nil
+    /// Raw `Info.plist` `CFBundleVersion` build number (e.g. `80`, `48000`).
+    var buildVersion: String? = nil
+
+    /// True when an older build cached `iconAvailable == false` after `RemoteZip` failed
+    /// before reading `Info.plist` (leaving both `released` and `buildVersion` nil).
+    var hasUnverifiedMissingIcon: Bool {
+        iconAvailable == false && released == nil && buildVersion == nil && ticketChecked == true
+    }
+}
 #endif

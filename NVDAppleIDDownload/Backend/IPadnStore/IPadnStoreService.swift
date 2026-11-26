@@ -60,7 +60,7 @@ enum IPadnStoreService {
     }
 
     static func deduplicatingResults(_ apps: [IPadnStoreApp], limit: Int? = nil) -> [IPadnStoreApp] {
-        let unique = AppSearchRanking.deduplicatePreservingOrder(apps)
+        let unique = IPadnAppSearchRanking.deduplicatePreservingOrder(apps)
         guard let limit else { return unique }
         return Array(unique.prefix(max(0, limit)))
     }
@@ -682,7 +682,7 @@ enum MacInstallerService {
 
     static func find(on website: URL) async throws -> [Installer] {
         guard safeWebsite(website.absoluteString) != nil else { return [] }
-        let (data, response) = try await HTTPClient.shared.request(website)
+        let (data, response) = try await IPadnHTTPClient.shared.request(website)
         guard data.count <= 2 * 1024 * 1024,
               response.mimeType?.lowercased().contains("html") == true,
               let html = String(data: data, encoding: .utf8) else { return [] }
@@ -989,7 +989,7 @@ actor IPadnVersionService {
         versionID: String,
         appVersion: String,
         versions: [IPadnAppVersion],
-        cachedMetadata: [String: VersionMetadata] = [:],
+        cachedMetadata: [String: IPadnVersionMetadata] = [:],
         rowIndex: Int? = nil,
         rowReleased: Date? = nil,
         latestReleased: Date? = nil
@@ -1038,8 +1038,8 @@ actor IPadnVersionService {
         rawVersion: String,
         released: Date?,
         versions: [IPadnAppVersion],
-        metadata: [String: VersionMetadata],
-        notes: [ReleaseNote],
+        metadata: [String: IPadnVersionMetadata],
+        notes: [IPadnReleaseNote],
         appVersion: String,
         rowIndex: Int? = nil
     ) -> String? {
@@ -1054,13 +1054,13 @@ actor IPadnVersionService {
             return nil
         }
 
-        let structuralMatches = notes.compactMap { note -> (note: ReleaseNote, precision: MarketingMatchPrecision)? in
+        let structuralMatches = notes.compactMap { note -> (note: IPadnReleaseNote, precision: MarketingMatchPrecision)? in
             guard let precision = compatibleMarketingPrecision(note.version, buildRaw: clean) else { return nil }
             return (note, precision)
         }
         guard !structuralMatches.isEmpty else { return nil }
 
-        let uniqueWinner: ([ (note: ReleaseNote, precision: MarketingMatchPrecision) ]) -> ReleaseNote? = { pool in
+        let uniqueWinner: ([ (note: IPadnReleaseNote, precision: MarketingMatchPrecision) ]) -> IPadnReleaseNote? = { pool in
             let distinctVersions = Set(pool.map { sanitizedVersion($0.note.version) })
             guard distinctVersions.count == 1 else { return nil }
             return pool.max(by: { $0.precision < $1.precision })?.note
@@ -1115,8 +1115,8 @@ actor IPadnVersionService {
 
     static func reconcileWithReleaseNotes(
         versions: [IPadnAppVersion],
-        metadata: [String: VersionMetadata],
-        notes: [ReleaseNote],
+        metadata: [String: IPadnVersionMetadata],
+        notes: [IPadnReleaseNote],
         appVersion: String
     ) -> [(id: String, version: String)] {
         guard !versions.isEmpty, !notes.isEmpty else { return [] }
