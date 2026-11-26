@@ -210,6 +210,11 @@ enum PurchasedDMAPService {
         // lấy không được thì dừng với lỗi đó thay vì gọi thiếu header.
         // URL trống nghĩa là không dùng header (hành vi cũ).
         let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
+        // Chẩn đoán cookie (build 21): ghi số cookie đã lưu + header
+        // Cookie có gắn hay không (chỉ tên, KHÔNG ghi giá trị) để log
+        // máy thật chứng minh được đường nối phiên.
+        let attachedCookie = Self.cookieHeaderValue(cookies: account.cookie)
+        logger.info("Purchased DMAP: saved cookies \(account.cookie.count) (\(account.cookie.map(\.name).joined(separator: ","))), Cookie header \(attachedCookie.isEmpty ? "empty" : "set")")
         let signer: ApplePackage.SAPSigner
         do {
             signer = try await ApplePackage.SAPSigner.connect()
@@ -501,14 +506,36 @@ enum PurchasedDMAPService {
         request.setValue(ApplePackage.Configuration.deviceIdentifier, forHTTPHeaderField: "X-GUID")
         request.setValue(account.passwordToken, forHTTPHeaderField: "X-Token")
         request.setValue(ApplePackage.Configuration.userAgent, forHTTPHeaderField: "User-Agent")
-        if let url = request.url {
-            for (name, value) in account.cookie.buildCookieHeader(url) {
-                request.setValue(value, forHTTPHeaderField: name)
-            }
+        // Cookie phiên đã đăng nhập: gửi NGUYÊN CHUỖI "a=b; c=d" như
+        // iPadn (purchaseHeaders: headers["Cookie"] = account.cookie)
+        // và iTunes thật — KHÔNG lọc theo domain/path như fork
+        // `buildCookieHeader`. Nguyên nhân (build 21, soi bằng code):
+        // cookie lưu từ đăng nhập iPadn mang domain ".itunes.apple.com"
+        // (dấu chấm đầu, HTTPCookie giữ nguyên) hoặc host-only của pod
+        // buy ("p<digits>-buy.itunes.apple.com") — matcher của fork
+        // không khớp cái nào với host pd.itunes.apple.com nên request
+        // DMAP đi không có Cookie → bước items 401, trong khi
+        // login/update (không cần cookie) vẫn 200. Cookie hết hạn thì
+        // bỏ; tên/giá trị rỗng thì bỏ.
+        let cookieValue = Self.cookieHeaderValue(cookies: account.cookie)
+        if !cookieValue.isEmpty {
+            request.setValue(cookieValue, forHTTPHeaderField: "Cookie")
         }
         for (name, value) in anisetteHeaders {
             request.setValue(value, forHTTPHeaderField: name)
         }
+    }
+
+    /// Giá trị header Cookie ("a=b; c=d") từ cookie đã lưu: gửi TẤT CẢ
+    /// cookie còn hạn, không lọc domain/path (xem ghi chú ở
+    /// applyHeaders). Cookie hết hạn (expiresAt trong quá khứ) thì bỏ.
+    private static func cookieHeaderValue(cookies: [ApplePackage.Cookie]) -> String {
+        let now = Date().timeIntervalSince1970
+        return cookies
+            .filter { !$0.name.isEmpty && !$0.value.isEmpty }
+            .filter { ($0.expiresAt ?? .infinity) > now }
+            .map { "\($0.name)=\($0.value)" }
+            .joined(separator: "; ")
     }
 
     private static func httpDate(_ date: Date) -> String {

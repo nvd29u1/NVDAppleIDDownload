@@ -180,9 +180,19 @@ final class IPadnLoginService {
             throw IPadnToolError.message("Apple chưa trả về vùng cửa hàng của tài khoản, hãy thử lại.")
         }
         let pod = Self.capturePod(from: response)
+        // Domain cookie của Apple thường có dấu chấm đầu
+        // (".itunes.apple.com", HTTPCookie giữ nguyên); matcher domain
+        // của fork (Cookie.buildCookieHeader) không khớp dạng này với
+        // host pd/buy.itunes.apple.com nên cookie bị lọc hết ở các đường
+        // fork (tải/mua) — bỏ dấu chấm đầu cho khớp RFC 6265 (dấu chấm
+        // đầu không có ý nghĩa). Tài khoản đã lưu trước bản này giữ
+        // nguyên domain cũ tới khi đăng nhập lại; đường DMAP/Commerce
+        // gửi cookie nguyên chuỗi nên không phụ thuộc vào đây.
         let forkCookies: [ApplePackage.Cookie] = cookies.map {
-            ApplePackage.Cookie(name: $0.name, value: $0.value, path: $0.path,
-                domain: $0.domain, expiresAt: $0.expiresDate?.timeIntervalSince1970,
+            var domain = $0.domain
+            if domain.hasPrefix(".") { domain = String(domain.dropFirst()) }
+            return ApplePackage.Cookie(name: $0.name, value: $0.value, path: $0.path,
+                domain: domain, expiresAt: $0.expiresDate?.timeIntervalSince1970,
                 httpOnly: $0.isHTTPOnly, secure: $0.isSecure)
         }
         logger.info("ipadn login: success (dsid set, store \(store), cookies \(forkCookies.count), cookie header \(cookieString.isEmpty ? "empty" : "set"))")

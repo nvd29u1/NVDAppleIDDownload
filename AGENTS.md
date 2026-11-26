@@ -1745,3 +1745,66 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     tài khoản phụ (kumit.95bt@gmail.com) xem vào được không; nếu vẫn lỗi
     thì chụp Nhật ký quanh dòng "ipadn login: ..." (stage + mã HTTP, không
     có mật khẩu/token trong log).
+## Đợt 5 build 21 — NỐI PHIÊN iPadn SANG ĐÃ MUA (2.1 build 21)
+  (Anh test bản 20 trên máy thật 07:22 26/11: đăng nhập ĐÃ CHẠY
+  (kumit.95bt@gmail.com vào được) nhưng mục Đã mua lỗi banner đỏ
+  "Phiên đăng nhập đã hết hạn (bước items, HTTP 401)". Danh sách 368
+  app vẫn hiện là cache cũ từ bản 14, không phải đồng bộ mới.)
+
+  ### 0. Nguyên nhân thật (soi bằng code, không đoán mò)
+  - Đường DMAP đi 3 bước login → update → items với CÙNG header
+    (X-Token + X-DSID + cookie + Anisette); login/update trả 200 mà
+    items 401 → items là bước duy nhất cần cookie phiên thật, còn
+    login/update chỉ cần X-Token. Chỉ có `account.cookie` là đầu vào
+    đổi giữa bản 14 (DMAP chạy, 368 app) và bản 20 (items 401):
+    passwordToken/X-DSID/store/GUID/UA/chữ ký SAP đều như cũ.
+  - Cookie lưu từ đăng nhập iPadn mang domain ".itunes.apple.com"
+    (dấu chấm đầu, HTTPCookie giữ nguyên) hoặc host-only của pod buy
+    ("p<digits>-buy.itunes.apple.com") — matcher domain của fork
+    (`Cookie.buildCookieHeader`, `matchesDomain`: bằng đúng hoặc hậu
+    tố ".domain") không khớp cái nào với host pd.itunes.apple.com nên
+    request DMAP đi KHÔNG CÓ header Cookie → items 401. iPadn thì
+    gửi nguyên chuỗi cookie (`purchaseHeaders`/`commerceHeaders`:
+    headers["Cookie"] = account.cookie), không lọc domain/path.
+  - Đường làm mới token cũng hỏng theo: `fetchDMAPWithTokenRefresh`
+    gọi fork `rotatePasswordToken` → fork `authenticate` (UA 2.17 +
+    header Anisette jkcoxson) là đúng hình dạng Apple đã từ chối từ
+    chiều 25/11 (log 19:42: 204 / redirect không địa chỉ / 403 / 404)
+    nên rotate hỏng → lỗi 401 gốc giữ nguyên, hiện banner đỏ.
+  - Bước Commerce (`PurchasedCommerceService.cookieHeaderValue`)
+    dùng chung matcher của fork nên cùng lỗi (đi không có Cookie →
+    401/403) — sửa chung một lần. Đường tải (StoreDownloadService)
+    cũng dùng `buildCookieHeader` nên CÓ THỂ gặp cùng lỗi với tài
+    khoản đã lưu bằng đường iPadn (chưa test trên bản 20) — chưa
+    sửa ở bản này, ghi lại để bản sau soi.
+
+  ### 1. Cách nối (4 file, phạm vi hẹp: chỉ Đã mua + mapping cookie
+  // lúc đăng nhập; không động đăng nhập, vùng tìm kiếm, tab/giao diện)
+  - `PurchasedDMAPService.applyHeaders`: gửi Cookie NGUYÊN CHUỖI
+    "a=b; c=d" từ mọi cookie đã lưu còn hạn (không lọc domain/path,
+    đúng như iPadn); helper mới `cookieHeaderValue(cookies:)`; log 1
+    dòng ở `fetchPurchasedApps` ghi số cookie đã lưu + tên (KHÔNG
+    ghi giá trị) + header Cookie có gắn hay không ("Purchased DMAP:
+    saved cookies N (...), Cookie header set/empty") để log máy thật
+    chứng minh được đường nối.
+  - `PurchasedCommerceService.cookieHeaderValue`: cùng cách gửi
+    nguyên chuỗi (bỏ tham số `url` + matcher fork); `mergeSetCookie`
+    theo redirect giữ nguyên.
+  - `IPadnLoginService` (mapping HTTPCookie → fork Cookie): bỏ dấu
+    chấm đầu của domain (".itunes.apple.com" → "itunes.apple.com",
+    theo RFC 6265) để các đường fork còn dùng `buildCookieHeader`
+    (tải/mua) khớp lại như bản 14. Chỉ áp dụng cho lần đăng nhập MỚI;
+    tài khoản đã lưu giữ domain cũ tới khi đăng nhập lại.
+  - `PurchasedStore.fetchDMAPWithTokenRefresh`: trên iOS, làm mới
+    token bằng đường đăng nhập iPadn (`authenticateIPadn` với
+    email/mật khẩu đã lưu, code "" — attempt "1", đã chạy được ở
+    build 20) thay cho fork `rotatePasswordToken`; Apple đòi mã 2FA
+    thì giữ lỗi 401 gốc để người dùng đăng nhập lại tay. Trên macOS
+    giữ rotate fork (macOS vẫn dùng đường đăng nhập fork cũ).
+  - Không đổi: X-Apple-Store-Front "…-1,34" (bản 14 chạy được),
+    UA 2.17 trên DMAP, header Anisette trên DMAP, chữ ký SAP fork.
+
+  ### 2. Version + CI/IPA
+  - Version: 2.1 build 21 (`CURRENT_PROJECT_VERSION` 20 → 21, chỉ
+    trong `Configuration/Version.xcconfig`; `MARKETING_VERSION` giữ
+    2.1 ở cả xcconfig và pbxproj).

@@ -99,7 +99,7 @@ enum PurchasedCommerceService {
         let currentYear = Calendar(identifier: .gregorian).component(.year, from: Date())
         var all: [PurchasedApp] = []
         var pod = account.pod ?? ""
-        var cookie = cookieHeaderValue(cookies: account.cookie, url: commerceURL(pod: pod, page: nil, year: currentYear) ?? URL(string: "https://\(plainHost)\(commercePath)")!)
+        var cookie = cookieHeaderValue(cookies: account.cookie)
         if pod.isEmpty { pod = podFromCookie(cookie) ?? "" }
         var lastError: Error?
         var anyYearSucceeded = false
@@ -293,11 +293,18 @@ enum PurchasedCommerceService {
     }
 
     /// Giá trị header Cookie ("a=b; c=d") từ cookie đã lưu của tài khoản.
-    private static func cookieHeaderValue(cookies: [ApplePackage.Cookie], url: URL) -> String {
-        for (name, value) in cookies.buildCookieHeader(url) where name.lowercased() == "cookie" {
-            return value
-        }
-        return ""
+    /// Gửi TẤT CẢ cookie còn hạn, KHÔNG lọc domain/path như fork
+    /// `buildCookieHeader` — cùng lỗi như DMAP (build 21): cookie lưu
+    /// từ đăng nhập iPadn mang domain ".itunes.apple.com" hoặc host-only
+    /// của pod buy nên matcher của fork lọc hết → Commerce đi không có
+    /// Cookie → 401/403. iPadn gửi nguyên chuỗi cookie (commerceHeaders).
+    private static func cookieHeaderValue(cookies: [ApplePackage.Cookie]) -> String {
+        let now = Date().timeIntervalSince1970
+        return cookies
+            .filter { !$0.name.isEmpty && !$0.value.isEmpty }
+            .filter { ($0.expiresAt ?? .infinity) > now }
+            .map { "\($0.name)=\($0.value)" }
+            .joined(separator: "; ")
     }
 
     /// Gộp Set-Cookie trong response vào chuỗi cookie gửi tiếp (cookie

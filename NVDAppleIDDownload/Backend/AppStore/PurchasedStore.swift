@@ -134,6 +134,27 @@ final class PurchasedStore: ObservableObject {
             guard case .sessionExpired = error else { throw error }
             let expiredError = error
             logger.info("Purchased sync: session expired, rotating token once and retrying")
+            #if os(iOS)
+            // Làm mới token bằng đường đăng nhập iPadn (build 21):
+            // rotate của fork (Authenticator.authenticate, UA 2.17 +
+            // header Anisette jkcoxson) là đúng hình dạng Apple đã từ
+            // chối từ chiều 25/11 (log 19:42: 204 / redirect không địa
+            // chỉ / 403 / 404) nên làm mới bằng nó sẽ hỏng và lỗi 401
+            // gốc giữ nguyên. Đăng nhập lại bằng iPadn (đã chạy được
+            // trên máy thật ở build 20) với mật khẩu đã lưu, không cần
+            // mã 2FA (attempt "1"); Apple mà đòi mã thì ném lỗi hết
+            // hạn gốc để người dùng đăng nhập lại tay (như trước).
+            guard let saved = AppStore.this.accounts.first(where: { $0.id == accountID }) else {
+                throw expiredError
+            }
+            do {
+                _ = try await AppStore.this.authenticateIPadn(email: saved.account.email, password: saved.account.password, code: "")
+                logger.info("Purchased sync: token refreshed via iPadn login, retrying DMAP")
+            } catch {
+                logger.error("Purchased sync: token rotation failed: \(StoreDiagnostics.errorSummary(error))")
+                throw expiredError
+            }
+            #else
             do {
                 let anisetteHeaders = try await AppStore.this.anisetteHeadersForStoreCall()
                 try await AppStore.this.withAccount(id: accountID) { userAccount in
@@ -148,6 +169,7 @@ final class PurchasedStore: ObservableObject {
                 logger.error("Purchased sync: token rotation failed: \(StoreDiagnostics.errorSummary(error))")
                 throw expiredError
             }
+            #endif
             return try await AppStore.this.withAccount(id: accountID) { userAccount in
                 try await PurchasedDMAPService.fetchPurchasedApps(account: userAccount.account)
             }
