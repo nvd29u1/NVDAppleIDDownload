@@ -4,6 +4,13 @@
 >
 > **Bản 3.0:** lõi đăng nhập, Đã mua và tải dùng lõi iPadn; giao diện NVD giữ nguyên — nền mận đậm, logo lợn xanh, tiếng Việt.
 
+<p align="center">
+  <img src="https://img.shields.io/badge/Platform-iOS%2016.0%E2%80%9327.2-blue?style=flat-square&logo=apple" alt="Platform" />
+  <img src="https://img.shields.io/badge/Swift-6.2-orange?style=flat-square&logo=swift" alt="Swift" />
+  <img src="https://img.shields.io/badge/Rust-FFI%20Core-red?style=flat-square&logo=rust" alt="Rust" />
+  <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="License" />
+</p>
+
 ## Tính năng
 
 - **Tìm kiếm:** tìm app trên App Store, xem giá, dung lượng, lịch sử phiên bản; chọn phiên bản cũ để tải khi Apple còn cho.

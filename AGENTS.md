@@ -2126,3 +2126,93 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     ĐƯỢC (vào Đã mua của acc IN) — đường nhập bản 2 kiểm chứng chạy
     đúng. Năm đã hiện "2026" đúng (08:06 27/11).**
 
+
+  ### 6. Build 3.0 build 3 — ROTATE TOKEN QUA iPadn + DỌN SayoSign KHỎI UI + README THÊM MỤC GIẤY PHÉP
+  (anh chốt 10:52 27/11 "Làm bản 3 luôn" sau khi rà soát mục cần sửa;
+  bổ sung 10:53: dọn SayoSign ở tab Ký IPA; 10:55: dọn nốt SayoSign ở
+  Cài đặt chính; 10:56: README thêm mục Giấy phép — anh đổi ý so với
+  dặn 10:06 26/11 README chỉ tính năng)
+  - Rotate Token (`AuthenticationService.rotate`, chỉ gọi từ
+    `AccountDetailView.swift:65`): iOS nối sang iPadn —
+    `authenticateIPadn(email:password:code: "")` với mật khẩu đã lưu
+    (đúng mẫu DMAP refresh build 21, attempt "1", tự lưu tài khoản;
+    Apple đòi mã 2FA thì map sang case mới
+    `AuthenticationError.verificationRequired` với thông báo tiếng Việt
+    "phiên hết hạn — đăng nhập lại ở tab Tài khoản" vì màn chi tiết
+    không có ô nhập mã; lỗi 2FA gốc của fork là tiếng Anh nên không
+    để lọt ra UI). macOS giữ fork cũ (rotatePasswordToken + Anisette
+    headers) trong `#else`. Giao diện không đổi (vẫn nút "Rotate
+    Token" + hint Success/lỗi).
+  - Chữ Anisette cũ trong thông báo lỗi nhập (`ProductView.swift`
+    PurchaseGateError, 4 case): bỏ câu "kiểm tra máy chủ Anisette
+    trong Cài đặt" / "máy chưa cấu hình máy chủ Anisette" — đường
+    iPadn không dùng Anisette; viết lại hướng dẫn đúng: đăng nhập
+    lại tài khoản rồi thử lại sau, hoặc dùng ipatool 2.8.1 trên máy
+    tính. Hai case *NoServer giữ lại cho đủ hình dạng cũ, thông báo
+    viết lại như case thường (comment trên enum đã sửa theo).
+  - Log lỗi iPadn ra Nhật ký (`LogView.swift`): thêm Section "Lỗi
+    iPadn gần nhất" hiện `IPadnRequestFailureLog.text` (tối đa 20
+    dòng, chỉ trong bộ nhớ) — trước đây không chỗ nào đọc `.text`
+    nên lỗi nhập/tải không có log soi. Bọc `#if os(iOS)` vì type
+    iPadn chỉ biên dịch trên iOS (bài học bản 2); LogView vẫn hiện
+    nút làm mới để đọc lại.
+  - Dọn SayoSign khỏi UI: (a) tab Ký IPA — footer mục Anisette
+    (`SignSettingsView.swift:105`) bỏ "SayoSign Desktop ... (scan
+    its QR code)"; viết lại trung tính + đúng thực tế: Anisette chỉ
+    cần khi ký bằng Apple ID (lấy provisioning profile qua
+    `SignAppleID.swift:464`), ký bằng .p12 local thì không cần; app
+    không có chức năng quét QR trong tab Ký (chỉ có deep-link
+    anisette:// nhận server). Cập nhật cả key + bản dịch en/vi trong
+    `Localizable.xcstrings`. (b) Cài đặt chính — câu ghi công
+    (`SettingView.swift:332`) bỏ "từ SayoSign của murk-sus", viết
+    lại "Tính năng ký dùng mã nguồn mở theo giấy phép GPL-3.0, xem
+    chi tiết trong LICENSES.md trên GitHub"; xoá link repo SayoSign
+    (346-347, `github.com/nvd29u1/SayoSign`); giữ link GitHub của
+    app + link BorderBeam. KHÔNG đụng `LICENSES.md`,
+    `LICENSE-SayoSign-GPL-3.0` (giấy phép vẫn ở đó).
+  - SayoSign còn sót (đã soi, KHÔNG sửa): 1 hit "SayoSign" trong
+    binary là literal Rust `rust/sayoidev/src/lib.rs:218`
+    (`RemotePairingClient::new(..., "SayoSign")` — tên client trong
+    giao thức pairing với app desktop; đổi tên có thể hỏng bắt tay
+    pairing, ngoài phạm vi dọn UI). 2 comment trong code
+    (`SignTheme.swift:6`, `SignContainer.swift:20`) không lên
+    binary, giữ nguyên.
+  - README thêm mục "Giấy phép" (25 dòng): tính năng như cũ +
+    4 dòng tóm tắt theo đúng `LICENSES.md` (Asspp MIT →
+    `LICENSE`; Ký IPA GPL-3.0 → `LICENSE-SayoSign-GPL-3.0`;
+    iPadn GPL-2.0-or-later → `LICENSE-iPadn-GPL-2.0`; BorderBeam
+    MIT → link repo upstream, vì repo không có file LICENSE riêng
+    cho BorderBeam). Không bê nguyên văn bản giấy phép dài vào README.
+  - Version: 3.0 build 3 (`CURRENT_PROJECT_VERSION` 2 → 3, chỉ
+    `Configuration/Version.xcconfig`; MARKETING_VERSION giữ 3.0).
+  - Đẩy: remote `f4d15006` (local `28f1021`, gộp cả ghi chú test
+    bản 2 chưa commit + commit ghi chú build 1 `14eaaeb` và build 2
+    `9225073` — lần đẩy này gộp hết). CI "Build App" run
+    45937243011: SUCCESS cả 2 job (build-osx + build-ios).
+  - Artifact iOS 52.813.520 byte — tải bằng redirect-capture.
+    Artifact là zip chứa 1 IPA trong (53.130.138 byte, chưa ký).
+    Ký ad-hoc zsign -a -z 9.
+  - IPA `deliver/NVDAppleIDDownload.ipa` 53.355.238 byte, SHA256
+    `d4fb0cfed36266457f33c9a86246a5658b5549a7484750edbc33722b91b8b9b4`:
+    kiểm chứng độc lập 3.0 build 3, bundle
+    com.NVD.appleiddownload, min iOS 16.0, sap.wasm ở root bundle +
+    đủ 7 file runtime, không còn file .part, IPadnLoginService 4 +
+    IPadnStore 6 + acquireFreeLicense 1 + acquireFreeApp 1 trong
+    binary, "No Downloads"/"No Accounts"/Twemoji 0 hit, "SayoSign
+    Desktop" 0 hit, "kiểm tra máy chủ Anisette" 0 hit, đủ 7 tab,
+    "Lỗi iPadn gần nhất" 1 hit, "LICENSES.md trên GitHub" 1 hit,
+    "signing with a local .p12" 1 hit. "SayoSign" 1 hit — là
+    literal Rust nói trên, không phải UI. Backup bản 2:
+    `deliver/NVDAppleIDDownload-3.0-build2-backup.ipa` (SHA256
+    `fdb6a760…` khớp bản đã giao). README trên remote đã kiểm chứng:
+    25 dòng, có "## Giấy phép" đủ 4 mục + link LICENSES.md.
+  - Lưu ý kiểm chứng: chuỗi UI kiểu `Text("Rotate Token")` không
+    nằm trong binary mà nằm trong `vi.lproj/Localizable.strings`
+    của bundle (catalog quản lý) — grep binary 0 hit KHÔNG có nghĩa
+    nút mất; đã đối chiếu bản 2 cũng 0 hit như vậy, và chuỗi có đủ
+    trong Localizable.strings ("Rotate Token" → "Xoay mã").
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: bấm "Rotate
+    Token" trong chi tiết tài khoản xem làm mới được không (hiện
+    "Success" hay báo hết hạn để đăng nhập lại); mở Nhật ký trong
+    Cài đặt xem có mục "Lỗi iPadn gần nhất" không; kiểm tra tab Ký
+    IPA + Cài đặt chính không còn chữ SayoSign.
