@@ -17,9 +17,17 @@ extension AppStore {
     /// bản vẫn giữ id cũ). Giờ có mô tả tiếng Việt rõ ràng.
     enum AuthenticationError: Error, LocalizedError {
         case accountNotFound
+        /// Làm mới token bằng iPadn đòi mã 2FA: màn chi tiết tài khoản
+        /// không có ô nhập mã nên báo hết hạn để đăng nhập lại tay.
+        case verificationRequired
 
         var errorDescription: String? {
-            String(localized: "Không tìm thấy tài khoản đã chọn trong app. Hãy chọn lại tài khoản ở màn chi tiết app, hoặc đăng nhập lại bằng Apple ID đó rồi thử lại.")
+            switch self {
+            case .accountNotFound:
+                return String(localized: "Không tìm thấy tài khoản đã chọn trong app. Hãy chọn lại tài khoản ở màn chi tiết app, hoặc đăng nhập lại bằng Apple ID đó rồi thử lại.")
+            case .verificationRequired:
+                return String(localized: "Phiên đăng nhập đã hết hạn — Apple yêu cầu mã xác minh. Hãy đăng nhập lại tài khoản ở tab Tài khoản rồi thử lại.")
+            }
         }
     }
 
@@ -241,6 +249,22 @@ extension AppStore {
             throw AuthenticationError.accountNotFound
         }
         do {
+#if os(iOS)
+            // Làm mới token bằng hệ iPadn như DMAP refresh ở build 21:
+            // đăng nhập lại bằng mật khẩu đã lưu, không cần mã 2FA
+            // (attempt "1"); Apple đòi mã thì báo hết hạn để người dùng
+            // đăng nhập lại tay (màn chi tiết tài khoản không có ô nhập mã).
+            do {
+                let updatedAccount = try await authenticateIPadn(email: account.account.email, password: account.account.password, code: "")
+                logger.info("account rotation successful for user id: \(id)")
+                return updatedAccount
+            } catch {
+                if case ApplePackage.AuthenticationError.verificationCodeRequired = error {
+                    throw AuthenticationError.verificationRequired
+                }
+                throw error
+            }
+#else
             // Token rotation signs in again, so it needs the Anisette
             // headers too when a server URL is set (giữ nguyên như bản
             // 18 — đường này đang chạy được: DMAP đồng bộ 368 app).
@@ -261,6 +285,7 @@ extension AppStore {
             let updatedAccount = try save(email: account.account.email, account: newAppleAccount)
             logger.info("account rotation successful for user id: \(id)")
             return updatedAccount
+#endif
         } catch {
             logger.error("account rotation failed for user id: \(id): \(error.localizedDescription)")
             throw error

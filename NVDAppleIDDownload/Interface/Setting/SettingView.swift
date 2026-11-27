@@ -329,7 +329,7 @@ struct SettingView: View {
                 Text("The App Store API can be unstable. Retry if an error occurs.")
                     .font(.footnote)
                     .foregroundStyle(.secondary)
-                Text("Dựa trên Asspp của Lakr233 (MIT). Tính năng ký được cá nhân hoá từ SayoSign của murk-sus (GPL-3.0). Hiệu ứng viền sáng BorderBeam của ismnoiet (MIT).")
+                Text("Dựa trên Asspp của Lakr233 (MIT). Tính năng ký dùng mã nguồn mở theo giấy phép GPL-3.0, xem chi tiết trong LICENSES.md trên GitHub. Hiệu ứng viền sáng BorderBeam của ismnoiet (MIT).")
                     .font(.caption)
                     .foregroundStyle(.secondary)
                 // Chuyển từ mục Giới thiệu cũ ở Cài đặt Ký IPA (bỏ ở
@@ -339,12 +339,6 @@ struct SettingView: View {
                 // vì app phân phối công khai (GPL-3.0/MIT).
                 Link(destination: URL(string: "https://github.com/nvd29u1/NVDAppleIDDownload")!) {
                     Label("GitHub", systemImage: "chevron.left.forwardslash.chevron.right")
-                }
-                // Đợt 5, build 17: bổ sung link SayoSign còn thiếu sau
-                // khi bản 16 chuyển credit sang đây (chỉ chuyển chữ,
-                // chưa chuyển link).
-                Link(destination: URL(string: "https://github.com/nvd29u1/SayoSign")!) {
-                    Label("SayoSign", systemImage: "signature")
                 }
                 Link(destination: URL(string: "https://github.com/ismnoiet/border-beam-ios")!) {
                     Label("BorderBeam", systemImage: "sun.max")

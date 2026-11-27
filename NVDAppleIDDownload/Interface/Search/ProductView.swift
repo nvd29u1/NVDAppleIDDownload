@@ -125,10 +125,10 @@ struct ProductView: View {
     /// Lỗi khi Apple từ chối yêu cầu nhập vào Đã mua trước khi xét tài
     /// khoản — cùng họ lỗi cửa Apple như lúc đăng nhập (trả về trống 204
     /// / chuyển hướng không có địa chỉ), không phải lỗi sai tài khoản.
-    /// Hai case *NoServer (build 15): cùng lỗi cửa đó nhưng máy chưa
-    /// cấu hình máy chủ Anisette nên app không gửi được bằng chứng xác
-    /// minh thiết bị — nói rõ để người dùng biết phải cấu hình máy chủ
-    /// chứ không phải tài khoản sai.
+    /// Hai case *NoServer giữ lại từ build 15 cho đủ hình dạng cũ nhưng
+    /// thông báo đã viết lại như case thường (đường iPadn không dùng
+    /// máy chủ Anisette nên "chưa cấu hình máy chủ" không còn là
+    /// nguyên nhân nữa).
     private enum PurchaseGateError: LocalizedError {
         case appleEmptyResponse
         case appleRedirectRefused
@@ -141,13 +141,13 @@ struct ProductView: View {
         var errorDescription: String? {
             switch self {
             case .appleEmptyResponse:
-                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy đăng nhập lại tài khoản rồi thử lại sau, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .appleRedirectRefused:
-                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy thử lại sau hoặc trên mạng khác, kiểm tra máy chủ Anisette trong Cài đặt, hoặc dùng ipatool 2.8.1 trên máy tính.")
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy đăng nhập lại tài khoản rồi thử lại sau, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .appleEmptyResponseNoServer:
-                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về trống — HTTP 204). Đây không phải lỗi sai tài khoản: hãy đăng nhập lại tài khoản rồi thử lại sau, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .appleRedirectRefusedNoServer:
-                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Máy chưa cấu hình máy chủ Anisette (Cài đặt → Máy chủ Anisette) nên app không gửi được bằng chứng xác minh thiết bị mà Apple đòi — hãy cấu hình máy chủ rồi thử lại, hoặc dùng ipatool 2.8.1 trên máy tính.")
+                return String(localized: "Apple đã từ chối yêu cầu nhập vào Đã mua (máy chủ trả về chuyển hướng nhưng không có địa chỉ chuyển tiếp). Đây không phải lỗi sai tài khoản: hãy đăng nhập lại tài khoản rồi thử lại sau, hoặc dùng ipatool 2.8.1 trên máy tính.")
             case .passwordTokenExpired:
                 return String(localized: "Phiên đăng nhập của tài khoản này đã hết hạn (mã 2034) — app đã thử làm mới lặng lẽ nhưng Apple không chấp nhận. Hãy đăng nhập lại tài khoản ở tab Tài khoản rồi bấm \"Nhập vào Đã mua\" lại.")
             }

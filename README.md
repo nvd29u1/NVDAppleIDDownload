@@ -14,3 +14,12 @@
 - **Tài khoản:** đăng nhập nhiều Apple ID, mỗi tài khoản giữ đúng vùng của nó; màn chi tiết app tự chọn tài khoản đúng vùng.
 - **Cài đặt:** khoá app bằng Face ID / Touch ID / mật khẩu; chọn máy chủ Anisette; chọn máy chủ manifest để cài app (mặc định `nvd-manifest`); xem nhật ký app.
 - **Hỗ trợ:** iOS 16.0–27.2 (đã kiểm chứng thật tới iOS 27.0) và macOS 15.0 trở lên; cài qua chứng chỉ cá nhân, SideStore, AltStore, LiveContainer hoặc TrollStore.
+
+## Giấy phép
+
+App trộn code từ nhiều nguồn mở, mỗi phần giữ giấy phép gốc của nó (xem chi tiết trong [`LICENSES.md`](./LICENSES.md); văn bản đầy đủ của từng giấy phép nằm trong các file LICENSE ở gốc repo):
+
+- **App gốc Asspp** — MIT — [`LICENSE`](./LICENSE)
+- **Tính năng ký IPA** — GPL-3.0 — [`LICENSE-SayoSign-GPL-3.0`](./LICENSE-SayoSign-GPL-3.0)
+- **Đăng nhập + lõi cửa hàng (iPadn)** — GPL-2.0-or-later — [`LICENSE-iPadn-GPL-2.0`](./LICENSE-iPadn-GPL-2.0)
+- **Hiệu ứng viền sáng BorderBeam** — MIT — [github.com/ismnoiet/border-beam-ios](https://github.com/ismnoiet/border-beam-ios)

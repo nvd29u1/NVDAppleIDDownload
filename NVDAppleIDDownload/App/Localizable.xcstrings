@@ -8282,18 +8282,18 @@
         }
       }
     },
-    "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or the one SayoSign Desktop runs on your computer (scan its QR code).": {
+    "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or one running on your computer. Anisette is only needed when signing with an Apple ID; signing with a local .p12 certificate does not need it.": {
       "localizations": {
         "en": {
           "stringUnit": {
             "state": "translated",
-            "value": "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or the one SayoSign Desktop runs on your computer (scan its QR code)."
+            "value": "Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or one running on your computer. Anisette is only needed when signing with an Apple ID; signing with a local .p12 certificate does not need it."
           }
         },
         "vi": {
           "stringUnit": {
             "state": "translated",
-            "value": "Từ tháng 10/2026 Apple chỉ chấp nhận máy chủ anisette chạy trên Mac. Hãy dùng một trong các máy chủ này, máy chủ của riêng bạn, hoặc máy chủ mà SayoSign Desktop chạy trên máy tính của bạn (quét mã QR của nó)."
+            "value": "Từ tháng 10/2026 Apple chỉ chấp nhận máy chủ anisette chạy trên Mac. Hãy dùng một trong các máy chủ này, máy chủ của riêng bạn, hoặc máy chủ đang chạy trên máy tính của bạn. Chỉ cần anisette khi ký bằng Apple ID; ký bằng chứng chỉ .p12 trên máy thì không cần."
           }
         }
       }

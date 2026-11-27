@@ -21,6 +21,18 @@ struct LogView: View {
         ZStack {
             if unlocked {
                 List {
+#if os(iOS)
+                    // Lỗi iPadn gần nhất (3.0 build 3): đường nhập/tải ghi
+                    // lỗi vào IPadnRequestFailureLog (chỉ trong bộ nhớ, tối
+                    // đa 20 dòng) mà trước đây không chỗ nào đọc ra — hiện
+                    // ở đây để lần sau lỗi còn có log soi.
+                    Section("Lỗi iPadn gần nhất") {
+                        Text(IPadnRequestFailureLog.text)
+                            .font(.system(.footnote, design: .monospaced))
+                            .lineLimit(nil)
+                            .textSelection(.enabled)
+                    }
+#endif
                     ForEach(Array(messages.enumerated()), id: \.offset) { _, line in
                         Text(line)
                             .font(.system(.footnote, design: .monospaced))

@@ -2045,3 +2045,84 @@ NVD theme: plum accent color (`AccentColor`), plum gradient welcome screen with 
     năm hiện "2.026" thay vì 2026 (định dạng số có dấu phân cách
     nghìn) — sửa ở bản sau cùng các lỗi anh tổng hợp.**
 
+  ### 5. Build 3.0 build 2 — NHẬP VÀO ĐÃ MUA QUA iPadn acquireFreeApp
+  (anh chốt 17:38 26/11: "khác vùng cũng được thì tốt")
+  - Nối dây (iOS): `ProductView.acquireLicense()` tách thành dispatcher
+    + `acquireLicenseIPadn` (iOS) + `acquireLicenseFork` (macOS giữ
+    nguyên rotate + buyProduct fork). iOS gọi
+    `IPadnStoreBridge.acquireFreeLicense(account:appID:entityType:region:)`
+    với `region` = vùng gói đang xem -> `selectedCountry`; thành công
+    thì hint xanh + làm mới Lịch sử phiên bản như cũ, giao diện không
+    đổi (chỉ sửa câu ghi chú dưới nút khi lệch vùng cho đúng hành vi
+    mới: thử nhập bằng vùng của gói, Apple không cho thì thêm tài khoản
+    đúng vùng).
+  - Mở lối gọi: `IPadnAppleService.acquireFreeLicense(appID:platform:selectedCountry:)`
+    public mới (gọi thẳng acquireFreeApp private bằng tài khoản đang
+    dùng, mac = platform == .macOS) — KHÔNG sửa logic lõi iPadn.
+    acquireFreeApp tự sửa storefront theo phản hồi -128 của Apple
+    (purchaseStorefrontCorrection, dialog MZCommerce.CountryMismatch)
+    rồi thử lại 1 lần nên khác vùng cũng nhập được KHI Apple cho
+    (app có trong cửa hàng đích); 5002 = đã có license -> thành công
+    luôn; 2059 thử lại dạng Arcade. Không có phép màu cho app hoàn toàn
+    không có ở cửa hàng đích — lúc đó vẫn lỗi vùng rõ ràng.
+  - Map lỗi (bridge `mapPurchaseError`): lỗi vùng iPadn ->
+    `StoreDownloadError.rejected` cùng mã (-128 accountRegionMismatch,
+    1010 appUnavailableInAccountRegion) để `regionFailureCode` nhận ra
+    -> `RegionPurchaseRefusal` -> popup chẩn đoán như đường fork cũ;
+    hết phiên (IPadnAppleAuthError / IPadnAppleLoginError /
+    IPadnHTTPStatusError 401/403) -> `PurchaseGateError.passwordTokenExpired`
+    (đăng nhập lại); lỗi khác giữ nguyên (đã là tiếng Việt).
+    Không rotate token fork nữa (đó là chỗ chết 2034), không cần header
+    Anisette (ký SAP bằng WASM). Cookie mới vẫn ghi về tài khoản đã
+    lưu qua `run()`/syncCookieBack như 3 đường kia.
+  - Sửa lỗi năm 2.026: nguyên nhân là `Text("... \(year) ...")` với
+    year Int — SwiftUI nội suy LocalizedStringKey nên format số theo
+    locale vi-VN (2026 -> "2.026"). Sửa bằng `\(String(year))` ở
+    PurchasedView footer; cùng lỗi ở header số lượng app
+    (`\(filteredItems.count)` -> `\(String(...))`, 1564 app sẽ thành
+    "1.564 app" nếu không sửa). Không còn chỗ nội suy số Int nào khác
+    trong Text (đã grep).
+  - KHÔNG đụng: nút làm mới ở chi tiết tài khoản (vẫn fork rotate),
+    thứ tự tab, README.
+  - Version: 3.0 build 2 (`CURRENT_PROJECT_VERSION` 1 -> 2, chỉ
+    `Configuration/Version.xcconfig`; MARKETING_VERSION giữ 3.0).
+  - Đẩy: 2 commit — `8b239b9` (nối dây + sửa năm) -> remote `2f078e9b`,
+    CI Build App run 45803970071 FAIL (build-ios pass, build-osx fail
+    bước Build); `91e8dca` (bọc `acquireLicenseIPadn` trong
+    `#if os(iOS)` — mọi type iPadn đều chỉ biên dịch trên iOS, để trơ
+    là macOS không tìm thấy IPadnStoreBridge/AuthError/LoginError/
+    HTTPStatusError) -> remote `7f19ff5e`, CI Build App run 45808661842
+    SUCCESS cả 2 job. Log job lỗi tải không được (timeout 300s khi tải
+    blob log) nên chẩn đoán từ source — đủ chắc vì chỉ có 1 chỗ mới
+    tham chiếu type iPadn ngoài guard. Bài học: hàm mới dùng type
+    iPadn trong file biên dịch cả 2 nền tảng PHẢI bọc `#if os(iOS)`
+    (swiftc -parse không bắt được lỗi này — chỉ kiểm tra cú pháp).
+  - Artifact iOS 52.813.498 byte (zip chứa 1 IPA 53.129.819 byte, chưa
+    ký) — tải bằng redirect-capture. Ký ad-hoc zsign -a -z 9.
+  - IPA `deliver/NVDAppleIDDownload.ipa` 53.354.535 byte, SHA256
+    `fdb6a760cb69372c3d0b942e039ea8bb28c5c687f13ecbfc7497ee9710371958`:
+    kiểm chứng độc lập 3.0 build 2, bundle com.NVD.appleiddownload,
+    min iOS 16.0, sap.wasm ở root bundle + đủ 7 file runtime, không
+    còn file .part, IPadnLoginService 4 + IPadnStore 6 +
+    acquireFreeLicense 1 + acquireFreeApp 1 trong binary,
+    Configurator/2.21 1 hit, "No Downloads"/"No Accounts"/Twemoji 0
+    hit, đủ 7 tab. Backup bản 1:
+    `deliver/NVDAppleIDDownload-3.0-build1-backup.ipa` (SHA256
+    `e961a4ad…` khớp bản đã giao).
+  - Chưa kiểm chứng trên iPhone thật — cần anh test: mở 1 app miễn phí
+    KHÁC VÙNG với tài khoản đang chọn (vd gói vùng VN + tài khoản IN),
+    bấm "Nhập vào Đã mua" xem có vào Đã mua không; kiểm tra footer
+    Đã mua hiện năm "2026" trơn (không còn "2.026") sau khi bấm
+    "Đồng bộ toàn bộ lịch sử mua".
+  - **Kết quả test trên máy thật 27/11: (1) Muse from Meta
+    (com.facebook.hatch) vùng US sang acc IN — KHÔNG nhập được, đã tra
+    cửa hàng Apple: Muse chỉ có ở US, không có ở IN/VN nên acc IN/VN
+    không thể mua license (Apple chặn theo vùng, không bản nào sửa
+    được; ipatool-web ipatool.codevn.net cũng vậy — tải theo đúng vùng
+    của tài khoản). (2) ALinkgram (app free) 10:45 27/11 lỗi mã 2034
+    phiên hết hạn — app thử làm mới lặng lẽ nhưng Apple không chấp
+    nhận (bước mua đòi xác minh lại thiết bị dù token tải còn sống);
+    anh đăng nhập lại ở tab Tài khoản rồi nhập lại 10:47 thì ĐÃ NHẬP
+    ĐƯỢC (vào Đã mua của acc IN) — đường nhập bản 2 kiểm chứng chạy
+    đúng. Năm đã hiện "2026" đúng (08:06 27/11).**
+

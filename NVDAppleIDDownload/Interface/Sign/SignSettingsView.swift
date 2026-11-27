@@ -102,7 +102,7 @@ struct SignSettingsView: View {
                 }
 
                 Section(header: Text(L("Anisette server")),
-                        footer: Text(L("Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or the one SayoSign Desktop runs on your computer (scan its QR code)."))) {
+                        footer: Text(L("Apple only accepts Mac-based anisette servers since October 2026. Use one of these, your own server, or one running on your computer. Anisette is only needed when signing with an Apple ID; signing with a local .p12 certificate does not need it."))) {
                     Picker(L("Server"), selection: serverChoice) {
                         ForEach(Anisette.presets, id: \.url) { p in Text(p.name).tag(p.url) }
                         Text(L("Custom")).tag("custom")
